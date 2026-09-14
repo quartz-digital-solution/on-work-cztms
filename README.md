@@ -21,12 +21,15 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 
 - Professional Buy now checkout for ready-made products and admin-toggleable customization
 - Front, back, right sleeve and left sleeve design areas
+- Product-specific side/sleeve photography for crew tees, polos, sports jerseys and uniform shirts
 - Multiple text and image elements on the same side
-- Independent move, resize, rotate, edit, delete and print method per element
+- Unrestricted drag positioning plus independent resize, rotate, edit, delete and print method per element
+- Animated visual garment picker and direct WhatsApp support for advanced customization
 - Separate admin-controlled image and text print prices
 - Budget, Standard and Premium cloth qualities with editable descriptions and rates
 - Sublimation automatically disabled for dark colours
 - Colour-specific uploaded product images, price, quantity and optional barcode
+- A colour image is reused consistently for every size belonging to that colour
 - Existing size-variant inventory remains supported by the staff stock desk
 - School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer
 - Real product cut-outs for garments, school belts and identification tags; no placeholder catalogue photos
