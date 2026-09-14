@@ -1,0 +1,93 @@
+(function(){
+"use strict";
+const S=window.OneLineStore,I=S.icon;
+const surfaces=[{id:"front",label:"Front",short:"Front"},{id:"back",label:"Back",short:"Back"},{id:"rightSleeve",label:"Right sleeve",short:"R sleeve"},{id:"leftSleeve",label:"Left sleeve",short:"L sleeve"}];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function select(options,value,attr){return '<select '+attr+'>'+options.map(x=>'<option value="'+S.esc(x.value)+'" '+(x.value===value?'selected':'')+' '+(x.disabled?'disabled':'')+'>'+S.esc(x.label)+'</option>').join('')+'</select>';}
+function mount(root,hooks){
+  const products=S.getProducts().filter(p=>p.active&&p.customizable);
+  const requested=hooks?.product;
+  const initial=products.find(p=>String(p.id)===String(requested?.id))||requested||products[0];
+  if(!initial){root.innerHTML='<div class="empty-state"><h2>No customizable products</h2><p>Enable customization for a product from admin.</p></div>';return;}
+  const state={product:initial,color:initial.colors?.[0]||"White",size:initial.sizes?.[0]||"Default",fabricId:initial.allowedFabricIds?.[0]||"standard",surface:"front",qty:1,activeId:null,notice:"",designs:{front:{layers:[]},back:{layers:[]},rightSleeve:{layers:[]},leftSleeve:{layers:[]}}};
+  const pointers=new Map();let gesture=null;
+  products.flatMap(p=>[p.image,p.backImage,p.sleeveImage]).filter(Boolean).forEach(src=>{const im=new Image();im.src=src;});
+  const current=()=>state.designs[state.surface];
+  const active=()=>current().layers.find(x=>x.id===state.activeId);
+  const fabrics=()=>S.getFabrics().filter(x=>x.active&&(state.product.allowedFabricIds||[]).includes(x.id));
+  const methods=()=>S.getPrints().filter(x=>x.active&&(state.product.allowedPrintIds||[]).includes(x.id));
+  const method=id=>S.getPrints().find(x=>x.id===id)||methods()[0];
+  const fabric=()=>S.getFabrics().find(x=>x.id===state.fabricId)||fabrics()[0]||{price:0,name:"Standard"};
+  const allLayers=()=>Object.values(state.designs).flatMap(x=>x.layers);
+  const layerPrice=l=>Number(l.type==="text"?method(l.printId)?.textPrice:method(l.printId)?.price)||0;
+  const rawUnit=()=>S.productPrice(state.product,state.color,state.size)+Number(fabric()?.price||0)+allLayers().reduce((n,l)=>n+layerPrice(l),0);
+  const discount=()=>S.discountFor(state.qty,hooks?.account);
+  const unitPrice=()=>Math.round(rawUnit()*(100-discount())/100);
+  const imageFor=()=>S.productImage(state.product,state.color,state.surface);
+  function addLayer(type,src){
+    const m=methods().find(x=>!(x.lightOnly&&!S.isLightColour(state.color)))||methods()[0];
+    const id=type+"-"+Date.now()+"-"+Math.random().toString(16).slice(2);
+    const layer={id,type,text:type==="text"?"YOUR TEXT":"",src:src||"",font:"Impact",colour:"#ffffff",size:type==="text"?30:82,rotation:0,x:50,y:type==="text"?40:60,printId:m?.id||"dtf"};
+    current().layers.push(layer);state.activeId=id;render();if(type==="text")setTimeout(()=>root.querySelector("[data-layer-text]")?.select(),0);
+  }
+  function validMethod(printId){const m=method(printId);return !(m?.lightOnly&&!S.isLightColour(state.color));}
+  function ensureValidMethods(){if(S.isLightColour(state.color))return;allLayers().forEach(l=>{if(!validMethod(l.printId)){l.printId=methods().find(x=>!x.lightOnly)?.id||l.printId;state.notice="Sublimation is available only on light colours. The print method was changed.";}});}
+  function layerHtml(l){const selected=l.id===state.activeId,style='left:'+l.x+'%;top:'+l.y+'%;'+(l.type==="text"?'color:'+l.colour+';font-family:'+S.esc(l.font)+';font-size:'+l.size+'px;':'width:'+l.size+'px;')+'transform:translate(-50%,-50%) rotate('+l.rotation+'deg)';return '<div class="design-layer '+l.type+'-layer '+(selected?'selected':'')+'" data-design-layer="'+l.id+'" style="'+style+'">'+(l.type==="text"?S.esc(l.text):'<img src="'+S.esc(l.src)+'" alt="Uploaded artwork" draggable="false">')+(selected?'<button class="layer-remove" data-remove-layer="'+l.id+'" aria-label="Delete">'+I('close')+'</button><button class="layer-rotate" data-transform-layer="'+l.id+'" aria-label="Resize and rotate">'+I('rotate')+'</button>':'')+'</div>';}
+  function render(){
+    ensureValidMethods();
+    const p=state.product,l=active(),src=imageFor(),sleeve=state.surface.includes("Sleeve"),offer=S.bestBulkOffer(state.qty);
+    const productOptions=products.map(x=>({value:String(x.id),label:x.name+" · "+S.money(x.price)}));
+    root.innerHTML='<main class="designer-page compact-designer">'+
+      '<header class="sub-header refined-sub-header"><button class="designer-back" data-action="back">'+I("back")+'</button><div class="step-label"><span>01</span> BUILD YOUR PRODUCT</div><button class="cart-button" data-action="add"><span>Add · '+S.money(unitPrice()*state.qty)+'</span>'+I("bag")+'</button></header>'+
+      '<div class="designer-layout compact-designer-layout"><section class="designer-stage compact-stage" data-stage>'+
+        '<div class="compact-designer-bar"><div class="compact-surface-tabs">'+surfaces.map(x=>'<button data-surface="'+x.id+'" class="'+(x.id===state.surface?'active':'')+'"><span class="full-label">'+x.label+'</span><span class="short-label">'+x.short+'</span>'+(state.designs[x.id].layers.length?'<i>'+state.designs[x.id].layers.length+'</i>':'')+'</button>').join("")+'</div><div class="apparel-dropdown"><span>Item</span>'+select(productOptions,String(p.id),'data-product-select')+'</div></div>'+
+        '<div class="stage-topline"><span>'+surfaces.find(x=>x.id===state.surface).label+'</span><span>STABLE PRODUCT VIEW</span></div>'+
+        '<div class="shirt-canvas compact-shirt-canvas view-'+state.surface+'"><div class="live-garment compact-garment garment-'+state.surface+'"><div class="garment-depth"></div><img class="garment-photo '+(sleeve?'sleeve-photo ':'')+(state.surface==="rightSleeve"?'mirror-sleeve':'')+'" src="'+S.esc(src)+'" alt="'+S.esc(p.name)+'" draggable="false"><div class="garment-tint '+(sleeve?'sleeve-tint ':'')+(state.surface==="rightSleeve"?'mirror-sleeve':'')+'" style="background:'+(S.palette[state.color]||state.color)+';mask-image:url('+S.esc(src)+');-webkit-mask-image:url('+S.esc(src)+')"></div><div class="print-area surface-'+state.surface+'" data-print-area>'+current().layers.map(layerHtml).join("")+'</div></div></div>'+
+        '<p class="drag-hint">'+I("move")+' Select and drag each element. Use the purple handle to resize and rotate.</p></section>'+
+      '<aside class="designer-controls compact-controls"><div class="control-head"><span>DESIGN CONTROLS</span><small>'+current().layers.length+' element'+(current().layers.length===1?'':'s')+' on this side</small></div>'+
+        (state.notice?'<div class="designer-warning">'+S.esc(state.notice)+'</div>':'')+
+        '<div class="quick-layer-tools"><button data-action="add-text">'+I("type")+'<span>Add text</span></button><button data-action="choose-image">'+I("image")+'<span>Add image</span></button><input data-file hidden type="file" accept="image/png,image/jpeg,image/webp"></div>'+
+        '<section class="control-block compact-choice-block"><div><label>Garment colour</label><div class="swatches">'+(p.colors||[]).map(c=>'<button aria-label="'+S.esc(c)+'" data-color="'+S.esc(c)+'" class="'+(state.color===c?'active':'')+'" style="background:'+(S.palette[c]||c)+'">'+(state.color===c?I("check"):'')+'</button>').join("")+'</div></div><div><label>Size / option</label>'+select((p.sizes||["Default"]).map(v=>({value:v,label:v})),state.size,'data-size-select')+'</div></section>'+
+        '<section class="control-block"><label>Cloth quality</label><div class="quality-options">'+fabrics().map(f=>'<button data-fabric="'+f.id+'" class="'+(state.fabricId===f.id?'active':'')+'"><span><b>'+S.esc(f.name)+'</b><small>'+S.esc(f.description)+'</small></span><strong>'+S.money(Number(f.price||0))+'</strong></button>').join("")+'</div></section>'+
+        (l?'<section class="control-block active-layer-editor"><div class="layer-editor-head"><label>Edit selected '+l.type+'</label><button data-remove-layer="'+l.id+'">'+I("trash")+' Delete</button></div>'+
+          (l.type==="text"?'<div class="input-with-icon">'+I("type")+'<input data-layer-text value="'+S.esc(l.text)+'" maxlength="60"></div><div class="inline-fields">'+select(["Impact","Arial Black","Georgia","Courier New","Trebuchet MS"].map(v=>({value:v,label:v})),l.font,'data-font-select')+'<input data-text-colour type="color" value="'+l.colour+'"><label class="range-field">Size<input data-layer-range="size" type="range" min="10" max="74" value="'+l.size+'"></label></div>':'<button class="refined-upload" data-action="choose-image"><img src="'+S.esc(l.src)+'" alt=""><span><b>Replace selected image</b><small>PNG, JPG or WEBP</small></span>'+I("upload")+'</button><label class="range-field full-range">Image size<input data-layer-range="size" type="range" min="24" max="190" value="'+l.size+'"></label>')+
+          '<label class="range-field full-range">Rotation<input data-layer-range="rotation" type="range" min="-180" max="180" value="'+l.rotation+'"></label><label>Printing quality</label><div class="print-options">'+methods().map(m=>{const blocked=m.lightOnly&&!S.isLightColour(state.color);return '<button data-print="'+m.id+'" '+(blocked?'disabled':'')+' class="'+(l.printId===m.id?'active':'')+'"><span><b>'+S.esc(m.name)+'</b><small>'+S.esc(m.note)+(blocked?' Light colours only.':'')+'</small></span><strong>+'+S.money(l.type==="text"?m.textPrice:m.price)+'</strong></button>';}).join("")+'</div></section>':'<section class="control-block empty-layer-help"><b>Add your first text or image</b><p>Every text and image is independent. Add several elements to the same side and edit each one separately.</p></section>')+
+        '<section class="price-breakdown"><div><span>Garment</span><b>'+S.money(S.productPrice(p,state.color,state.size))+'</b></div><div><span>'+S.esc(fabric().name)+' cloth</span><b>'+S.money(fabric().price)+'</b></div><div><span>'+allLayers().length+' print element'+(allLayers().length===1?'':'s')+'</span><b>'+S.money(allLayers().reduce((n,x)=>n+layerPrice(x),0))+'</b></div>'+(discount()?'<div class="discount-line"><span>Bulk / B2B offer</span><b>-'+discount()+'%</b></div>':'')+'</section>'+
+        '<div class="designer-total refined-total"><div><small>Estimated total</small><strong>'+S.money(unitPrice()*state.qty)+'</strong><span>'+S.money(unitPrice())+' each'+(offer?' · '+S.esc(offer.label):'')+'</span></div><div class="qty-control polished-qty"><button data-action="qty-minus">'+I("minus")+'</button><span>'+state.qty+'</span><button data-action="qty-plus">'+I("plus")+'</button></div></div>'+
+        '<button class="primary wide refined-add" data-action="add">Add custom design to cart '+I("arrow")+'</button>'+
+      '</aside></div></main>';
+    bind();
+  }
+  function saveDesign(){return {productId:state.product.id,model:state.product.name,garmentImage:S.productImage(state.product,state.color,"front"),garmentBackImage:S.productImage(state.product,state.color,"back"),sleeveImage:S.productImage(state.product,state.color,"rightSleeve"),garmentColor:state.color,fabricId:state.fabricId,fabricName:fabric().name,surfaceDesigns:S.clone(state.designs),elementCount:allLayers().length};}
+  function add(){if(!allLayers().length){state.notice="Add at least one text or image before adding a custom design.";render();return;}hooks.onAdd({key:"custom-"+Date.now(),productId:state.product.id,name:state.product.name+" · Custom",price:unitPrice(),basePrice:rawUnit(),discount:discount(),qty:state.qty,color:state.color,size:state.size,detail:fabric().name+" cloth · "+allLayers().length+" print elements",image:S.productImage(state.product,state.color,"front"),custom:true,customDesign:saveDesign()});}
+  function upload(file){if(!file||!file.type.startsWith("image/"))return;const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,1200/Math.max(img.width,img.height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);const data=canvas.toDataURL("image/webp",.86);const l=active();if(l?.type==="image"){l.src=data;l.rotation=0;render();}else addLayer("image",data);};img.src=String(reader.result);};reader.readAsDataURL(file);}
+  function updateLayerStyle(l){const el=root.querySelector('[data-design-layer="'+l.id+'"]');if(!el)return;el.style.left=l.x+"%";el.style.top=l.y+"%";el.style.transform='translate(-50%,-50%) rotate('+l.rotation+'deg)';if(l.type==="text"){el.style.fontSize=l.size+"px";el.style.color=l.colour;el.style.fontFamily=l.font;}else el.style.width=l.size+"px";}
+  function bind(){
+    root.querySelector('[data-action="back"]')?.addEventListener("click",hooks.onBack);
+    root.querySelectorAll('[data-action="add"]').forEach(x=>x.addEventListener("click",add));
+    root.querySelector('[data-action="add-text"]')?.addEventListener("click",()=>addLayer("text"));
+    root.querySelectorAll('[data-action="choose-image"]').forEach(x=>x.addEventListener("click",()=>root.querySelector("[data-file]")?.click()));
+    root.querySelector("[data-file]")?.addEventListener("change",e=>upload(e.target.files?.[0]));
+    root.querySelectorAll("[data-surface]").forEach(x=>x.addEventListener("click",()=>{state.surface=x.dataset.surface;state.activeId=null;state.notice="";render();}));
+    root.querySelector("[data-product-select]")?.addEventListener("change",e=>{const p=products.find(x=>String(x.id)===e.target.value);if(!p)return;state.product=p;state.color=p.colors?.[0]||"White";state.size=p.sizes?.[0]||"Default";state.fabricId=p.allowedFabricIds?.[0]||"standard";state.activeId=null;render();});
+    root.querySelectorAll("[data-color]").forEach(x=>x.addEventListener("click",()=>{state.color=x.dataset.color;ensureValidMethods();render();}));
+    root.querySelector("[data-size-select]")?.addEventListener("change",e=>{state.size=e.target.value;render();});
+    root.querySelectorAll("[data-fabric]").forEach(x=>x.addEventListener("click",()=>{state.fabricId=x.dataset.fabric;render();}));
+    root.querySelectorAll("[data-design-layer]").forEach(el=>el.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;e.preventDefault();e.stopPropagation();const id=el.dataset.designLayer;if(state.activeId!==id){state.activeId=id;render();return;}el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,id});}));
+    root.querySelectorAll("[data-design-layer]").forEach(el=>{el.addEventListener("pointermove",e=>{const p=pointers.get(e.pointerId);if(!p)return;e.preventDefault();const area=root.querySelector("[data-print-area]").getBoundingClientRect(),l=active();l.x=clamp((e.clientX-area.left)/area.width*100,3,97);l.y=clamp((e.clientY-area.top)/area.height*100,3,97);updateLayerStyle(l);});const end=e=>pointers.delete(e.pointerId);el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end);});
+    root.querySelectorAll("[data-transform-layer]").forEach(h=>{h.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();const l=active(),b=h.parentElement.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2;gesture={id:e.pointerId,cx,cy,startAngle:Math.atan2(e.clientY-cy,e.clientX-cx),startDistance:Math.hypot(e.clientX-cx,e.clientY-cy),rotation:l.rotation,size:l.size};h.setPointerCapture(e.pointerId);});h.addEventListener("pointermove",e=>{if(!gesture||gesture.id!==e.pointerId)return;const l=active(),a=Math.atan2(e.clientY-gesture.cy,e.clientX-gesture.cx),d=Math.max(1,Math.hypot(e.clientX-gesture.cx,e.clientY-gesture.cy));l.rotation=Math.round(gesture.rotation+(a-gesture.startAngle)*180/Math.PI);l.size=clamp(gesture.size*d/Math.max(1,gesture.startDistance),l.type==="text"?10:24,l.type==="text"?74:190);updateLayerStyle(l);});const end=()=>gesture=null;h.addEventListener("pointerup",end);h.addEventListener("pointercancel",end);});
+    root.querySelectorAll("[data-remove-layer]").forEach(x=>x.addEventListener("click",e=>{e.stopPropagation();current().layers=current().layers.filter(l=>l.id!==x.dataset.removeLayer);state.activeId=null;render();}));
+    root.querySelector("[data-layer-text]")?.addEventListener("input",e=>{const l=active();l.text=e.target.value;const el=root.querySelector('[data-design-layer="'+l.id+'"]');if(el)el.childNodes[0].nodeValue=l.text;});
+    root.querySelector("[data-font-select]")?.addEventListener("change",e=>{active().font=e.target.value;updateLayerStyle(active());});
+    root.querySelector("[data-text-colour]")?.addEventListener("input",e=>{active().colour=e.target.value;updateLayerStyle(active());});
+    root.querySelectorAll("[data-layer-range]").forEach(x=>x.addEventListener("input",()=>{active()[x.dataset.layerRange]=Number(x.value);updateLayerStyle(active());}));
+    root.querySelectorAll("[data-print]").forEach(x=>x.addEventListener("click",()=>{if(!x.disabled){active().printId=x.dataset.print;render();}}));
+    root.querySelector('[data-action="qty-minus"]')?.addEventListener("click",()=>{state.qty=Math.max(1,state.qty-1);render();});
+    root.querySelector('[data-action="qty-plus"]')?.addEventListener("click",()=>{state.qty=Math.min(999,state.qty+1);render();});
+    root.querySelector("[data-stage]")?.addEventListener("pointerdown",e=>{if(!e.target.closest("[data-design-layer]")&&state.activeId){state.activeId=null;render();}});
+  }
+  render();
+  return{destroy(){root.innerHTML="";}};
+}
+window.OneLineDesigner={mount};
+})();
