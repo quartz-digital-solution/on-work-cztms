@@ -1,11 +1,12 @@
-const CACHE="one-line-static-v2";
+const CACHE="one-line-static-v3";
 const CORE=[
   "./index.html","./admin.html","./staff.html","./receiver.html","./css/styles.css",
   "./js/data.js","./js/designer.js","./js/app.js","./js/admin.js","./js/staff.js",
   "./one-line-mark.svg","./icon-192.png","./icon-512.png","./manifest.webmanifest",
   "./assets/crew-tee.webp","./assets/crew-tee-back.webp","./assets/polo-shirt.webp",
-  "./assets/polo-shirt-back.webp","./assets/premium-polo-product.webp",
-  "./assets/sports-jersey.webp","./assets/sports-jersey-back.webp","./assets/sleeve-side-neutral.webp"
+  "./assets/polo-shirt-back.webp","./assets/sports-jersey.webp","./assets/sports-jersey-back.webp",
+  "./assets/sleeve-side-neutral.webp","./assets/uniform-shirt-front.webp","./assets/uniform-shirt-back.webp",
+  "./assets/school-belt.webp","./assets/student-id-tag.webp","./assets/oxford-shirt.webp"
 ];
 self.addEventListener("install",event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)));});
 self.addEventListener("activate",event=>event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));await self.clients.claim();})()));

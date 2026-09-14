@@ -5,8 +5,8 @@ A mobile-first custom apparel storefront with separate customer, staff, admin an
 ## Pages
 
 - `index.html` — customer storefront, B2B login, customizer, cart, checkout, callbacks and order history
-- `staff.html` — authenticated order board, exact production files, variant stock, product editing and direct orders
-- `admin.html` — authenticated full control for products, variants, categories, fabric, printing, bulk offers, access accounts, callbacks, orders and WhatsApp settings
+- `staff.html` — authenticated order board, exact production files, colour/variant stock, image upload, product editing and direct orders
+- `admin.html` — authenticated full control for product galleries, colour images/rates/quantity/barcodes, categories, fabric, printing, bulk offers, B2B access, callbacks, orders and WhatsApp settings
 - `receiver.html` — compatibility redirect to the protected staff console
 
 ## First preview logins
@@ -19,20 +19,21 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 
 ## Implemented commerce rules
 
-- Ready-made and admin-toggleable customizable products
+- Professional Buy now checkout for ready-made products and admin-toggleable customization
 - Front, back, right sleeve and left sleeve design areas
 - Multiple text and image elements on the same side
 - Independent move, resize, rotate, edit, delete and print method per element
 - Separate admin-controlled image and text print prices
 - Budget, Standard and Premium cloth qualities with editable descriptions and rates
 - Sublimation automatically disabled for dark colours
-- Colour-specific product images
-- Variant-level colour, size, price, stock and optional barcode
-- School belts and identification tag products
+- Colour-specific uploaded product images, price, quantity and optional barcode
+- Existing size-variant inventory remains supported by the staff stock desk
+- School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer
+- Real product cut-outs for garments, school belts and identification tags; no placeholder catalogue photos
 - Editable quantity offers and protected B2B account discounts
 - Configurable WhatsApp support and cart enquiry
 - Customer callback requests shown in admin
-- Direct staff orders reduce the selected variant stock
+- Direct staff orders reduce the selected colour or variant stock
 - PWA manifest and offline shell
 
 ## Preview locally

@@ -741,6 +741,95 @@ footer { background:radial-gradient(circle at 80% 0,#57145f 0,#251029 35%,#150d1
   .hero-copy h1 { font-size:clamp(45px,14vw,55px)!important; }
 }
 
+.colour-product-image { width:100%;height:100%;position:relative;display:grid;place-items:center; }
+.colour-product-image > img,.colour-product-image > span { width:100%;height:100%;position:absolute;inset:0;object-fit:contain; }
+.colour-product-image > img { filter:grayscale(1); }
+.colour-product-image > span { opacity:.86;mix-blend-mode:multiply;mask-size:contain;mask-position:center;mask-repeat:no-repeat;-webkit-mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat;pointer-events:none; }
+.detail-colour-image { min-height:100%; }
+.product-detail-image > .colour-product-image { position:absolute;inset:0; }
+
+.staff-image-upload { grid-column:1/-1!important;padding:9px!important;display:grid!important;grid-template-columns:90px 1fr!important;align-items:center!important;gap:12px!important;border:1px dashed #cdbfd1!important;border-radius:12px!important;background:#faf7fb!important;cursor:pointer!important; }
+.staff-image-upload img { width:90px;height:80px;grid-row:1/3;object-fit:contain;border-radius:9px;background:#ede6ef; }
+.staff-image-upload b { display:flex;align-items:center;gap:7px;color:#681573;font-size:9px; }.staff-image-upload b svg { width:15px; }
+.staff-image-upload input { position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important; }
+
+/* Final customizer cascade: printed output is clipped, edit ghost remains selectable. */
+.designer-stage .live-garment { animation:none!important;transform:none!important; }
+.compact-garment .print-area-clip { z-index:5!important;overflow:hidden!important;pointer-events:none!important;border:0!important; }
+.compact-garment .interaction-area { z-index:7!important;overflow:visible!important;pointer-events:none!important;border:1px dashed rgba(103,21,114,.22)!important; }
+.compact-garment .interaction-area .interaction-layer { pointer-events:auto!important; }
+.compact-garment .printed-layer { filter:url(#cloth-print-warp)!important;opacity:.93!important;pointer-events:none!important; }
+.compact-garment .printed-layer .layer-visual { width:100%;display:block;mix-blend-mode:multiply;filter:contrast(.96) saturate(.92); }
+.compact-garment .printed-layer.image-layer,.compact-garment .interaction-layer.image-layer { aspect-ratio:1;display:grid;place-items:center; }
+.compact-garment .printed-layer.image-layer img,.compact-garment .interaction-layer.image-layer img { width:100%;height:100%;object-fit:contain; }
+.compact-garment .interaction-layer .layer-visual { width:100%;display:block;opacity:0!important; }
+.compact-garment .interaction-layer.selected .layer-visual { opacity:.2!important;filter:saturate(.45); }
+.compact-garment .interaction-layer.text-layer,.compact-garment .interaction-layer.text-layer .layer-visual { max-width:100%;overflow:hidden; }
+.compact-garment .interaction-layer.selected { outline:2px solid #64116f!important;outline-offset:5px!important;box-shadow:none!important; }
+.compact-garment .interaction-layer.selected:after { display:none!important;content:none!important; }
+
+/* Publish-ready catalogue controls and garment printing. */
+select {
+  appearance:none;
+  -webkit-appearance:none;
+  padding-right:34px!important;
+  border:1px solid #d9cedc!important;
+  border-radius:10px!important;
+  background-color:#fff!important;
+  background-image:linear-gradient(45deg,transparent 50%,#671572 50%),linear-gradient(135deg,#671572 50%,transparent 50%),linear-gradient(145deg,#fff,#f8f4f9)!important;
+  background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%,0 0!important;
+  background-size:5px 5px,5px 5px,100% 100%!important;
+  background-repeat:no-repeat!important;
+  color:#302632;
+  cursor:pointer;
+  outline:none;
+  box-shadow:inset 0 1px 0 #fff;
+}
+select:focus { border-color:#71197d!important;box-shadow:0 0 0 3px rgba(113,25,125,.11)!important; }
+.apparel-dropdown select { height:22px!important;padding:0 24px 0 0!important;border:0!important;border-radius:0!important;background-color:transparent!important;background-image:linear-gradient(45deg,transparent 50%,#671572 50%),linear-gradient(135deg,#671572 50%,transparent 50%)!important;background-position:calc(100% - 10px) 48%,calc(100% - 6px) 48%!important;background-size:4px 4px,4px 4px!important;box-shadow:none!important; }
+
+.fabric-filter { width:0;height:0;position:absolute;pointer-events:none; }
+.compact-garment .print-area-clip { z-index:5;overflow:hidden;pointer-events:none; }
+.compact-garment .interaction-area { z-index:7;overflow:visible;pointer-events:none;border:1px dashed rgba(103,21,114,.2); }
+.compact-garment .interaction-layer { pointer-events:auto; }
+.compact-garment .printed-layer { filter:url(#cloth-print-warp);opacity:.93;pointer-events:none; }
+.compact-garment .printed-layer .layer-visual { display:block;mix-blend-mode:multiply;filter:contrast(.96) saturate(.92); }
+.compact-garment .printed-layer.image-layer img { width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;opacity:.94; }
+.compact-garment .interaction-layer .layer-visual { display:block;opacity:0; }
+.compact-garment .interaction-layer.selected .layer-visual { opacity:.2;filter:saturate(.5); }
+.compact-garment .interaction-layer.image-layer { aspect-ratio:1;display:grid;place-items:center; }
+.compact-garment .interaction-layer.image-layer img { width:100%;height:100%;object-fit:contain; }
+.compact-garment .text-layer .layer-visual { white-space:nowrap;line-height:.92; }
+.compact-garment .interaction-layer.selected { outline:2px solid #671572!important;outline-offset:5px!important; }
+.compact-garment .interaction-layer.selected:after { display:none!important; }
+.garment-print-zone { overflow:hidden; }
+.saved-design-text,.saved-design-image { mix-blend-mode:multiply;filter:url(#cloth-print-warp);opacity:.93; }
+
+.gallery-upload-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px; }
+.gallery-upload { min-width:0;padding:10px;display:grid!important;gap:7px;border:1px solid #dfd5e1;border-radius:13px;background:linear-gradient(145deg,#fff,#f7f2f8);text-transform:none!important;letter-spacing:0!important;cursor:pointer; }
+.gallery-upload img { width:100%;height:118px;object-fit:contain;border-radius:9px;background:radial-gradient(circle,#fff,#ebe4ed); }
+.gallery-upload span { color:#685d6b;font-size:8px;font-weight:800; }
+.gallery-upload b { display:flex;align-items:center;justify-content:center;gap:5px;min-height:32px;border-radius:8px;background:#efe5f1;color:#681573;font-size:8px; }
+.gallery-upload b svg { width:13px; }
+.gallery-upload input[type=file] { position:absolute;width:1px;height:1px;opacity:0;pointer-events:none; }
+.colour-manager { display:grid;gap:9px; }
+.colour-manager article { padding:9px;display:grid;grid-template-columns:74px 1fr 90px 82px 1fr 34px;gap:8px;align-items:end;border:1px solid #dfd5e1;border-radius:13px;background:#faf7fb; }
+.colour-manager article > label { display:grid;gap:5px;color:#706574;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.08em; }
+.colour-manager article input { width:100%;height:37px;padding:0 8px;border:1px solid #ddd2df;border-radius:9px;background:#fff;font-size:9px;outline:none; }
+.colour-manager article input:focus { border-color:#71197d;box-shadow:0 0 0 3px rgba(113,25,125,.08); }
+.colour-photo { height:64px;position:relative;overflow:hidden;border-radius:10px;background:#ece5ee; }
+.colour-photo img { width:100%;height:100%;object-fit:contain; }
+.colour-photo label { position:absolute;inset:auto 4px 4px 4px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(31,22,33,.86);color:#fff;cursor:pointer; }
+.colour-photo label svg { width:12px; }.colour-photo input { display:none!important; }
+.colour-manager [data-remove-colour] { width:34px;height:37px;display:grid;place-items:center;border:0;border-radius:9px;background:#f8e2e4;color:#9d2637;cursor:pointer; }
+.colour-manager [data-remove-colour] svg { width:14px; }
+
+@media (max-width:760px) {
+  .gallery-upload-grid { grid-template-columns:1fr; }
+  .gallery-upload { grid-template-columns:82px 1fr;align-items:center; }.gallery-upload img { grid-row:1/3;height:72px; }
+  .colour-manager article { grid-template-columns:62px 1fr 1fr; }.colour-manager article > label:nth-of-type(3),.colour-manager article > label:nth-of-type(4) { grid-column:span 1; }
+}
+
 /* Publish-ready commerce and role consoles */
 .designer-stage .garment-photo,.designer-stage .garment-tint,.designer-stage .live-garment,.designer-stage .shirt-canvas { animation:none!important;transition:none!important; }
 .compact-controls select { width:100%;height:42px;padding:0 34px 0 11px;border:1px solid #d9cedc;border-radius:10px;background:#fff;color:#241f26;font-size:9px;font-weight:800;outline:none; }
