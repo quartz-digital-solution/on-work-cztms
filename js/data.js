@@ -1,98 +1,169 @@
-(function(){
-"use strict";
-const KEYS={products:"custom-store-products-v3",orders:"custom-store-orders-v3",cart:"custom-store-cart-v3",categories:"custom-store-categories-v3",delivery:"custom-store-delivery-v3",prints:"custom-store-print-types-v3",fabrics:"custom-store-fabrics-v3",offers:"custom-store-bulk-offers-v3",accounts:"custom-store-accounts-v3",callbacks:"custom-store-callbacks-v3",settings:"custom-store-settings-v3",session:"custom-store-session-v3",audit:"custom-store-audit-v3"};
-const palette={Black:"#171817",White:"#f7f6f1",Navy:"#23314c",Maroon:"#7c2637",Olive:"#59634a",Sky:"#7ea8bf",Sand:"#c7aa79",Red:"#c53a3f",Green:"#44866a",Yellow:"#e5c74f",Violet:"#684278"};
-const darkColours=["Black","Navy","Maroon","Olive","Violet","Dark Green","Dark Blue"];
-const categoryDefaults=[
-{id:"cat-tshirts",name:"T-Shirts",subcategories:["Crew Neck","Polo","Oversized"],code:"01",tone:"acid",image:"assets/category-tshirts.webp",active:true},
-{id:"cat-uniforms",name:"Uniforms",subcategories:["School","Office","Industrial","Belts","Identification Tags"],code:"02",tone:"ink",image:"assets/category-uniforms.webp",active:true},
-{id:"cat-sports",name:"Sportswear",subcategories:["Jerseys","Shorts","Tracksuits"],code:"03",tone:"blue",image:"assets/category-sportswear.webp",active:true},
-{id:"cat-shirts",name:"Shirts",subcategories:["Formal","Casual","Workwear"],code:"04",tone:"clay",image:"assets/category-shirts.webp",active:true},
-{id:"cat-tags",name:"Tags & Labels",subcategories:["Woven Labels","Printed Labels","Identification Tags"],code:"05",tone:"paper",image:"assets/category-tags-labels.webp",active:true}
-];
-const fabricDefaults=[
-{id:"budget",name:"Budget",description:"Reliable everyday fabric for events and value-focused bulk orders.",price:0,active:true},
-{id:"standard",name:"Standard",description:"Balanced comfort, colour retention and durability for regular use.",price:90,active:true},
-{id:"premium",name:"Premium",description:"Higher GSM, softer finish and stronger shape retention for a premium result.",price:190,active:true}
-];
-const printDefaults=[
-{id:"dtf",name:"DTF Print",price:180,textPrice:120,note:"Vivid full-colour print with a soft, durable finish.",lightOnly:false,active:true},
-{id:"screen",name:"Screen Print",price:120,textPrice:90,note:"Durable and economical for repeated bulk designs.",lightOnly:false,active:true},
-{id:"embroidery",name:"Embroidery",price:260,textPrice:220,note:"Premium stitched finish for logos, names and uniforms.",lightOnly:false,active:true},
-{id:"sublimation",name:"Sublimation Print",price:210,textPrice:140,note:"Breathable colour infused into light fabric only.",lightOnly:true,active:true}
-];
-const offerDefaults=[{id:"bulk-10",minQty:10,discount:5,label:"Team order",active:true},{id:"bulk-25",minQty:25,discount:8,label:"Institution order",active:true},{id:"bulk-50",minQty:50,discount:12,label:"Production order",active:true}];
-const variants=(colours,sizes,stock,price)=>colours.flatMap(colour=>sizes.map(size=>({id:(colour+"-"+size).toLowerCase().replace(/[^a-z0-9]+/g,"-"),colour,size,stock,price,barcode:""})));
-const seedProducts=[
-{id:1,sku:"OL-TEE-001",barcodeEnabled:true,barcode:"890100000001",name:"Heavyweight Crew Tee",category:"T-Shirts",subcategory:"Crew Neck",price:449,mrp:599,image:"assets/crew-tee.webp",backImage:"assets/crew-tee-back.webp",leftSleeveImage:"assets/crew-tee-left-sleeve-close.webp",rightSleeveImage:"assets/crew-tee-right-sleeve-close.webp",customColourMode:"changeable",customizerColours:["Black","White","Navy","Maroon","Olive"],customizerImage:"assets/crew-tee.webp",customizerBackImage:"assets/crew-tee-back.webp",customizerSleeveImage:"assets/crew-tee-sleeve.webp",colors:["Black","White","Navy","Maroon","Olive"],sizes:["S","M","L","XL","XXL"],stock:200,active:true,customizable:false,b2bEnabled:true,b2bOnly:false,allowedFabricIds:["budget","standard","premium"],allowedPrintIds:["dtf","screen","embroidery","sublimation"],colorImages:{White:"assets/crew-tee.webp",Black:"assets/crew-tee.webp",Navy:"assets/crew-tee.webp",Maroon:"assets/crew-tee.webp",Olive:"assets/crew-tee.webp"},variants:variants(["Black","White","Navy","Maroon","Olive"],["S","M","L","XL","XXL"],8,449),description:"240 GSM combed cotton with a structured fit, reinforced neck and a smooth print-ready surface."},
-{id:2,sku:"OL-SPR-002",barcodeEnabled:true,barcode:"890100000002",name:"Performance Team Jersey",category:"Sportswear",subcategory:"Jerseys",price:649,mrp:799,image:"assets/sports-jersey.webp",backImage:"assets/sports-jersey-back.webp",leftSleeveImage:"assets/sports-jersey-left-sleeve-close.webp",rightSleeveImage:"assets/sports-jersey-right-sleeve-close.webp",customColourMode:"changeable",customizerColours:["Navy","Maroon","Sky","White"],customizerImage:"assets/sports-jersey.webp",customizerBackImage:"assets/sports-jersey-back.webp",customizerSleeveImage:"assets/sports-jersey-sleeve.webp",colors:["Navy","Maroon","Sky","White"],sizes:["S","M","L","XL"],stock:112,active:true,customizable:false,b2bEnabled:true,b2bOnly:false,allowedFabricIds:["budget","standard","premium"],allowedPrintIds:["dtf","screen","sublimation"],colorImages:{Navy:"assets/sports-jersey.webp",Maroon:"assets/sports-jersey.webp",Sky:"assets/sports-jersey.webp",White:"assets/sports-jersey.webp"},variants:variants(["Navy","Maroon","Sky","White"],["S","M","L","XL"],7,649),description:"Breathable quick-dry sports fabric designed for complete team customization."},
-{id:3,sku:"OL-UNI-003",barcodeEnabled:false,barcode:"",name:"Executive Uniform Shirt",category:"Uniforms",subcategory:"Office",price:720,mrp:890,image:"assets/uniform-shirt-front.webp",backImage:"assets/uniform-shirt-back.webp",leftSleeveImage:"assets/uniform-shirt-left-sleeve-close.webp",rightSleeveImage:"assets/uniform-shirt-right-sleeve-close.webp",customColourMode:"changeable",customizerColours:["White","Sky","Sand"],customizerImage:"assets/uniform-shirt-front.webp",customizerBackImage:"assets/uniform-shirt-back.webp",customizerSleeveImage:"assets/uniform-shirt-sleeve.webp",colors:["White","Sky","Sand"],sizes:["38","40","42","44"],stock:96,active:true,customizable:false,b2bEnabled:true,b2bOnly:false,allowedFabricIds:["standard","premium"],allowedPrintIds:["dtf","embroidery","sublimation"],colorImages:{White:"assets/uniform-shirt-front.webp",Sky:"assets/uniform-shirt-front.webp",Sand:"assets/uniform-shirt-front.webp"},variants:variants(["White","Sky","Sand"],["38","40","42","44"],8,720),description:"Freshly pressed easy-care office uniform with a clean professional profile and embroidery-ready chest panel."},
-{id:4,sku:"OL-POL-004",barcodeEnabled:true,barcode:"890100000004",name:"Premium Polo T-Shirt",category:"T-Shirts",subcategory:"Polo",price:599,mrp:749,image:"assets/polo-shirt.webp",backImage:"assets/polo-shirt-back.webp",leftSleeveImage:"assets/polo-shirt-left-sleeve-close.webp",rightSleeveImage:"assets/polo-shirt-right-sleeve-close.webp",customColourMode:"changeable",customizerColours:["Black","Navy","Maroon","White"],customizerImage:"assets/polo-shirt.webp",customizerBackImage:"assets/polo-shirt-back.webp",customizerSleeveImage:"assets/polo-shirt-sleeve.webp",colors:["Black","Navy","Maroon","White"],sizes:["M","L","XL","XXL"],stock:112,active:true,customizable:false,b2bEnabled:true,b2bOnly:false,allowedFabricIds:["standard","premium"],allowedPrintIds:["dtf","screen","embroidery"],colorImages:{Black:"assets/polo-shirt.webp",Navy:"assets/polo-shirt.webp",Maroon:"assets/polo-shirt.webp",White:"assets/polo-shirt.webp"},variants:variants(["Black","Navy","Maroon","White"],["M","L","XL","XXL"],7,599),description:"Soft pique polo suitable for staff uniforms, events and everyday business wear."},
-{id:5,sku:"OL-BELT-005",barcodeEnabled:false,barcode:"",name:"School Uniform Belt",category:"Uniforms",subcategory:"Belts",price:180,mrp:240,image:"assets/school-belt.webp",colors:["Navy","Black","Maroon"],sizes:["28–32 inch","34–38 inch","40–44 inch"],stock:60,active:true,customizable:false,enquiryOnly:true,b2bEnabled:true,allowedFabricIds:["standard"],allowedPrintIds:[],colorImages:{Navy:"assets/school-belt.webp",Black:"assets/school-belt.webp",Maroon:"assets/school-belt.webp"},variants:[],description:"Practical woven school belt supplied in institutional colours. Submit an enquiry for buckle branding, size mix and bulk pricing."},
-{id:6,sku:"OL-TAG-006",barcodeEnabled:false,barcode:"",name:"Student Identification Tag",category:"Tags & Labels",subcategory:"Identification Tags",price:95,mrp:130,image:"assets/student-id-tag.webp",colors:["White"],sizes:["Standard","Large"],stock:100,active:true,customizable:false,enquiryOnly:true,b2bEnabled:true,allowedFabricIds:["standard"],allowedPrintIds:[],colorImages:{White:"assets/student-id-tag.webp"},variants:[],description:"Blank school identification badge available for institutional orders. Request a callback for layout, student data and quantity pricing."},
-{id:7,sku:"OL-SHT-007",barcodeEnabled:true,barcode:"890100000007",name:"Classic Oxford Shirt",category:"Shirts",subcategory:"Formal",price:799,mrp:999,image:"assets/oxford-shirt.webp",backImage:"assets/uniform-shirt-back.webp",colors:["White","Sky","Navy"],sizes:["38","40","42","44"],stock:23,active:true,customizable:false,b2bEnabled:false,b2bOnly:false,allowedFabricIds:["standard","premium"],allowedPrintIds:["embroidery"],colorImages:{White:"assets/oxford-shirt.webp",Sky:"assets/oxford-shirt.webp",Navy:"assets/oxford-shirt.webp"},variants:[],description:"A clean formal staple with reliable sizing, natural cotton texture and a professional finish."}
-,{id:900,sku:"OL-CUSTOM-001",barcodeEnabled:false,barcode:"",name:"Custom T-Shirt Studio",category:"T-Shirts",subcategory:"Customizable",price:449,mrp:449,image:"assets/crew-tee.webp",backImage:"assets/crew-tee-back.webp",leftSleeveImage:"assets/crew-tee-left-sleeve-close.webp",rightSleeveImage:"assets/crew-tee-right-sleeve-close.webp",customSection:true,customColourMode:"changeable",customizerColours:["Black","White","Navy","Maroon","Olive"],customColorValues:{Black:"#171817",White:"#f7f6f1",Navy:"#23314c",Maroon:"#7c2637",Olive:"#59634a"},customizerImage:"assets/crew-tee.webp",customizerBackImage:"assets/crew-tee-back.webp",customizerSleeveImage:"assets/crew-tee-sleeve.webp",colors:["Black","White","Navy","Maroon","Olive"],sizes:["S","M","L","XL","XXL"],stock:9999,active:true,customizable:true,enquiryOnly:false,b2bEnabled:true,b2bOnly:false,allowedFabricIds:[],allowedPrintIds:["dtf","screen","embroidery","sublimation"],colorImages:{},variants:[],description:"Dedicated customizable product. Customers can choose garment colour, add text or images, and select a printing method."}
-];
-const seedOrders=[{id:"CS-1048",customer:"Anand K",phone:"9876543210",total:1897,items:3,delivery:"Courier",payment:"Cash on delivery",status:"Confirmed",channel:"Customer",createdAt:new Date(Date.now()-240000).toISOString(),address:"Kozhikode, Kerala 673001",orderItems:[]},{id:"CS-1047",customer:"Bluepeak Academy",phone:"9744011882",total:8240,items:16,delivery:"Store pickup",payment:"Pay at pickup",status:"Packed",channel:"B2B",createdAt:new Date(Date.now()-1680000).toISOString(),address:"Mavoor Road, Kozhikode",orderItems:[]}];
-const deliveryDefaults=[{id:"courier",name:"Courier",note:"Door delivery; charge is confirmed with the order.",active:true},{id:"pickup",name:"Store pickup",note:"Collect from the production desk.",active:true},{id:"bus",name:"Bus parcel",note:"Collect from your selected bus stand.",active:true}];
-const accountDefaults=[{id:"admin-1",role:"admin",name:"Store Admin",username:"admin",password:"admin123",phone:"",active:true,business:"One-Line"},{id:"staff-1",role:"staff",name:"Production Staff",username:"staff",password:"staff123",phone:"",active:true,permissions:["products","stock","orders"]},{id:"b2b-1",role:"b2b",name:"Bluepeak Academy",username:"bluepeak",password:"b2b123",phone:"9744011882",business:"Bluepeak Academy",active:true,discount:8}];
-const settingsDefaults={storeName:"One-Line",tagline:"CUSTOM APPAREL STUDIO",whatsappNumber:"9446297271",whatsappMessage:"Hello, I need help with a custom apparel order.",currency:"INR",taxLabel:"Tax included",allowCOD:true,allowOnline:false,b2bEnabled:true,callbackEnabled:true,lowStockAt:8,supportText:"Need help choosing fabric, print or quantity? Talk to our team on WhatsApp."};
-const iconPaths={menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',bag:'<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/>',orders:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>',arrow:'<path d="M5 12h14M14 6l6 6-6 6"/>',back:'<path d="m15 18-6-6 6-6M9 12h11"/>',check:'<path d="m5 12 4 4L19 6"/>',shield:'<path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/>',package:'<path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/>',truck:'<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',type:'<path d="M5 5h14M12 5v14M8 19h8"/>',image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 4"/>',sliders:'<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="18" r="2"/>',move:'<path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3 3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/>',sparkle:'<path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z"/>',trash:'<path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/>',map:'<path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z"/><circle cx="12" cy="10" r="2"/>',card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',chevron:'<path d="m6 9 6 6 6-6"/>',upload:'<path d="M12 16V4m0 0L7 9m5-5 5 5M5 20h14"/>',rotate:'<path d="M20 11a8 8 0 1 0-2 5M20 4v7h-7"/>',box:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v5"/>',external:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v7H4V6h7"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>',eye:'<path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2"/>',phone:'<path d="M7 3 4 5c0 8 7 15 15 15l2-3-5-3-2 2c-3-1-5-3-6-6l2-2-3-5Z"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',lock:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',barcode:'<path d="M3 5v14M6 5v14M10 5v14M13 5v14M18 5v14M21 5v14"/>',logout:'<path d="M10 17l5-5-5-5M15 12H3M14 3h7v18h-7"/>'};
-function clone(v){return typeof structuredClone==="function"?structuredClone(v):JSON.parse(JSON.stringify(v));}
-function icon(n,c){return '<svg class="icon '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(iconPaths[n]||iconPaths.sparkle)+'</svg>';}
-function money(v){return "₹"+Number(v||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
-function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c]);}
-function load(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):clone(f);}catch(_){return clone(f);}}
-function log(actor,action){const rows=load(KEYS.audit,[]);rows.unshift({id:Date.now(),actor:actor?.name||actor||"System",role:actor?.role||"system",action,at:new Date().toISOString()});localStorage.setItem(KEYS.audit,JSON.stringify(rows.slice(0,200)));}
-function save(k,v,actor){localStorage.setItem(k,JSON.stringify(v));if(actor)log(actor,"Updated "+k);window.dispatchEvent(new CustomEvent("one-line-change",{detail:{key:k}}));return v;}
-const sleeveDefaults={
-  1:{left:"assets/crew-tee-left-sleeve-close.webp",right:"assets/crew-tee-right-sleeve-close.webp"},
-  2:{left:"assets/sports-jersey-left-sleeve-close.webp",right:"assets/sports-jersey-right-sleeve-close.webp"},
-  3:{left:"assets/uniform-shirt-left-sleeve-close.webp",right:"assets/uniform-shirt-right-sleeve-close.webp"},
-  4:{left:"assets/polo-shirt-left-sleeve-close.webp",right:"assets/polo-shirt-right-sleeve-close.webp"}
-};
-const getProducts=()=>{
-  const stored=load(KEYS.products,seedProducts);
-  const rows=stored.map(raw=>{
-    const seeded=seedProducts.find(x=>String(x.id)===String(raw.id)),legacyCustom=raw.customSection==null&&raw.customizable===true,p=Object.assign({active:true,customizable:false,customSection:false,enquiryOnly:false,b2bEnabled:false,b2bOnly:false,customColourMode:"fixed",customizerColours:[],customColorValues:{},customizerImage:"",customizerBackImage:"",customizerSleeveImage:"",colors:[],sizes:["Default"],variants:[],colourOptions:[],allowedFabricIds:[],allowedPrintIds:["dtf"],colorImages:{},barcodeEnabled:false},raw),fallback=sleeveDefaults[p.id],legacySleeve=Boolean(p.sleeveImage&&/sleeve-side-neutral|crew-tee-sleeve|polo-shirt-sleeve|sports-jersey-sleeve|uniform-shirt-sleeve/.test(p.sleeveImage));
-    if(legacyCustom){p.customizable=false;p.customSection=false;}
-    if(p.customSection){p.customizable=true;p.customColourMode="changeable";p.enquiryOnly=false;}else{p.customizable=false;p.customSection=false;}
-    if(!p.customizerColours.length&&seeded?.customizerColours)p.customizerColours=clone(seeded.customizerColours);
-    if(!Object.keys(p.customColorValues||{}).length&&seeded?.customColorValues)p.customColorValues=clone(seeded.customColorValues);
-    if(!p.customizerImage&&seeded?.customizerImage)p.customizerImage=seeded.customizerImage;
-    if(!p.customizerBackImage&&seeded?.customizerBackImage)p.customizerBackImage=seeded.customizerBackImage;
-    if(!p.customizerSleeveImage&&seeded?.customizerSleeveImage)p.customizerSleeveImage=seeded.customizerSleeveImage;
-    if(fallback){if(!p.leftSleeveImage||legacySleeve)p.leftSleeveImage=fallback.left;if(!p.rightSleeveImage||legacySleeve)p.rightSleeveImage=fallback.right;}
-    return p;
-  });
-  if(!localStorage.getItem(KEYS.products)&&!rows.some(x=>x.customSection)){const studio=seedProducts.find(x=>x.customSection);if(studio)rows.push(clone(studio));}
-  return rows;
-};
-const getOrders=()=>load(KEYS.orders,seedOrders),getCart=()=>load(KEYS.cart,[]),getCategories=()=>load(KEYS.categories,categoryDefaults).map(c=>{const fallback=categoryDefaults.find(x=>x.id===c.id||x.name===c.name);return Object.assign({},fallback||{},c,{image:c.image||fallback?.image||"assets/category-tshirts.webp"});}),getDelivery=()=>load(KEYS.delivery,deliveryDefaults),getPrints=()=>load(KEYS.prints,printDefaults),getFabrics=()=>load(KEYS.fabrics,fabricDefaults),getOffers=()=>load(KEYS.offers,offerDefaults).sort((a,b)=>a.minQty-b.minQty),getAccounts=()=>load(KEYS.accounts,accountDefaults),getCallbacks=()=>load(KEYS.callbacks,[]),getSettings=()=>{const x=Object.assign({},settingsDefaults,load(KEYS.settings,settingsDefaults));if(x.whatsappNumber==="919876543210")x.whatsappNumber=settingsDefaults.whatsappNumber;return x;},getAudit=()=>load(KEYS.audit,[]);
-function categoriesForCustomer(){return getCategories().filter(x=>x.active).map(x=>({name:x.name,sub:x.subcategories.join(" · "),code:x.code,tone:x.tone,id:x.id,image:x.image}));}
-function productImage(p,c,side){const colour=(p?.colourOptions||[]).find(x=>x.colour===c),variantImage=(p?.variants||[]).find(x=>x.colour===c&&x.image)?.image;if(side==="back")return colour?.backImage||p.backImage||colour?.image||p.image;if(side==="rightSleeve")return colour?.rightSleeveImage||colour?.sleeveImage||p.rightSleeveImage||p.sleeveImage||colour?.image||p.image;if(side==="leftSleeve")return colour?.leftSleeveImage||colour?.sleeveImage||p.leftSleeveImage||p.sleeveImage||colour?.image||p.image;return colour?.image||p.colorImages?.[c]||variantImage||p.image;}
-function shouldTintProduct(p,c,side){const colour=(p?.colourOptions||[]).find(x=>x.colour===c);if((p?.colors||[]).length<2)return false;if(side==="back")return !colour?.backImage;if(side==="rightSleeve")return !(colour?.rightSleeveImage||colour?.sleeveImage);if(side==="leftSleeve")return !(colour?.leftSleeveImage||colour?.sleeveImage);return !((colour?.image&&colour.image!==p.image)||(p?.colorImages?.[c]&&p.colorImages[c]!==p.image)||(p?.variants||[]).some(v=>v.colour===c&&v.image&&v.image!==p.image));}
-function customizerColours(p){const source=p?.customizerColours?.length?p.customizerColours:p?.colors||[];return [...new Set(source)].filter(Boolean);}
-function colourValue(p,c){return p?.customColorValues?.[c]||palette[c]||c||"#ffffff";}
-function customizerImage(p,c,side){if(p?.customColourMode!=="changeable")return productImage(p,c,side);if(side==="back")return p.customizerBackImage||p.backImage||p.customizerImage||p.image;if(side==="rightSleeve"||side==="leftSleeve")return p.customizerSleeveImage||p.sleeveImage||p.rightSleeveImage||p.leftSleeveImage||p.customizerImage||p.image;return p.customizerImage||p.image;}
-function shouldTintCustomizer(p){return Boolean(p?.customSection);}
-function findVariant(p,c,s){return (p?.variants||[]).find(v=>(!v.colour||v.colour===c)&&(!v.size||v.size===s));}
-function findColour(p,c){return (p?.colourOptions||[]).find(v=>v.colour===c);}
-const productPrice=(p,c,s)=>Number(findVariant(p,c,s)?.price??findColour(p,c)?.price??p?.price??0),productStock=(p,c,s)=>Number(findVariant(p,c,s)?.stock??findColour(p,c)?.stock??p?.stock??0);
-function compressImage(file,maxEdge=1200,quality=.86){return new Promise((resolve,reject)=>{if(!file?.type?.startsWith("image/"))return reject(new Error("Choose an image file."));const reader=new FileReader();reader.onerror=()=>reject(new Error("Could not read image."));reader.onload=()=>{const image=new Image();image.onerror=()=>reject(new Error("Could not open image."));image.onload=()=>{const scale=Math.min(1,maxEdge/Math.max(image.width,image.height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/webp",quality));};image.src=String(reader.result);};reader.readAsDataURL(file);});}
-function bestBulkOffer(q){return getOffers().filter(x=>x.active&&q>=Number(x.minQty)).sort((a,b)=>b.minQty-a.minQty)[0]||null;}
-function discountFor(q,a){return Math.max(Number(bestBulkOffer(q)?.discount||0),Number(a?.discount||0));}
-function authenticate(role,u,p){return getAccounts().find(x=>x.role===role&&x.active&&x.username.trim().toLowerCase()===String(u).trim().toLowerCase()&&x.password===p)||null;}
-function setSession(a){const safe=a?{id:a.id,role:a.role,name:a.name,username:a.username,business:a.business||"",discount:Number(a.discount||0)}:null;if(safe)sessionStorage.setItem(KEYS.session,JSON.stringify(safe));else sessionStorage.removeItem(KEYS.session);return safe;}
-function getSession(role){try{const s=JSON.parse(sessionStorage.getItem(KEYS.session)||"null");return s&&(!role||s.role===role)?s:null;}catch(_){return null;}}
-function createOrder(o,actor){const rows=getOrders(),row=Object.assign({id:"OL-"+Date.now().toString().slice(-7),status:"Confirmed",createdAt:new Date().toISOString(),channel:actor?.role==="staff"?"Staff":"Customer"},o);rows.unshift(row);save(KEYS.orders,rows,actor);return row;}
-function updateStockForOrder(o,direction){const ps=getProducts();(o.orderItems||[]).forEach(i=>{const p=ps.find(x=>String(x.id)===String(i.productId));if(!p)return;const amount=Number(i.qty||1)*(direction||-1),v=findVariant(p,i.color,i.size),c=findColour(p,i.color);if(v)v.stock=Math.max(0,Number(v.stock||0)+amount);else if(c)c.stock=Math.max(0,Number(c.stock||0)+amount);else p.stock=Math.max(0,Number(p.stock||0)+amount);if(p.variants?.length)p.stock=p.variants.reduce((n,x)=>n+Number(x.stock||0),0);else if(p.colourOptions?.length)p.stock=p.colourOptions.reduce((n,x)=>n+Number(x.stock||0),0);});save(KEYS.products,ps);}
-function timeAgo(v){const m=Math.max(0,Math.floor((Date.now()-new Date(v||Date.now()))/60000));return m<1?"Just now":m<60?m+" min ago":m<1440?Math.floor(m/60)+" hr ago":Math.floor(m/1440)+" day ago";}
-function whatsappUrl(m,p){let number=String(p||getSettings().whatsappNumber||"").replace(/\D/g,"");if(number.length===10)number="91"+number;return "https://wa.me/"+number+"?text="+encodeURIComponent(m||getSettings().whatsappMessage);}
-function isLightColour(c){return !darkColours.some(x=>x.toLowerCase()===String(c).toLowerCase());}
-function surfaceDesign(d,s){const raw=d?.surfaceDesigns?.[s];if(raw?.layers)return raw;if(raw){const layers=[];if(raw.text)layers.push({id:"legacy-text",type:"text",text:raw.text,font:raw.font||"Impact",colour:raw.textColor||"#fff",size:raw.textSize||30,rotation:raw.textRotation||0,x:raw.positions?.text?.x||50,y:raw.positions?.text?.y||40});if(raw.uploadedImage)layers.push({id:"legacy-image",type:"image",src:raw.uploadedImage,size:raw.imageSize||82,rotation:raw.imageRotation||0,x:raw.positions?.image?.x||50,y:raw.positions?.image?.y||60});return {layers};}return {layers:[]};}
-function designedSurfaces(d){return ["front","back","rightSleeve","leftSleeve"].filter(s=>surfaceDesign(d,s).layers.length);}
-function layerMarkup(l,w){const scale=w?100/w:.42;return l.type==="text"?'<span class="saved-design-text" style="left:'+l.x+'%;top:'+l.y+'%;color:'+esc(l.colour)+';font-family:'+esc(l.font)+';font-size:'+Math.max(1,Number(l.size)*scale)+'cqw;transform:translate(-50%,-50%) rotate('+Number(l.rotation||0)+'deg)">'+esc(l.text)+'</span>':'<img class="saved-design-image" src="'+esc(l.src)+'" alt="" style="left:'+l.x+'%;top:'+l.y+'%;width:'+Math.max(1,Number(l.size)*scale)+'%;transform:translate(-50%,-50%) rotate('+Number(l.rotation||0)+'deg)">';}
-function designPreview(d,s,cls){s=s||"front";const sd=surfaceDesign(d,s),sl=s.includes("Sleeve"),g=s==="rightSleeve"?(d.rightSleeveImage||d.sleeveImage||d.garmentImage):s==="leftSleeve"?(d.leftSleeveImage||d.sleeveImage||d.garmentImage):s==="back"?(d.garmentBackImage||d.garmentImage):d.garmentImage,tint=d.surfaceTint?.[s],mirror=d.sleeveMirror&&s==="rightSleeve"?" mirror-sleeve":"",mode=d.sleeveMirror?" changeable-preview":" fixed-preview";return '<div class="real-garment-preview preview-'+s+mode+' '+esc(cls||'')+'"><div class="garment-depth"></div><img class="garment-photo '+(sl?'sleeve-preview ':'')+mirror+'" src="'+esc(g)+'" alt="">'+(tint?'<span class="garment-tint '+(sl?'sleeve-preview ':'')+mirror+'" style="background:'+esc(d.garmentHex||palette[d.garmentColor]||d.garmentColor||palette.Navy)+';mask-image:url('+esc(g)+');-webkit-mask-image:url('+esc(g)+')"></span>':'')+'<div class="garment-print-zone zone-'+s+'">'+sd.layers.map(l=>layerMarkup(l,sd.width)).join('')+'</div></div>';}
-window.OneLineStore={KEYS,palette,darkColours,categoryDefaults,seedProducts,seedOrders,deliveryDefaults,printDefaults,fabricDefaults,offerDefaults,settingsDefaults,icon,money,esc,clone,load,save,log,getProducts,getOrders,getCart,getCategories,getDelivery,getPrints,getFabrics,getOffers,getAccounts,getCallbacks,getSettings,getAudit,categoriesForCustomer,productImage,shouldTintProduct,customizerColours,colourValue,customizerImage,shouldTintCustomizer,findVariant,findColour,productPrice,productStock,compressImage,bestBulkOffer,discountFor,authenticate,setSession,getSession,requireRole:getSession,createOrder,updateStockForOrder,timeAgo,whatsappUrl,isLightColour,surfaceDesign,designedSurfaces,designPreview};
+(function () {
+  "use strict";
+
+  const palette = {
+    Black: "#171817", White: "#f7f6f1", Navy: "#23314c", Maroon: "#7c2637",
+    Olive: "#59634a", Sky: "#7ea8bf", Sand: "#c7aa79", Red: "#bd2437", Royal: "#315bb5"
+  };
+
+  const categoryDefaults = [
+    { id:"cat-tshirt", name:"T-Shirts", sub:"Crew neck · Polo · Oversized", code:"01", tone:"acid", image:"assets/premium-polo-product.webp", subcategories:["Crew Neck","Polo","Oversized"] },
+    { id:"cat-uniform", name:"Uniforms", sub:"School · Office · Industrial", code:"02", tone:"ink", image:"assets/premium-polo-product.webp", subcategories:["Office","School","Industrial"] },
+    { id:"cat-sports", name:"Sportswear", sub:"Jerseys · Shorts · Tracksuits", code:"03", tone:"blue", image:"assets/sports-jersey.webp", subcategories:["Jerseys","Shorts","Tracksuits"] },
+    { id:"cat-shirts", name:"Shirts", sub:"Formal · Casual · Workwear", code:"04", tone:"clay", image:"assets/polo-shirt.webp", subcategories:["Formal","Casual","Workwear"] },
+    { id:"cat-tags", name:"Tags & Labels", sub:"Woven · Printed · Hang tags", code:"05", tone:"paper", image:"assets/crew-tee-back.webp", subcategories:["Woven Labels","Printed Labels","Hang Tags"] }
+  ];
+
+  const seedProducts = [
+    { id:1, audience:"retail", name:"Heavyweight Crew Tee", category:"T-Shirts", subcategory:"Crew Neck", price:449, mrp:599, image:"assets/crew-tee.webp", type:"Colour + Option", colors:["Black","White","Olive"], sizes:["S","M","L","XL","XXL"], stock:42, description:"240 GSM combed cotton with a structured fit, reinforced neck and smooth print-ready surface.", colorGroups:[
+      {color:"Black",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:8},{value:"M",stock:8},{value:"L",stock:7},{value:"XL",stock:6},{value:"XXL",stock:4}]},
+      {color:"White",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:7},{value:"M",stock:8},{value:"L",stock:7},{value:"XL",stock:6},{value:"XXL",stock:4}]},
+      {color:"Olive",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:5},{value:"M",stock:6},{value:"L",stock:5},{value:"XL",stock:4},{value:"XXL",stock:3}]}
+    ]},
+    { id:2, audience:"retail", name:"Performance Team Jersey", category:"Sportswear", subcategory:"Jerseys", price:649, mrp:799, image:"assets/sports-jersey.webp", type:"Colour + Option", colors:["Navy","Maroon","Royal"], sizes:["S","M","L","XL"], stock:28, description:"Breathable quick-dry sports fabric made for team kits, club uniforms and custom printing.", colorGroups:[
+      {color:"Navy",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:6},{value:"M",stock:7},{value:"L",stock:6},{value:"XL",stock:5}]},
+      {color:"Maroon",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:5},{value:"M",stock:6},{value:"L",stock:5},{value:"XL",stock:4}]},
+      {color:"Royal",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:5},{value:"M",stock:6},{value:"L",stock:5},{value:"XL",stock:4}]}
+    ], subItem:{name:"Matching sports shorts",price:299,sizes:["S","M","L","XL"]} },
+    { id:3, audience:"retail", name:"Executive Uniform Polo", category:"Uniforms", subcategory:"Office", price:720, mrp:890, image:"assets/premium-polo-product.webp", type:"Colour + Option", colors:["White","Sky","Navy"], sizes:["38","40","42","44"], stock:35, description:"Easy-care staff uniform with a clean professional profile and an embroidery-ready chest panel.", colorGroups:[
+      {color:"White",image:"assets/premium-polo-product.webp",sizes:[{value:"38",stock:8},{value:"40",stock:8},{value:"42",stock:8},{value:"44",stock:7}]},
+      {color:"Sky",image:"assets/premium-polo-product.webp",sizes:[{value:"38",stock:6},{value:"40",stock:7},{value:"42",stock:7},{value:"44",stock:5}]},
+      {color:"Navy",image:"assets/premium-polo-product.webp",sizes:[{value:"38",stock:5},{value:"40",stock:6},{value:"42",stock:6},{value:"44",stock:5}]}
+    ]},
+    { id:4, audience:"retail", name:"Premium Polo T-Shirt", category:"T-Shirts", subcategory:"Polo", price:599, mrp:749, image:"assets/premium-polo-product.webp", type:"Colour + Option", colors:["Black","Navy","Maroon"], sizes:["M","L","XL","XXL"], stock:31, description:"Soft pique polo for staff uniforms, events and everyday business wear.", colorGroups:[
+      {color:"Black",image:"assets/premium-polo-product.webp",sizes:[{value:"M",stock:8},{value:"L",stock:7},{value:"XL",stock:6},{value:"XXL",stock:4}]},
+      {color:"Navy",image:"assets/premium-polo-product.webp",sizes:[{value:"M",stock:7},{value:"L",stock:7},{value:"XL",stock:5},{value:"XXL",stock:4}]},
+      {color:"Maroon",image:"assets/premium-polo-product.webp",sizes:[{value:"M",stock:6},{value:"L",stock:6},{value:"XL",stock:5},{value:"XXL",stock:3}]}
+    ]},
+    { id:5, audience:"retail", name:"Woven Brand Label Set", category:"Tags & Labels", subcategory:"Woven Labels", price:380, mrp:450, image:"assets/crew-tee-back.webp", type:"One Option", colors:[], sizes:["50 pcs","100 pcs","250 pcs"], optionTitle:"Pack quantity", stock:18, description:"Durable custom woven labels with clean folded edges for garments and merchandise.", options:[
+      {value:"50 pcs",stock:8,image:"assets/crew-tee-back.webp"},{value:"100 pcs",stock:6,image:"assets/crew-tee-back.webp"},{value:"250 pcs",stock:4,image:"assets/crew-tee-back.webp"}
+    ]},
+    { id:6, audience:"retail", name:"Classic Oxford Shirt", category:"Shirts", subcategory:"Formal", price:799, mrp:999, image:"assets/polo-shirt.webp", type:"Colour + Option", colors:["White","Sky","Navy"], sizes:["38","40","42","44"], stock:23, description:"A clean formal staple with reliable sizing and a smooth finish for monogramming.", colorGroups:[
+      {color:"White",image:"assets/polo-shirt.webp",sizes:[{value:"38",stock:6},{value:"40",stock:6},{value:"42",stock:5},{value:"44",stock:4}]},
+      {color:"Sky",image:"assets/polo-shirt.webp",sizes:[{value:"38",stock:5},{value:"40",stock:5},{value:"42",stock:4},{value:"44",stock:3}]},
+      {color:"Navy",image:"assets/polo-shirt.webp",sizes:[{value:"38",stock:4},{value:"40",stock:5},{value:"42",stock:4},{value:"44",stock:3}]}
+    ]}
+  ];
+
+  const seedB2BProducts = [
+    { id:101, audience:"b2b", name:"Blank 240 GSM Crew Tee", category:"T-Shirts", subcategory:"Blank Garments", image:"assets/crew-tee.webp", type:"Colour + Option", colors:["White","Black","Navy"], sizes:["S","M","L","XL","XXL"], stock:120, description:"Bulk blank cotton T-shirt for printers, resellers and uniform suppliers.", colorGroups:[
+      {color:"White",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:25},{value:"M",stock:30},{value:"L",stock:25},{value:"XL",stock:20},{value:"XXL",stock:20}]},
+      {color:"Black",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:22},{value:"M",stock:28},{value:"L",stock:24},{value:"XL",stock:18},{value:"XXL",stock:16}]},
+      {color:"Navy",image:"assets/crew-tee.webp",sizes:[{value:"S",stock:18},{value:"M",stock:22},{value:"L",stock:20},{value:"XL",stock:15},{value:"XXL",stock:12}]}
+    ]},
+    { id:102, audience:"b2b", name:"Blank Sports Jersey", category:"Sportswear", subcategory:"Blank Jerseys", image:"assets/sports-jersey.webp", type:"Colour + Option", colors:["White","Navy","Royal"], sizes:["S","M","L","XL"], stock:85, description:"Quick-dry blank sports jersey supplied in bulk for clubs and printing businesses.", colorGroups:[
+      {color:"White",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:18},{value:"M",stock:22},{value:"L",stock:20},{value:"XL",stock:16}]},
+      {color:"Navy",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:15},{value:"M",stock:20},{value:"L",stock:18},{value:"XL",stock:14}]},
+      {color:"Royal",image:"assets/sports-jersey.webp",sizes:[{value:"S",stock:15},{value:"M",stock:18},{value:"L",stock:16},{value:"XL",stock:12}]}
+    ]}
+  ];
+
+  const seedOrders = [
+    { id:"CS-1048", customer:"Anand K", phone:"+91 98765 43210", total:1897, items:3, delivery:"Courier", payment:"Online · Paid", status:"Confirmed", time:"4 min ago", address:"Kozhikode, Kerala 673001", orderItems:[] },
+    { id:"CS-1047", customer:"Bluepeak Academy", phone:"+91 97440 11882", total:8240, items:16, delivery:"Store pickup", payment:"Pay at pickup", status:"Packed", time:"28 min ago", address:"Mavoor Road, Kozhikode", orderItems:[] },
+    { id:"CS-1046", customer:"Faris M", phone:"+91 81293 77121", total:1248, items:2, delivery:"Bus parcel", payment:"Online · Paid", status:"Ready", time:"1 hr ago", address:"Bus stand pickup, Malappuram", orderItems:[] }
+  ];
+
+  const deliveryDefaults = [
+    { name:"Courier", note:"Door delivery · charge confirmed with order", active:true },
+    { name:"Store pickup", note:"Collect from the production desk", active:true },
+    { name:"Bus parcel", note:"Collect from your selected bus stand", active:true }
+  ];
+
+  const printDefaults = [
+    { name:"DTF Print", price:180, note:"Vivid colour · works on light and dark garments", lightOnly:false },
+    { name:"Screen Print", price:120, note:"Durable and cost-effective for bulk orders", lightOnly:false },
+    { name:"Embroidery", price:260, note:"Premium thread finish for logos and names", lightOnly:false },
+    { name:"Sublimation Print", price:150, note:"Light colours only. Sublimation ink cannot be seen correctly on dark fabric.", lightOnly:true }
+  ];
+
+  const settingsDefaults = { whatsapp:"", b2bLoginId:"B2B", b2bPassword:"1234" };
+
+  const iconPaths = {
+    menu:'<path d="M4 7h16M4 12h16M4 17h16"/>', bag:'<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/>', search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>', minus:'<path d="M5 12h14"/>', home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/>', orders:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>',
+    arrow:'<path d="M5 12h14M14 6l6 6-6 6"/>', back:'<path d="m15 18-6-6 6-6M9 12h11"/>', check:'<path d="m5 12 4 4L19 6"/>', shield:'<path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/>', package:'<path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7M12 11v10"/>',
+    truck:'<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>', type:'<path d="M5 5h14M12 5v14M8 19h8"/>', image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 4"/>',
+    sliders:'<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="18" r="2"/>', move:'<path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/>', sparkle:'<path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3ZM5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15Z"/>',
+    trash:'<path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/>', map:'<path d="M12 22s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z"/><circle cx="12" cy="10" r="2"/>', card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>',
+    download:'<path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/>', close:'<path d="m6 6 12 12M18 6 6 18"/>', chevron:'<path d="m6 9 6 6 6-6"/>', upload:'<path d="M12 16V4m0 0L7 9m5-5 5 5M5 20h14"/>', rotate:'<path d="M20 11a8 8 0 1 0-2 5M20 4v7h-7"/>',
+    box:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v5"/>', external:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v7H4V6h7"/>', clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>', eye:'<path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2"/>', phone:'<path d="M7 3 4 5c0 8 7 15 15 15l2-3-5-3-2 2c-3-1-5-3-6-6l2-2-3-5Z"/>',
+    edit:'<path d="m4 20 4-1 10-10-3-3L5 16l-1 4Z"/><path d="m13 8 3 3"/>', filter:'<path d="M4 5h16l-6 7v6l-4 2v-8L4 5Z"/>', whatsapp:'<path d="M20 11.5a8 8 0 0 1-11.7 7L4 20l1.5-4A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 3 2 4.5 5 5"/>', lock:'<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'
+  };
+
+  function icon(name, cls) { return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(iconPaths[name]||iconPaths.sparkle)+'</svg>'; }
+  function money(value) { return "₹"+Number(value||0).toLocaleString("en-IN"); }
+  function esc(value) { return String(value ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c]); }
+  function clone(value) { try { return structuredClone(value); } catch (_) { return JSON.parse(JSON.stringify(value)); } }
+  function load(key, fallback) { try { const raw=localStorage.getItem(key); return raw?JSON.parse(raw):clone(fallback); } catch (_) { return clone(fallback); } }
+  function save(key, value) { localStorage.setItem(key,JSON.stringify(value)); window.dispatchEvent(new CustomEvent("one-line-change",{detail:{key}})); }
+
+  function getCategories(){ return load("custom-store-categories",categoryDefaults); }
+  function getProducts(){ return load("custom-store-products",seedProducts).map(normalizeProduct); }
+  function getB2BProducts(){ return load("custom-store-b2b-products",seedB2BProducts).map(normalizeProduct); }
+  function getOrders(){ return load("custom-store-orders",seedOrders); }
+  function getCart(){ return load("custom-store-cart",[]); }
+  function getDelivery(){ return load("custom-store-delivery",deliveryDefaults); }
+  function getPrints(){ const arr=load("custom-store-print-types",printDefaults); if(!arr.some(x=>/sublimation/i.test(x.name))) arr.push(clone(printDefaults[3])); return arr; }
+  function getSettings(){ return Object.assign({},settingsDefaults,load("custom-store-settings",settingsDefaults)); }
+
+  function normalizeProduct(p){
+    const out=Object.assign({audience:"retail",type:"Simple",colors:[],sizes:["Default"],stock:0,description:"",image:"assets/crew-tee.webp"},p||{});
+    if(out.type==="Colour + Option"){
+      if(!Array.isArray(out.colorGroups)||!out.colorGroups.length){
+        out.colorGroups=(out.colors||[]).map(c=>({color:c,image:out.variantImages?.[c]||out.image,sizes:(out.sizes||[]).map(s=>({value:s,stock:Number(out.stock||0)}))}));
+      }
+      out.colors=out.colorGroups.map(g=>g.color);
+      out.sizes=[...new Set(out.colorGroups.flatMap(g=>(g.sizes||[]).map(s=>typeof s==='string'?s:s.value)))];
+    } else if(out.type==="One Option"){
+      if(!Array.isArray(out.options)||!out.options.length) out.options=(out.sizes||[]).map(v=>({value:v,stock:Number(out.stock||0),image:out.image}));
+      out.sizes=out.options.map(x=>x.value);
+    } else {
+      out.sizes=out.sizes?.length?out.sizes:["Default"];
+    }
+    return out;
+  }
+
+  function productImage(product,color,option){
+    const p=normalizeProduct(product);
+    if(p.type==="Colour + Option") return p.colorGroups.find(g=>g.color===color)?.image || p.image;
+    if(p.type==="One Option") return p.options.find(o=>o.value===option)?.image || p.image;
+    return p.image;
+  }
+  function availableOptions(product){
+    const p=normalizeProduct(product);
+    if(p.type==="Colour + Option") return [...new Set(p.colorGroups.flatMap(g=>(g.sizes||[]).map(s=>typeof s==='string'?s:s.value)))];
+    if(p.type==="One Option") return p.options.map(o=>o.value);
+    return p.sizes||[];
+  }
+  function availableSubcategories(products,category){ return [...new Set(products.filter(p=>!category||category==='All'||p.category===category).map(p=>p.subcategory).filter(Boolean))].sort(); }
+  function isDarkHex(hex){
+    const clean=String(hex||'').replace('#',''); if(!/^[0-9a-f]{6}$/i.test(clean)) return false;
+    const r=parseInt(clean.slice(0,2),16),g=parseInt(clean.slice(2,4),16),b=parseInt(clean.slice(4,6),16);
+    return (0.2126*r+0.7152*g+0.0722*b)<150;
+  }
+  function isDarkColor(name){ return isDarkHex(palette[name]||name); }
+
+  function surfaceDesign(design,surface){
+    const blank={text:"",font:"Impact",textColor:"#fff",textSize:28,textRotation:0,imageSize:80,imageRotation:0,positions:{text:{x:50,y:40},image:{x:50,y:62}}};
+    if(design?.surfaceDesigns?.[surface]) return Object.assign({},blank,design.surfaceDesigns[surface]);
+    if(surface==="front"&&design) return Object.assign({},blank,design);
+    return blank;
+  }
+  function designedSurfaces(design){ return ["front","back","rightSleeve","leftSleeve"].filter(s=>{const d=surfaceDesign(design,s);return d.text||d.uploadedImage;}); }
+  function designPreview(design,surface,className){
+    surface=surface||"front"; const d=surfaceDesign(design,surface); const sleeve=surface.includes("Sleeve");
+    const garment=sleeve?(design.sleeveImage||"assets/sleeve-side-neutral.webp"):surface==="back"?(design.garmentBackImage||design.garmentImage):design.garmentImage;
+    const mirror=surface==="rightSleeve"?" scaleX(-1)":""; const zone="zone-"+surface;
+    const text=d.text?'<span class="saved-design-text" style="left:'+d.positions.text.x+'%;top:'+d.positions.text.y+'%;color:'+esc(d.textColor)+';font-family:'+esc(d.font)+';font-size:'+Math.max(7,d.textSize*.42)+'px;transform:translate(-50%,-50%) rotate('+(d.textRotation||0)+'deg)">'+esc(d.text)+'</span>':'';
+    const image=d.uploadedImage?'<img class="saved-design-image" src="'+esc(d.uploadedImage)+'" alt="" style="left:'+d.positions.image.x+'%;top:'+d.positions.image.y+'%;width:'+Math.max(14,d.imageSize*.42)+'px;transform:translate(-50%,-50%) rotate('+(d.imageRotation||0)+'deg)" />':'';
+    return '<div class="real-garment-preview preview-'+surface+' '+esc(className||'')+'"><div class="garment-depth"></div><img class="garment-photo '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" src="'+esc(garment)+'" alt="" style="transform:'+mirror+'"><span class="garment-tint '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" style="background:'+esc(palette[design.garmentColor]||design.garmentColor||palette.Navy)+';mask-image:url('+esc(garment)+');-webkit-mask-image:url('+esc(garment)+');transform:'+mirror+'"></span><div class="garment-print-zone '+zone+'">'+text+image+'</div></div>';
+  }
+  function whatsappUrl(message){ const settings=getSettings(), num=String(settings.whatsapp||'').replace(/\D/g,''); return num?'https://wa.me/'+num+'?text='+encodeURIComponent(message):'https://wa.me/?text='+encodeURIComponent(message); }
+
+  window.OneLineStore={
+    palette,categories:categoryDefaults,categoryDefaults,seedProducts,seedB2BProducts,seedOrders,deliveryDefaults,printDefaults,settingsDefaults,
+    icon,money,esc,clone,load,save,getCategories,getProducts,getB2BProducts,getOrders,getCart,getDelivery,getPrints,getSettings,
+    normalizeProduct,productImage,availableOptions,availableSubcategories,isDarkHex,isDarkColor,surfaceDesign,designedSurfaces,designPreview,whatsappUrl
+  };
 })();
