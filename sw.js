@@ -1,4 +1,4 @@
-const CACHE="one-line-static-v5";
+const CACHE="one-line-static-v6";
 const CORE=[
   "./index.html","./admin.html","./staff.html","./receiver.html","./css/styles.css",
   "./js/data.js","./js/designer.js","./js/app.js","./js/admin.js","./js/staff.js",
@@ -6,6 +6,7 @@ const CORE=[
   "./assets/crew-tee.webp","./assets/crew-tee-back.webp","./assets/polo-shirt.webp",
   "./assets/polo-shirt-back.webp","./assets/sports-jersey.webp","./assets/sports-jersey-back.webp",
   "./assets/crew-tee-left-sleeve-close.webp","./assets/crew-tee-right-sleeve-close.webp",
+  "./assets/crew-tee-sleeve.webp","./assets/polo-shirt-sleeve.webp","./assets/sports-jersey-sleeve.webp","./assets/uniform-shirt-sleeve.webp",
   "./assets/polo-shirt-left-sleeve-close.webp","./assets/polo-shirt-right-sleeve-close.webp",
   "./assets/sports-jersey-left-sleeve-close.webp","./assets/sports-jersey-right-sleeve-close.webp",
   "./assets/uniform-shirt-left-sleeve-close.webp","./assets/uniform-shirt-right-sleeve-close.webp","./assets/uniform-shirt-front.webp","./assets/uniform-shirt-back.webp",

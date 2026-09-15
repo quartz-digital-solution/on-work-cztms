@@ -21,15 +21,18 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 
 - Professional Buy now checkout for ready-made products and admin-toggleable customization
 - Front, back, right sleeve and left sleeve design areas
-- Separate close-up right and left sleeve photography for crew tees, polos, sports jerseys and uniform shirts; sleeve views are never mirrored
+- Practical side-profile sleeve editing for the colour-changeable garments, with independent right- and left-sleeve design data
 - Multiple text and image elements on the same side
-- Unrestricted drag positioning plus independent resize, rotate, edit, delete and print method per element
+- Unrestricted drag positioning plus independent resize, rotate, edit and delete controls
 - Animated visual garment picker and direct WhatsApp support for advanced customization
-- Separate admin-controlled image and text print prices
+- One clearly styled print-method selector appears whenever a design element exists; it does not depend on selecting a text or image
+- Every text and image remains separately charged using the chosen method's admin-controlled text/image rates
 - Budget, Standard and Premium cloth qualities with editable descriptions and rates
 - Sublimation automatically disabled for dark colours
 - Colour-specific front, back and sleeve uploads, price, quantity and optional barcode
-- Uploaded garment colours are displayed unchanged and locked inside the customizer
+- Two per-item customization modes: admin-approved colour-changing mockups, or ready-made colour-locked photos
+- Ready-made shop images and fixed-colour customizer images are never automatically recoloured
+- Per-item admin customization controls select available colours, cloth types, printing methods and colour-changing mockup views
 - A colour image is reused consistently for every size belonging to that colour
 - Existing size-variant inventory remains supported by the staff stock desk
 - School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer

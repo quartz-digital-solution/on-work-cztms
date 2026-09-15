@@ -1307,3 +1307,113 @@ select:focus { border-color:#71197d!important;box-shadow:0 0 0 3px rgba(113,25,1
   .compact-garment .print-area.surface-rightSleeve { left:71%!important;top:46%!important;width:34%!important;height:31%!important; }
   .compact-controls .print-options button { min-height:68px!important;padding:12px!important; }
 }
+
+/* v11 practical customization modes and global print selection */
+.compact-garment.fixed-garment > .garment-photo { filter:none!important;opacity:1!important; }
+.compact-garment.tint-enabled > .garment-photo { filter:grayscale(1)!important;opacity:1!important; }
+.compact-garment.tint-enabled > .garment-tint { opacity:.88!important;mix-blend-mode:multiply!important; }
+.compact-garment.tint-enabled.garment-leftSleeve > .sleeve-photo,
+.compact-garment.tint-enabled.garment-rightSleeve > .sleeve-photo,
+.compact-garment.tint-enabled.garment-leftSleeve > .sleeve-tint,
+.compact-garment.tint-enabled.garment-rightSleeve > .sleeve-tint { inset:4% 8%!important;width:84%!important;height:92%!important;border-radius:16px!important;object-fit:contain!important; }
+.compact-garment.tint-enabled .mirror-sleeve { transform:scaleX(-1)!important; }
+.compact-garment.tint-enabled .print-area.surface-leftSleeve { left:58%!important;top:43%!important;width:20%!important;height:29%!important;transform:translate(-50%,-50%) rotate(2deg)!important; }
+.compact-garment.tint-enabled .print-area.surface-rightSleeve { left:42%!important;top:43%!important;width:20%!important;height:29%!important;transform:translate(-50%,-50%) rotate(-2deg)!important; }
+.real-garment-preview.changeable-preview .sleeve-preview { inset:4%!important;width:92%!important;height:92%!important;border-radius:7px!important;object-fit:contain!important; }
+.real-garment-preview.changeable-preview .sleeve-preview.mirror-sleeve { transform:scaleX(-1)!important; }
+.real-garment-preview.changeable-preview.preview-leftSleeve .garment-print-zone { left:58%!important;top:43%!important;width:20%!important;height:29%!important;transform:translate(-50%,-50%)!important; }
+.real-garment-preview.changeable-preview.preview-rightSleeve .garment-print-zone { left:42%!important;top:43%!important;width:20%!important;height:29%!important;transform:translate(-50%,-50%)!important; }
+
+.garment-choice { grid-template-columns:minmax(0,1fr) 118px!important;align-items:end!important; }
+.custom-colour-options { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px; }
+.custom-colour-options button { min-width:0;height:42px;padding:0 8px;display:grid;grid-template-columns:18px minmax(0,1fr) 13px;gap:6px;align-items:center;border:1px solid #ddd3df;border-radius:10px;background:#faf8fb;color:#463a49;text-align:left;cursor:pointer;transition:border-color .16s,background .16s,transform .16s; }
+.custom-colour-options button:hover { transform:translateY(-1px);border-color:#bca8c1; }
+.custom-colour-options button > span { width:18px;height:18px;border:1px solid rgba(30,22,32,.18);border-radius:50%;box-shadow:inset 0 0 0 2px #fff; }
+.custom-colour-options button b { min-width:0;overflow:hidden;text-overflow:ellipsis;color:#574b5a;font-size:7.5px;white-space:nowrap; }
+.custom-colour-options button svg { width:12px;opacity:0;color:#681573; }
+.custom-colour-options button.active { border:2px solid #6b1876;background:#f8eff9; }
+.custom-colour-options button.active svg { opacity:1; }
+
+.global-print-selector { padding:16px!important; }
+.global-print-head { margin-bottom:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px; }
+.global-print-head > div { display:grid;gap:3px; }
+.global-print-head span { color:#7a6d7e;font-size:6.5px;font-weight:900;letter-spacing:.15em; }
+.global-print-head h3 { margin:0;color:#2e2630;font-size:14px;line-height:1.15; }
+.global-print-head > small { max-width:145px;color:#8a7e8e;font-size:7px;line-height:1.4;text-align:right; }
+.compact-controls .print-method-grid { display:grid!important;gap:8px!important; }
+.compact-controls .print-method-grid button { width:100%!important;min-height:78px!important;padding:12px!important;display:grid!important;grid-template-columns:30px minmax(0,1fr) auto!important;grid-template-rows:1fr!important;gap:11px!important;align-items:center!important;border:1px solid #ddd4df!important;border-radius:13px!important;background:#fff!important;box-shadow:0 5px 14px rgba(51,30,55,.045)!important;text-align:left!important;cursor:pointer; }
+.compact-controls .print-method-grid button > i { width:30px;height:30px;display:grid;place-items:center;border:1px solid #d6cbd9;border-radius:9px;background:#f5f0f6;color:#79577e;font-style:normal; }
+.compact-controls .print-method-grid button > i svg { width:14px;height:14px; }
+.compact-controls .print-method-grid button > span { width:auto!important;height:auto!important;padding:0!important;display:grid!important;grid-row:auto!important;gap:4px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#2d2630!important; }
+.compact-controls .print-method-grid button > span:after { display:none!important; }
+.compact-controls .print-method-grid button b { color:#2d2630!important;font-size:10px!important;line-height:1.2!important; }
+.compact-controls .print-method-grid button small { color:#817687!important;font-size:7.5px!important;line-height:1.45!important; }
+.compact-controls .print-method-grid button > strong { padding:0!important;display:grid!important;grid-column:3!important;grid-row:1!important;gap:5px!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;font-size:inherit!important;white-space:nowrap!important; }
+.compact-controls .print-method-grid button > strong em { padding:6px 8px;border-radius:8px;background:#f3eaf5;color:#651671;font-size:7px;font-style:normal;font-weight:900;text-align:center; }
+.compact-controls .print-method-grid button.active { border:2px solid #6b1876!important;background:linear-gradient(145deg,#fff,#fbf4fc)!important;box-shadow:0 8px 20px rgba(107,24,118,.08)!important; }
+.compact-controls .print-method-grid button.active > i { border-color:#6b1876;background:#6b1876;color:#fff; }
+.compact-controls .print-method-grid button.active > strong { background:transparent!important;color:inherit!important; }
+.compact-controls .print-method-grid button.active > strong em { background:#6b1876;color:#fff; }
+.compact-controls .print-method-grid button:disabled { opacity:.43!important;cursor:not-allowed; }
+
+.admin-customization-section { margin:16px;border:1px solid #d8c7dc!important;border-radius:18px;background:linear-gradient(145deg,#fbf7fc,#f4edf6);box-shadow:0 12px 28px rgba(77,26,85,.07); }
+.admin-customization-head { margin:-20px -20px 18px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ded0e1; }
+.admin-customization-head > div { display:grid;gap:4px; }
+.admin-customization-head span { color:#7a4280;font-size:7px;font-weight:900;letter-spacing:.16em; }
+.admin-customization-head h3 { margin:0;color:#2e2430;font-size:19px; }
+.admin-customization-head p { margin:0;color:#7e7182;font-size:8px; }
+.admin-customization-head > svg { width:25px;color:#6b1876; }
+.custom-mode-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.custom-mode-card { min-height:86px;padding:13px;position:relative;display:grid!important;grid-template-columns:34px 1fr;gap:11px;align-items:center;border:1px solid #d9cedc;border-radius:13px;background:#fff;cursor:pointer; }
+.custom-mode-card input { position:absolute;opacity:0;pointer-events:none; }
+.custom-mode-card > span { width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#f1e9f3;color:#6b1876; }
+.custom-mode-card > span svg { width:17px; }
+.custom-mode-card > div { display:grid;gap:5px; }
+.custom-mode-card b { color:#352c38;font-size:9px; }
+.custom-mode-card small { color:#817486;font-size:7px;line-height:1.4; }
+.custom-mode-card.active { border:2px solid #6b1876;background:#fbf6fc;box-shadow:0 8px 18px rgba(90,26,99,.08); }
+.custom-mode-card.active > span { background:#6b1876;color:#fff; }
+.custom-setting-block { margin-top:14px;padding:14px;border:1px solid #ded3e0;border-radius:13px;background:rgba(255,255,255,.78); }
+.custom-setting-block > label { display:block;margin-bottom:11px;color:#5e5262;font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase; }
+.custom-colour-admin-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px; }
+.custom-colour-admin-grid label { min-width:0;height:40px;padding:0 8px;position:relative;display:grid;grid-template-columns:18px minmax(0,1fr) 12px;gap:6px;align-items:center;border:1px solid #ddd2df;border-radius:9px;background:#fff;cursor:pointer; }
+.custom-colour-admin-grid input { position:absolute;opacity:0; }
+.custom-colour-admin-grid label > span { width:18px;height:18px;border:1px solid rgba(30,20,32,.17);border-radius:50%;box-shadow:inset 0 0 0 2px #fff; }
+.custom-colour-admin-grid b { overflow:hidden;color:#534757;font-size:7.5px;text-overflow:ellipsis;white-space:nowrap; }
+.custom-colour-admin-grid svg { width:11px;opacity:0;color:#6b1876; }
+.custom-colour-admin-grid label:has(input:checked) { border:2px solid #6b1876;background:#faf3fb; }
+.custom-colour-admin-grid label:has(input:checked) svg { opacity:1; }
+.customizer-view-grid { grid-template-columns:repeat(3,minmax(0,1fr))!important; }
+.fixed-colour-note { margin-top:14px;padding:14px;display:grid;grid-template-columns:30px 1fr;gap:11px;align-items:center;border:1px solid #d9cedc;border-radius:12px;background:#fff; }
+.fixed-colour-note > svg { width:21px;color:#6b1876; }
+.fixed-colour-note div { display:grid;gap:4px; }
+.fixed-colour-note b { color:#3b313e;font-size:9px; }
+.fixed-colour-note p { margin:0;color:#817586;font-size:7.5px;line-height:1.45; }
+.custom-settings-columns { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.customization-checks { display:grid!important;gap:7px!important; }
+.customization-checks label { min-height:48px;padding:9px!important;display:grid!important;grid-template-columns:17px 1fr!important;gap:8px!important;align-items:start!important;border:1px solid #ddd3df;border-radius:9px;background:#fff; }
+.customization-checks input { width:16px;height:16px;accent-color:#6b1876; }
+.customization-checks span { display:grid;gap:3px; }
+.customization-checks b { color:#463b49;font-size:8px; }
+.customization-checks small { color:#847887;font-size:6.5px;line-height:1.4; }
+
+@media (max-width:760px) {
+  .compact-garment.tint-enabled.garment-leftSleeve > .sleeve-photo,
+  .compact-garment.tint-enabled.garment-rightSleeve > .sleeve-photo,
+  .compact-garment.tint-enabled.garment-leftSleeve > .sleeve-tint,
+  .compact-garment.tint-enabled.garment-rightSleeve > .sleeve-tint { inset:3%!important;width:94%!important;height:94%!important; }
+  .compact-garment.tint-enabled .print-area.surface-leftSleeve { left:58%!important;top:43%!important;width:24%!important;height:31%!important; }
+  .compact-garment.tint-enabled .print-area.surface-rightSleeve { left:42%!important;top:43%!important;width:24%!important;height:31%!important; }
+  .garment-choice { grid-template-columns:1fr!important; }
+  .custom-colour-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .global-print-selector { padding:14px!important; }
+  .compact-controls .print-method-grid button { min-height:76px!important;padding:11px!important;grid-template-columns:28px minmax(0,1fr)!important;gap:9px!important; }
+  .compact-controls .print-method-grid button > i { width:28px;height:28px; }
+  .compact-controls .print-method-grid button > strong { grid-column:2!important;grid-row:2!important;display:flex!important;gap:5px!important; }
+  .compact-controls .print-method-grid button > strong em { padding:5px 7px; }
+  .admin-customization-section { margin:10px;padding:14px!important; }
+  .admin-customization-head { margin:-14px -14px 14px;padding:15px 14px; }
+  .custom-mode-grid,.custom-settings-columns { grid-template-columns:1fr; }
+  .custom-colour-admin-grid { grid-template-columns:1fr 1fr; }
+  .customizer-view-grid { grid-template-columns:1fr!important; }
+}
