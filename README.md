@@ -19,7 +19,7 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 
 ## Implemented commerce rules
 
-- Professional Buy now checkout for ready-made products and admin-toggleable customization
+- Ready-made catalogue products are never opened in the editor; they can be bought normally or sent as a customization enquiry
 - Front, back, right sleeve and left sleeve design areas
 - Practical side-profile sleeve editing for the colour-changeable garments, with independent right- and left-sleeve design data
 - Multiple text and image elements on the same side
@@ -30,9 +30,9 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 - Budget, Standard and Premium cloth qualities with editable descriptions and rates
 - Sublimation automatically disabled for dark colours
 - Colour-specific front, back and sleeve uploads, price, quantity and optional barcode
-- Two per-item customization modes: admin-approved colour-changing mockups, or ready-made colour-locked photos
+- A separate Admin → Customizable area manages the dedicated editor products, colours, mockups, sizes and print methods
 - Ready-made shop images and fixed-colour customizer images are never automatically recoloured
-- Per-item admin customization controls select available colours, cloth types, printing methods and colour-changing mockup views
+- The customer editor is intentionally limited to garment colour + text + image customization, with a clear print-method selector
 - A colour image is reused consistently for every size belonging to that colour
 - Existing size-variant inventory remains supported by the staff stock desk
 - School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer

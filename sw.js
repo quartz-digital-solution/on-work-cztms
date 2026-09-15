@@ -1,7 +1,7 @@
-const CACHE="one-line-static-v6";
+const CACHE="one-line-static-20260915-1750-r4";
 const CORE=[
-  "./index.html","./admin.html","./staff.html","./receiver.html","./css/styles.css",
-  "./js/data.js","./js/designer.js","./js/app.js","./js/admin.js","./js/staff.js",
+  "./index.html","./admin.html","./staff.html","./receiver.html","./css/styles.css?v=20260915-1750-r4",
+  "./js/data.js?v=20260915-1750-r4","./js/designer.js?v=20260915-1750-r4","./js/app.js?v=20260915-1750-r4","./js/admin.js?v=20260915-1750-r4","./js/staff.js?v=20260915-1750-r4",
   "./one-line-mark.svg","./icon-192.png","./icon-512.png","./manifest.webmanifest",
   "./assets/crew-tee.webp","./assets/crew-tee-back.webp","./assets/polo-shirt.webp",
   "./assets/polo-shirt-back.webp","./assets/sports-jersey.webp","./assets/sports-jersey-back.webp",
