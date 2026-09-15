@@ -2,14 +2,14 @@
   "use strict";
   const S=window.OneLineStore;
   const root=document.getElementById("admin-app");
-  const state={view:"products",menu:false,products:S.getProducts(),categories:S.getCategories(),settings:S.getSettings(),prints:S.getPrints(),editingId:null,editingCategoryId:null,formImages:[],colourGroups:[],toast:""};
+  const state={view:"products",menu:false,products:S.getProducts(),categories:S.getCategories(),settings:S.getSettings(),prints:S.getPrints(),editingId:null,editingCategoryId:null,formImages:[],colourGroups:[],subColourGroups:[],subBaseImage:"",toast:""};
   const fallback="assets/crew-tee.webp";
   const esc=S.esc;
   const imageTag=(src,alt,cls)=>'<img '+(cls?'class="'+cls+'" ':'')+'src="'+esc(src||fallback)+'" alt="'+esc(alt||'')+'" onerror="this.onerror=null;this.src=\''+fallback+'\'">';
   const uid=()=>Date.now()+Math.floor(Math.random()*10000);
   const productById=id=>state.products.find(p=>String(p.id)===String(id));
   const currentProduct=()=>state.editingId?productById(state.editingId):null;
-  const defaultForm=()=>({audience:"retail",category:state.categories[0]?.name||"",subcategory:"",name:"",description:"",type:"Simple",optionTitle:"Size",options:"",mrp:"",price:"",stock:"0"});
+  const defaultForm=()=>({audience:"retail",category:state.categories[0]?.name||"",subcategory:"",name:"",description:"",type:"Simple",optionTitle:"Size",options:"",mrp:"",price:"",stock:"0",subEnabled:false,subName:"",subPrice:"",subType:"One Option",subOptionTitle:"Size",subOptions:"",subImageUrl:""});
   let form=defaultForm();
 
   function saveProducts(){S.save("custom-store-products-v3",state.products);}
@@ -47,7 +47,7 @@
       '<div class="field-row"><label class="field"><span>Visible to</span><select id="fAudience"><option value="retail" '+(form.audience==="retail"?'selected':'')+'>Retail customer</option><option value="b2b" '+(form.audience==="b2b"?'selected':'')+'>B2B only</option></select><small>B2B-only products never appear in the normal customer catalogue.</small></label><label class="field"><span>Available stock</span><input id="fStock" type="number" min="0" value="'+esc(form.stock)+'"></label></div>'+
       '<label class="field"><span>Description</span><textarea id="fDescription" placeholder="Short product detail">'+esc(form.description)+'</textarea></label>'+
       '<section class="editor-box"><div class="editor-box-head"><div><b>Product type & options</b><small>Same simple model as WellOne: Simple, One option, or Colour + option.</small></div></div><div class="product-type-row"><label class="field"><span>Product type</span><select id="fType"><option '+(form.type==="Simple"?'selected':'')+'>Simple</option><option '+(form.type==="One Option"?'selected':'')+'>One Option</option><option '+(form.type==="Colour + Option"?'selected':'')+'>Colour + Option</option></select></label></div>'+imagesEditor()+variantEditor()+'</section>'+
-      pricingEditor()+'<div class="form-actions"><button type="button" class="ghost-btn" data-action="cancel-edit">Cancel</button><button type="submit" class="primary-btn">'+(p?'Save changes':'Add product')+'</button></div></div></form></section>';
+      subItemEditor()+pricingEditor()+'<div class="form-actions"><button type="button" class="ghost-btn" data-action="cancel-edit">Cancel</button><button type="submit" class="primary-btn">'+(p?'Save changes':'Add product')+'</button></div></div></form></section>';
   }
 
   function imagesEditor(){
@@ -60,6 +60,17 @@
   }
   function colourGroup(g,i){
     return '<div class="colour-group" data-group="'+i+'"><div class="colour-group-head"><label class="field"><span>Colour</span><input data-group-color="'+i+'" value="'+esc(g.color)+'" placeholder="Black"></label><label class="field"><span>Options for this colour</span><input data-group-options="'+i+'" value="'+esc(g.options)+'" placeholder="S, M, L, XL"></label><button type="button" class="remove-group" data-action="remove-colour-group" data-index="'+i+'">Remove</button></div><div class="colour-image-control">'+imageTag(g.image||fallback,g.color||'Colour image')+'<div><b>Colour image</b><small>One image is reused for every size/option in this colour.</small><label>Add colour image<input data-group-image="'+i+'" type="file" accept="image/*"></label><input data-group-url="'+i+'" value="'+esc(g.url||'')+'" placeholder="Or paste image URL" style="min-height:38px;padding:0 9px;border:1px solid #d7e2bc;border-radius:9px"></div></div></div>';
+  }
+
+  function subItemEditor(){
+    return '<section class="editor-box subitem-editor"><div class="editor-box-head"><div><b>Optional sub-item / matching item</b><small>Example: jersey + matching shorts. Sub-items can use One Option or Colour + Option.</small></div><label class="subitem-admin-toggle"><input id="fSubEnabled" type="checkbox" '+(form.subEnabled?'checked':'')+'><span>Add sub-item</span></label></div>'+(form.subEnabled?'<div class="field-row"><label class="field"><span>Sub-item name</span><input id="fSubName" value="'+esc(form.subName)+'" placeholder="Matching sports shorts"></label><label class="field"><span>Additional price</span><input id="fSubPrice" type="number" min="0" value="'+esc(form.subPrice)+'" placeholder="299"></label></div><div class="field-row"><label class="field"><span>Sub-item type</span><select id="fSubType"><option '+(form.subType==='One Option'?'selected':'')+'>One Option</option><option '+(form.subType==='Colour + Option'?'selected':'')+'>Colour + Option</option></select></label><label class="field"><span>Option title</span><input id="fSubOptionTitle" value="'+esc(form.subOptionTitle)+'" placeholder="Size"></label></div>'+subVariantEditor():'<p class="variant-help">Enable this only when the main product can be ordered with a matching extra item.</p>')+'</section>';
+  }
+  function subVariantEditor(){
+    if(form.subType==='One Option')return '<div class="field-row"><label class="field"><span>Options</span><input id="fSubOptions" value="'+esc(form.subOptions)+'" placeholder="S, M, L, XL"></label><label class="field"><span>Sub-item image URL</span><input id="fSubImageUrl" value="'+esc(form.subImageUrl||'')+'" placeholder="https://..."></label></div><div class="subitem-base-image">'+imageTag(state.subBaseImage||form.subImageUrl||fallback,'Sub-item')+'<label>Add / replace sub-item image<input id="subBaseImageFile" type="file" accept="image/*"></label></div>';
+    return '<p class="variant-help">Each sub-item colour gets its own image and can have many sizes/options.</p><div class="option-builder sub-option-builder">'+state.subColourGroups.map((g,i)=>subColourGroup(g,i)).join('')+'<button type="button" class="add-group" data-action="add-sub-colour-group">+ Add sub-item colour</button></div>';
+  }
+  function subColourGroup(g,i){
+    return '<div class="colour-group" data-sub-group="'+i+'"><div class="colour-group-head"><label class="field"><span>Sub-item colour</span><input data-sub-group-color="'+i+'" value="'+esc(g.color)+'" placeholder="Black"></label><label class="field"><span>Options for this colour</span><input data-sub-group-options="'+i+'" value="'+esc(g.options)+'" placeholder="S, M, L, XL"></label><button type="button" class="remove-group" data-action="remove-sub-colour-group" data-index="'+i+'">Remove</button></div><div class="colour-image-control">'+imageTag(g.image||fallback,g.color||'Sub-item colour image')+'<div><b>Sub-item colour image</b><small>One image is used for every size under this colour.</small><label>Add image<input data-sub-group-image="'+i+'" type="file" accept="image/*"></label><input data-sub-group-url="'+i+'" value="'+esc(g.url||'')+'" placeholder="Or paste image URL" style="min-height:38px;padding:0 9px;border:1px solid #d7e2bc;border-radius:9px"></div></div></div>';
   }
   function pricingEditor(){
     if(form.audience==="b2b")return '<div class="b2b-info"><b>B2B price is hidden.</b><br>The B2B customer sees “Ask for price” and is redirected to WhatsApp. No fixed rate is required.</div>';
@@ -77,12 +88,13 @@
 
   function readForm(){
     const v=id=>document.getElementById(id)?.value;
-    form.category=v("fCategory")??form.category;form.subcategory=v("fSubcategory")??form.subcategory;form.name=v("fName")??form.name;form.audience=v("fAudience")??form.audience;form.stock=v("fStock")??form.stock;form.description=v("fDescription")??form.description;form.type=v("fType")??form.type;form.optionTitle=v("fOptionTitle")??form.optionTitle;form.options=v("fOptions")??form.options;form.mrp=v("fMrp")??form.mrp;form.price=v("fPrice")??form.price;
+    form.category=v("fCategory")??form.category;form.subcategory=v("fSubcategory")??form.subcategory;form.name=v("fName")??form.name;form.audience=v("fAudience")??form.audience;form.stock=v("fStock")??form.stock;form.description=v("fDescription")??form.description;form.type=v("fType")??form.type;form.optionTitle=v("fOptionTitle")??form.optionTitle;form.options=v("fOptions")??form.options;form.mrp=v("fMrp")??form.mrp;form.price=v("fPrice")??form.price;form.subEnabled=document.getElementById("fSubEnabled")?.checked??form.subEnabled;form.subName=v("fSubName")??form.subName;form.subPrice=v("fSubPrice")??form.subPrice;form.subType=v("fSubType")??form.subType;form.subOptionTitle=v("fSubOptionTitle")??form.subOptionTitle;form.subOptions=v("fSubOptions")??form.subOptions;form.subImageUrl=v("fSubImageUrl")??form.subImageUrl;
     state.colourGroups.forEach((g,i)=>{const c=document.querySelector('[data-group-color="'+i+'"]');const o=document.querySelector('[data-group-options="'+i+'"]');const u=document.querySelector('[data-group-url="'+i+'"]');if(c)g.color=c.value;if(o)g.options=o.value;if(u)g.url=u.value;});
+    state.subColourGroups.forEach((g,i)=>{const c=document.querySelector('[data-sub-group-color="'+i+'"]');const o=document.querySelector('[data-sub-group-options="'+i+'"]');const u=document.querySelector('[data-sub-group-url="'+i+'"]');if(c)g.color=c.value;if(o)g.options=o.value;if(u)g.url=u.value;});
   }
   function comma(v){return [...new Set(String(v||'').split(',').map(x=>x.trim()).filter(Boolean))];}
-  function startNew(){state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[{color:"",options:"",image:"",url:""}];state.view="add";state.menu=false;shell();}
-  function startEdit(id){const p=productById(id);if(!p)return;state.editingId=p.id;form={audience:p.audience||"retail",category:p.category||"",subcategory:p.subcategory||"",name:p.name||"",description:p.description||"",type:p.type||"Simple",optionTitle:p.optionTitle||"Size",options:(p.sizes||[]).join(', '),mrp:p.mrp||"",price:p.price||"",stock:p.stock??0};state.formImages=[...(p.images?.length?p.images:[p.image]).filter(Boolean)];state.colourGroups=(p.colorVariants?.length?p.colorVariants.map(v=>({color:v.color||"",options:(v.sizes||[]).join(', '),image:v.image||"",url:""})):[{color:"",options:"",image:"",url:""}]);state.view="add";state.menu=false;shell();}
+  function startNew(){state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[{color:"",options:"",image:"",url:""}];state.subColourGroups=[{color:"",options:"",image:"",url:""}];state.subBaseImage="";state.view="add";state.menu=false;shell();}
+  function startEdit(id){const p=productById(id);if(!p)return;const sub=p.subItem||null;state.editingId=p.id;form={audience:p.audience||"retail",category:p.category||"",subcategory:p.subcategory||"",name:p.name||"",description:p.description||"",type:p.type||"Simple",optionTitle:p.optionTitle||"Size",options:(p.sizes||[]).join(', '),mrp:p.mrp||"",price:p.price||"",stock:p.stock??0,subEnabled:!!sub,subName:sub?.name||"",subPrice:sub?.price||"",subType:sub?.type||((sub?.colorVariants||[]).length?'Colour + Option':'One Option'),subOptionTitle:sub?.optionTitle||"Size",subOptions:(sub?.sizes||[]).join(', '),subImageUrl:sub?.image||""};state.formImages=[...(p.images?.length?p.images:[p.image]).filter(Boolean)];state.colourGroups=(p.colorVariants?.length?p.colorVariants.map(v=>({color:v.color||"",options:(v.sizes||[]).join(', '),image:v.image||"",url:""})):[{color:"",options:"",image:"",url:""}]);state.subColourGroups=(sub?.colorVariants?.length?sub.colorVariants.map(v=>({color:v.color||"",options:(v.sizes||[]).join(', '),image:v.image||"",url:""})):[{color:"",options:"",image:"",url:""}]);state.subBaseImage=sub?.image||sub?.images?.[0]||"";state.view="add";state.menu=false;shell();}
 
   async function compress(file){
     if(!file||!file.type.startsWith('image/'))return "";
@@ -101,9 +113,23 @@
       if(!colorVariants.length){toast('Add at least one colour with its sizes/options.');return;}
       colors=colorVariants.map(g=>g.color);sizes=[...new Set(colorVariants.flatMap(g=>g.sizes))];
     }
+    let subItem=null;
+    if(form.subEnabled){
+      if(!form.subName.trim()){toast('Add the sub-item name.');return;}
+      if(form.subType==='Colour + Option'){
+        const subColorVariants=state.subColourGroups.map(g=>({color:g.color.trim(),image:(g.image||g.url||state.subBaseImage||fallback),sizes:comma(g.options)})).filter(g=>g.color&&g.sizes.length);
+        if(!subColorVariants.length){toast('Add at least one sub-item colour with options.');return;}
+        const subColors=subColorVariants.map(g=>g.color),subSizes=[...new Set(subColorVariants.flatMap(g=>g.sizes))];
+        subItem={name:form.subName.trim(),price:Number(form.subPrice||0),type:'Colour + Option',optionTitle:form.subOptionTitle.trim()||'Size',colors:subColors,sizes:subSizes,colorVariants:subColorVariants,images:subColorVariants.map(g=>g.image),image:subColorVariants[0]?.image||fallback};
+      }else{
+        const subSizes=comma(form.subOptions),subImage=state.subBaseImage||form.subImageUrl||fallback;
+        if(!subSizes.length){toast('Add sub-item options.');return;}
+        subItem={name:form.subName.trim(),price:Number(form.subPrice||0),type:'One Option',optionTitle:form.subOptionTitle.trim()||'Size',colors:[],sizes:subSizes,colorVariants:[],images:[subImage],image:subImage};
+      }
+    }
     const old=currentProduct(),id=old?.id||uid(),images=state.formImages.length?state.formImages.slice():(colorVariants.length?colorVariants.map(x=>x.image):[fallback]);
-    const product={...(old||{}),id,audience:form.audience,name:form.name.trim(),category:form.category,subcategory:form.subcategory.trim(),description:form.description.trim(),type:form.type,optionTitle:form.type==='Simple'?'':(form.optionTitle.trim()||'Option'),sizes,colors,colorVariants,images,image:images[0]||fallback,stock:Number(form.stock||0),price:form.audience==='b2b'?0:Number(form.price||0),mrp:form.audience==='b2b'?0:Number(form.mrp||0)};
-    const idx=state.products.findIndex(x=>String(x.id)===String(id));if(idx>=0)state.products[idx]=product;else state.products.unshift(product);saveProducts();toast(old?'Product updated.':'Product added.');state.view='products';state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[];shell();
+    const product={...(old||{}),id,audience:form.audience,name:form.name.trim(),category:form.category,subcategory:form.subcategory.trim(),description:form.description.trim(),type:form.type,optionTitle:form.type==='Simple'?'':(form.optionTitle.trim()||'Option'),sizes,colors,colorVariants,images,image:images[0]||fallback,stock:Number(form.stock||0),price:form.audience==='b2b'?0:Number(form.price||0),mrp:form.audience==='b2b'?0:Number(form.mrp||0),subItem};
+    const idx=state.products.findIndex(x=>String(x.id)===String(id));if(idx>=0)state.products[idx]=product;else state.products.unshift(product);saveProducts();toast(old?'Product updated.':'Product added.');state.view='products';state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[];state.subColourGroups=[];state.subBaseImage='';shell();
   }
 
   function bind(){
@@ -116,12 +142,18 @@
     root.querySelector('[data-action="apply-product-filter"]')?.addEventListener('click',filterAdminProducts);root.querySelector('#adminSearch')?.addEventListener('input',filterAdminProducts);root.querySelector('#adminCatFilter')?.addEventListener('change',filterAdminProducts);
     root.querySelector('#fType')?.addEventListener('change',e=>{readForm();form.type=e.target.value;if(form.type==='Colour + Option'&&!state.colourGroups.length)state.colourGroups=[{color:'',options:'',image:'',url:''}];shell();});
     root.querySelector('#fAudience')?.addEventListener('change',e=>{readForm();form.audience=e.target.value;shell();});
-    root.querySelector('#productForm')?.addEventListener('submit',saveProduct);root.querySelector('[data-action="cancel-edit"]')?.addEventListener('click',()=>{state.view='products';state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[];shell();});
+    root.querySelector('#fSubEnabled')?.addEventListener('change',e=>{readForm();form.subEnabled=e.target.checked;if(form.subEnabled&&!state.subColourGroups.length)state.subColourGroups=[{color:'',options:'',image:'',url:''}];shell();});
+    root.querySelector('#fSubType')?.addEventListener('change',e=>{readForm();form.subType=e.target.value;if(form.subType==='Colour + Option'&&!state.subColourGroups.length)state.subColourGroups=[{color:'',options:'',image:'',url:''}];shell();});
+    root.querySelector('#productForm')?.addEventListener('submit',saveProduct);root.querySelector('[data-action="cancel-edit"]')?.addEventListener('click',()=>{state.view='products';state.editingId=null;form=defaultForm();state.formImages=[];state.colourGroups=[];state.subColourGroups=[];state.subBaseImage='';shell();});
     root.querySelector('#productImages')?.addEventListener('change',async e=>{readForm();const list=Array.from(e.target.files||[]);for(const f of list){const src=await compress(f);if(src)state.formImages.push(src);}shell();});
     root.querySelectorAll('[data-action="remove-form-image"]').forEach(b=>b.addEventListener('click',()=>{readForm();state.formImages.splice(Number(b.dataset.index),1);shell();}));
     root.querySelector('[data-action="add-colour-group"]')?.addEventListener('click',()=>{readForm();state.colourGroups.push({color:'',options:'',image:'',url:''});shell();});
     root.querySelectorAll('[data-action="remove-colour-group"]').forEach(b=>b.addEventListener('click',()=>{readForm();state.colourGroups.splice(Number(b.dataset.index),1);if(!state.colourGroups.length)state.colourGroups.push({color:'',options:'',image:'',url:''});shell();}));
     root.querySelectorAll('[data-group-image]').forEach(input=>input.addEventListener('change',async e=>{readForm();const i=Number(input.dataset.groupImage),src=await compress(e.target.files?.[0]);if(src)state.colourGroups[i].image=src;shell();}));
+    root.querySelector('#subBaseImageFile')?.addEventListener('change',async e=>{readForm();const src=await compress(e.target.files?.[0]);if(src){state.subBaseImage=src;form.subImageUrl='';}shell();});
+    root.querySelector('[data-action="add-sub-colour-group"]')?.addEventListener('click',()=>{readForm();state.subColourGroups.push({color:'',options:'',image:'',url:''});shell();});
+    root.querySelectorAll('[data-action="remove-sub-colour-group"]').forEach(b=>b.addEventListener('click',()=>{readForm();state.subColourGroups.splice(Number(b.dataset.index),1);if(!state.subColourGroups.length)state.subColourGroups.push({color:'',options:'',image:'',url:''});shell();}));
+    root.querySelectorAll('[data-sub-group-image]').forEach(input=>input.addEventListener('change',async e=>{readForm();const i=Number(input.dataset.subGroupImage),src=await compress(e.target.files?.[0]);if(src)state.subColourGroups[i].image=src;shell();}));
     root.querySelector('#categoryForm')?.addEventListener('submit',saveCategory);root.querySelector('[data-action="cancel-category"]')?.addEventListener('click',()=>{state.editingCategoryId=null;shell();});
     root.querySelectorAll('[data-action="edit-category"]').forEach(b=>b.addEventListener('click',()=>{state.editingCategoryId=b.dataset.id;shell();}));
     root.querySelectorAll('[data-action="delete-category"]').forEach(b=>b.addEventListener('click',()=>{const c=state.categories.find(x=>String(x.id)===String(b.dataset.id));if(!c||!confirm('Delete category '+c.name+'?'))return;state.categories=state.categories.filter(x=>String(x.id)!==String(c.id));saveCategories();shell();toast('Category deleted.');}));

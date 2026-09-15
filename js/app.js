@@ -4,7 +4,7 @@
   const clone=v=>typeof structuredClone==="function"?structuredClone(v):JSON.parse(JSON.stringify(v));
   const state={
     screen:'home',products:S.getProducts(),categories:S.getCategories(),cart:S.getCart(),orders:S.getOrders(),settings:S.getSettings(),
-    filterCategories:[],filterSubs:[],filterOptions:[],filterOpen:false,filterDraft:null,selected:null,previewImage:'',color:'',size:'',subItem:false,subSize:'',menu:false,
+    filterCategories:[],filterSubs:[],filterOptions:[],filterOpen:false,filterDraft:null,selected:null,previewImage:'',color:'',size:'',subItem:false,subColor:'',subSize:'',menu:false,
     toast:'',legal:'',checkoutStep:1,details:{name:'',phone:'',address:'',business:''},delivery:'Courier',payment:'Cash on delivery',paymentDemo:false,
     orderPlaced:false,orderReference:'',installPrompt:null,b2bAuthed:sessionStorage.getItem('one-line-b2b-auth')==='1',b2bError:''
   };
@@ -24,17 +24,20 @@
   const img=(src,alt,cls,fallback)=>'<img src="'+S.esc(src||fallback||'assets/crew-tee.webp')+'" alt="'+S.esc(alt||'')+'" class="'+S.esc(cls||'')+'" loading="lazy" onerror="this.onerror=null;this.src=\''+S.esc(fallback||'assets/crew-tee.webp')+'\'">';
   function logo(compact){return '<div class="brand" aria-label="One-Line"><img class="brand-mark" src="one-line-mark.svg" alt="">'+(compact?'':'<span class="brand-copy"><b>One-Line</b><small>CUSTOM APPAREL STUDIO</small></span>')+'</div>';}
   function showToast(text){state.toast=text;render();setTimeout(()=>{if(state.toast===text){state.toast='';render();}},2200);}
+  function rememberScroll(){
+    try{if(history.state?.oneLine)history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);}catch(_){}
+  }
   function go(screen,options){
     options=options||{};
     state.menu=false;state.filterOpen=false;state.filterDraft=null;
     if(screen===state.screen&&!options.force){window.scrollTo({top:0,behavior:'smooth'});render();return;}
-    state.screen=screen;
-    if(!options.fromHistory){try{history.pushState({oneLine:true,screen},'',location.pathname+location.search+'#'+screen);}catch(_){}}
+    rememberScroll();state.screen=screen;
+    if(!options.fromHistory){try{history.pushState({oneLine:true,oneLineGuard:true,screen,scrollY:0},'',location.pathname+location.search+'#'+screen);}catch(_){}}
     window.scrollTo({top:0,behavior:options.instant?'auto':'smooth'});render();
   }
   function navigateBack(fallback){
     if(state.screen==='home'){window.scrollTo({top:0,behavior:'smooth'});return;}
-    if(history.state&&history.state.oneLine){history.back();return;}
+    if(history.state?.oneLine){history.back();return;}
     go(fallback||'home');
   }
   function saveCart(){if(state.cart.length)S.save('custom-store-cart-v3',state.cart);else localStorage.removeItem('custom-store-cart-v3');}
@@ -64,17 +67,27 @@
   function resetFilters(category){state.filterCategories=category&&category!=='All'?[category]:[];state.filterSubs=[];state.filterOptions=[];saveFilters();}
   function commitFilterDraft(){if(!state.filterDraft)return;state.filterCategories=clone(state.filterDraft.categories||[]);state.filterSubs=clone(state.filterDraft.subs||[]);state.filterOptions=clone(state.filterDraft.options||[]);saveFilters();}
   function closeFilter(saveDraft){if(saveDraft!==false)commitFilterDraft();state.filterOpen=false;state.filterDraft=null;render();}
-  function openProduct(id,audience){const p=state.products.find(x=>String(x.id)===String(id));if(!p)return;state.selected=p;state.previewImage='';state.color=p.colors?.[0]||p.colorVariants?.[0]?.color||'';const sizes=state.color?p.colorVariants?.find(v=>v.color===state.color)?.sizes:p.sizes;state.size=(sizes||p.sizes||[])[0]||'';state.subItem=false;state.subSize=p.subItem?.sizes?.[0]||'';go(audience==='b2b'?'b2bProduct':'product');}
+  function openProduct(id,audience){
+    const p=state.products.find(x=>String(x.id)===String(id));if(!p)return;
+    state.selected=p;state.previewImage='';state.color=p.colors?.[0]||p.colorVariants?.[0]?.color||'';
+    const sizes=state.color?p.colorVariants?.find(v=>v.color===state.color)?.sizes:p.sizes;state.size=(sizes||p.sizes||[])[0]||'';
+    state.subItem=false;state.subColor=p.subItem?.colors?.[0]||p.subItem?.colorVariants?.[0]?.color||'';
+    const subSizes=state.subColor?p.subItem?.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.subColor).toLowerCase())?.sizes:p.subItem?.sizes;
+    state.subSize=(subSizes||p.subItem?.sizes||[])[0]||'';
+    go(audience==='b2b'?'b2bProduct':'product');
+  }
   function selectedProductImage(p){return state.previewImage||(state.color?S.productImageForColor(p,state.color):(p.images?.[0]||p.image));}
   function currentSizes(p){const row=p.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.color).toLowerCase());return row?.sizes?.length?row.sizes:(p.sizes||[]);}
-
-  function productImages(p){
-    const list=[p.image,...(p.images||[]),...(p.colorVariants||[]).map(v=>v.image)].filter(Boolean);
-    return [...new Set(list)];
+  function currentSubSizes(p){const sub=p?.subItem;if(!sub)return[];const row=sub.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.subColor).toLowerCase());return row?.sizes?.length?row.sizes:(sub.sizes||[]);}
+  function currentSubImage(p){const sub=p?.subItem;if(!sub)return'';const row=sub.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.subColor).toLowerCase());return row?.image||sub.image||sub.images?.[0]||p.image||'assets/crew-tee.webp';}
+  function productGallery(p){const preferred=state.color?S.productImageForColor(p,state.color):selectedProductImage(p);return [...new Set([preferred,...productImages(p)].filter(Boolean))];}
+  function detailSlider(images,name){
+    images=(images||[]).filter(Boolean);if(!images.length)images=['assets/crew-tee.webp'];
+    return '<div class="detail-slider" data-detail-slider><div class="detail-slider-frame"><div class="product-slide-track detail-slide-track">'+images.map((src,i)=>'<div class="product-slide detail-slide" data-detail-index="'+i+'">'+img(src,name+' '+(i+1),'product-image','assets/crew-tee.webp')+'</div>').join('')+'</div></div>'+(images.length>1?'<div class="product-slide-progress detail-slide-progress">'+images.map((_,i)=>'<i class="'+(i===0?'active':'')+'"></i>').join('')+'</div>':'<div class="product-slide-progress detail-slide-progress single"><i class="active"></i></div>')+'</div>';
   }
   function productCard(p,audience){
     const isB2B=audience==='b2b',slides=productImages(p),discount=p.mrp&&p.price?Math.max(0,Math.round((p.mrp-p.price)/p.mrp*100)):0;
-    return '<article class="product-card wellone-card" tabindex="0" data-open-product="'+S.esc(p.id)+'" data-audience="'+(isB2B?'b2b':'retail')+'"><div class="product-image-wrap ratio-3x4 product-card-slider" data-card-slider="'+S.esc(p.id)+'" data-slider-audience="'+(isB2B?'b2b':'retail')+'"><div class="product-slide-track">'+slides.map((src,i)=>'<div class="product-slide" data-slide-index="'+i+'">'+img(src,p.name+' '+(i+1),'product-image')+'</div>').join('')+'</div>'+(discount?'<span class="discount-tag">-'+discount+'%</span>':'')+'</div>'+(slides.length>1?'<div class="product-slide-progress" aria-hidden="true">'+slides.map((_,i)=>'<i class="'+(i===0?'active':'')+'"></i>').join('')+'</div>':'<div class="product-slide-progress single" aria-hidden="true"><i class="active"></i></div>')+'<div class="product-info"><p>'+S.esc(p.subcategory||p.category)+'</p><h3>'+S.esc(p.name)+'</h3>'+(isB2B?'<div class="ask-price-row"><strong>Ask for price</strong><span>Wholesale enquiry</span></div>':'<div class="price-row"><strong>'+S.money(p.price)+'</strong>'+(p.mrp?'<s>'+S.money(p.mrp)+'</s>':'')+'</div>')+'</div></article>';
+    return '<article class="product-card wellone-card" tabindex="0" data-open-product="'+S.esc(p.id)+'" data-audience="'+(isB2B?'b2b':'retail')+'"><div class="product-image-wrap ratio-4x3 product-card-slider" data-card-slider="'+S.esc(p.id)+'" data-slider-audience="'+(isB2B?'b2b':'retail')+'"><div class="product-slide-track">'+slides.map((src,i)=>'<div class="product-slide" data-slide-index="'+i+'">'+img(src,p.name+' '+(i+1),'product-image')+'</div>').join('')+'</div>'+(discount?'<span class="discount-tag">-'+discount+'%</span>':'')+'</div>'+(slides.length>1?'<div class="product-slide-progress" aria-hidden="true">'+slides.map((_,i)=>'<i class="'+(i===0?'active':'')+'"></i>').join('')+'</div>':'<div class="product-slide-progress single" aria-hidden="true"><i class="active"></i></div>')+'<div class="product-info"><p>'+S.esc(p.subcategory||p.category)+'</p><h3>'+S.esc(p.name)+'</h3>'+(isB2B?'<div class="ask-price-row"><strong>Ask for price</strong><span>Wholesale enquiry</span></div>':'<div class="price-row"><strong>'+S.money(p.price)+'</strong>'+(p.mrp?'<s>'+S.money(p.mrp)+'</s>':'')+'</div>')+'</div></article>';
   }
   function orderedCategoryNames(list){
     const available=[...new Set(list.map(p=>p.category).filter(Boolean))],configured=state.categories.map(c=>c.name).filter(n=>available.includes(n));
@@ -92,7 +105,8 @@
     return '<main class="screen screen-enter"><section class="hero"><div class="hero-copy"><span class="eyebrow">MADE FOR YOUR NAME, TEAM OR BUSINESS</span><h1>Wear your<br><em>own idea.</em></h1><p>Design one custom garment in the studio or order ready-made products from a clean mobile-friendly catalogue.</p><div class="hero-actions"><button class="primary" data-go="customize">Start customizing '+I('arrow')+'</button><button class="secondary" data-go="catalog">Shop ready-made</button></div><div class="hero-proof"><span>'+I('shield')+' Exact print position saved</span><span>'+I('package')+' Cart keeps your design</span></div></div><div class="hero-visual"><div class="hero-grid-label">ONE-LINE CUSTOM STUDIO</div><div class="hero-product-orbit"><div class="orbit-ring"></div><img src="assets/crew-tee.webp" alt="Premium blank T-shirt"><div class="hero-brand-badge"><img src="one-line-mark.svg" alt=""><span>BUILD YOUR OWN</span></div></div><div class="floating-tool tool-a">'+I('type')+'<span>Add text</span></div><div class="floating-tool tool-b">'+I('image')+'<span>Upload image</span></div><div class="floating-tool tool-c">'+I('sparkle')+'<span>Choose print</span></div><button class="visual-cta" data-go="customize"><span>OPEN DESIGNER</span>'+I('arrow')+'</button></div></section>'+categoriesSection()+processSection()+'<section class="products-section section-wrap"><div class="section-heading"><div><span class="eyebrow">READY TO ORDER</span><h2>Popular essentials.</h2></div><button data-go="catalog">See full catalogue '+I('arrow')+'</button></div><div class="product-grid home-product-grid">'+popular.map(p=>productCard(p,'retail')).join('')+'</div></section><section class="bulk-banner section-wrap"><div><span>BULK / TEAMS / INSTITUTIONS</span><h2>Need a custom uniform order?</h2><p>Ready-made products stay simple. For logos, names, team kits or special production, use the quick WhatsApp customization enquiry.</p></div><button class="whatsapp-enquiry-button" data-action="whatsapp" data-message="Hi, I need a custom uniform / bulk apparel quotation.">'+I('whatsapp')+' Contact to customize</button></section></main>';
   }
   function categoriesSection(){
-    return '<section class="category-section section-wrap borderless-categories"><div class="section-heading"><div><span class="eyebrow">SHOP BY CATEGORY</span><h2>Ready-made catalogue.</h2></div><button data-go="catalog">View all products '+I('arrow')+'</button></div><div class="category-grid real-category-grid">'+state.categories.map((c,i)=>'<button class="category-block '+S.esc(c.tone||'paper')+' real-category-card" data-category="'+S.esc(c.name)+'"><span class="category-code">'+String(i+1).padStart(2,'0')+'</span><div class="category-photo">'+img(c.image,c.name,'','assets/crew-tee.webp')+'</div><div><h3>'+S.esc(c.name)+'</h3><p>'+S.esc(c.sub||'Ready-made products')+'</p></div>'+I('arrow')+'</button>').join('')+'</div></section>';
+    const cats=[...state.categories].sort((a,b)=>{const at=/t[- ]?shirts?/i.test(a.name||'')?0:1,bt=/t[- ]?shirts?/i.test(b.name||'')?0:1;return at-b;});
+    return '<section class="category-section section-wrap borderless-categories"><div class="section-heading"><div><span class="eyebrow">SHOP BY CATEGORY</span><h2>Ready-made catalogue.</h2></div><button data-go="catalog">View all products '+I('arrow')+'</button></div><div class="category-grid real-category-grid">'+cats.map((c,i)=>'<button class="category-block '+S.esc(c.tone||'paper')+' real-category-card" data-category="'+S.esc(c.name)+'"><span class="category-code">'+String(i+1).padStart(2,'0')+'</span><div class="category-photo">'+img(c.image,c.name,'','assets/crew-tee.webp')+'</div><div><h3>'+S.esc(c.name)+'</h3><p>'+S.esc(c.sub||'Ready-made products')+'</p></div>'+I('arrow')+'</button>').join('')+'</div></section>';
   }
   function processSection(){const rows=[['sliders','Choose','Select apparel type, cloth quality, garment colour and size.'],['move','Create','Move only your print layers while the garment stays locked.'],['sparkle','Print','Select the print method; sublimation is disabled on dark garments.'],['truck','Receive','Add the exact saved design to cart and complete the order.']];return '<section class="process-section"><div class="section-wrap"><span class="eyebrow light">CUSTOM ORDER PROCESS</span><h2>From blank garment<br>to finished piece.</h2><div class="process-grid">'+rows.map((x,i)=>'<article><b>0'+(i+1)+'</b>'+I(x[0])+'<h3>'+x[1]+'</h3><p>'+x[2]+'</p></article>').join('')+'</div><button class="acid-button" data-go="customize">Design an apparel now '+I('arrow')+'</button></div></section>';}
   function activeFilterChips(){const all=[...state.filterCategories.map(v=>['category',v]),...state.filterSubs.map(v=>['sub',v]),...state.filterOptions.map(v=>['option',v])];return all.length?'<div class="active-filter-chips">'+all.map(([k,v])=>'<button data-remove-filter="'+k+'" data-value="'+S.esc(v)+'">'+S.esc(v)+' <b>×</b></button>').join('')+'</div>':'';}
@@ -101,8 +115,11 @@
     return '<main class="catalog-page section-wrap screen screen-enter wellone-catalog grouped-catalog"><div class="catalog-title compact-catalog-title"><div><span class="eyebrow">READY-MADE / '+String(list.length).padStart(2,'0')+'</span><h1>Ready-made</h1><p>T-shirts appear first, with every other category arranged in its own clean section below.</p></div><button class="filter-button wellone-filter-button" data-action="open-filter">'+I('filter')+' Filter '+((state.filterCategories.length+state.filterSubs.length+state.filterOptions.length)?'<b>'+(state.filterCategories.length+state.filterSubs.length+state.filterOptions.length)+'</b>':'')+'</button></div>'+activeFilterChips()+(list.length?groupedProductSections(list,'retail'):'<div class="empty-state">'+I('filter')+'<h2>No matching items</h2><p>Clear a filter and try again.</p><button data-action="clear-filters">Clear filters</button></div>')+'</main>';
   }
   function product(){
-    const p=state.selected;if(!p)return catalog();const image=selectedProductImage(p),sizes=currentSizes(p),price=p.price+(state.subItem?p.subItem?.price||0:0),allImages=productImages(p);
-    return '<main class="product-fullscreen screen screen-enter"><div class="product-full-back"><button class="back-button" data-action="nav-back" data-fallback="catalog">'+I('back')+' Back</button></div><div class="product-full-inner"><section class="product-full-media">'+img(image,p.name,'','assets/crew-tee.webp')+(allImages.length>1?'<div class="product-thumbs">'+allImages.slice(0,7).map(x=>'<button data-product-image="'+S.esc(x)+'">'+img(x,'','','assets/crew-tee.webp')+'</button>').join('')+'</div>':'')+'</section><section class="product-full-info"><span class="eyebrow">'+S.esc(p.category)+' / '+S.esc(p.subcategory)+'</span><h1>'+S.esc(p.name)+'</h1><div class="detail-price"><strong>'+S.money(price)+'</strong>'+(p.mrp?'<s>'+S.money(p.mrp)+'</s>':'')+'</div><p>'+S.esc(p.description)+'</p>'+(p.colors?.length?'<div class="selection-block"><label>Colour <b>'+S.esc(state.color)+'</b></label><div class="colour-options">'+p.colors.map(c=>'<button class="'+(state.color===c?'active':'')+'" data-product-color="'+S.esc(c)+'"><span style="background:'+(S.palette[c]||'#ddd')+'"></span>'+S.esc(c)+'</button>').join('')+'</div></div>':'')+(sizes.length?'<div class="selection-block"><label>'+S.esc(p.optionTitle||'Size')+' <b>'+S.esc(state.size)+'</b></label><div class="size-options">'+sizes.map(v=>'<button class="'+(state.size===v?'active':'')+'" data-product-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div></div>':'')+(p.subItem?'<div class="subitem-box"><label><input data-subitem type="checkbox" '+(state.subItem?'checked':'')+'><span><b>Add '+S.esc(p.subItem.name)+'</b><small>Optional matching item</small></span><strong>+'+S.money(p.subItem.price)+'</strong></label>'+(state.subItem?'<div class="size-options compact">'+p.subItem.sizes.map(v=>'<button class="'+(state.subSize===v?'active':'')+'" data-sub-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div>':'')+'</div>':'')+'<div class="product-action-row"><button class="primary detail-add" data-action="add-product">Add to cart '+I('bag')+'</button><button class="custom-enquiry-btn" data-action="whatsapp" data-message="Hi, I want to customize '+S.esc(p.name)+'. Please share the customization options and price.">'+I('whatsapp')+' Contact to customize</button></div><div class="ready-made-note"><b>Ready-made item</b><span>This product itself is not edited in the customizer. Contact us for a custom version.</span></div></section></div></main>';
+    const p=state.selected;if(!p)return catalog();
+    const sizes=currentSizes(p),sub=p.subItem||null,subSizes=currentSubSizes(p),price=Number(p.price||0)+(state.subItem?Number(sub?.price||0):0),gallery=productGallery(p);
+    const subColors=sub?.colors?.length?sub.colors:(sub?.colorVariants||[]).map(v=>v.color).filter(Boolean);
+    const subPanel=sub?'<div class="subitem-box advanced-subitem"><label class="subitem-toggle"><input data-subitem type="checkbox" '+(state.subItem?'checked':'')+'><span><b>Add '+S.esc(sub.name)+'</b><small>Optional matching item</small></span><strong>+'+S.money(sub.price||0)+'</strong></label>'+(state.subItem?'<div class="subitem-config"><div class="subitem-media">'+img(currentSubImage(p),sub.name,'','assets/crew-tee.webp')+'</div><div class="subitem-controls">'+(subColors.length?'<div class="selection-block sub-selection"><label>Colour <b>'+S.esc(state.subColor)+'</b></label><div class="colour-options">'+subColors.map(c=>'<button class="'+(state.subColor===c?'active':'')+'" data-sub-color="'+S.esc(c)+'"><span style="background:'+(S.palette[c]||'#ddd')+'"></span>'+S.esc(c)+'</button>').join('')+'</div></div>':'')+(subSizes.length?'<div class="selection-block sub-selection"><label>'+S.esc(sub.optionTitle||'Size')+' <b>'+S.esc(state.subSize)+'</b></label><div class="size-options">'+subSizes.map(v=>'<button class="'+(state.subSize===v?'active':'')+'" data-sub-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div></div>':'')+'</div></div>':'')+'</div>':'';
+    return '<main class="product-fullscreen screen screen-enter"><div class="product-full-back"><button class="back-button" data-action="nav-back" data-fallback="catalog">'+I('back')+' Back</button></div><div class="product-full-inner"><section class="product-full-media">'+detailSlider(gallery,p.name)+'</section><section class="product-full-info"><span class="eyebrow">'+S.esc(p.category)+' / '+S.esc(p.subcategory)+'</span><h1>'+S.esc(p.name)+'</h1><div class="detail-price"><strong>'+S.money(price)+'</strong>'+(p.mrp?'<s>'+S.money(p.mrp)+'</s>':'')+'</div><p>'+S.esc(p.description)+'</p>'+(p.colors?.length?'<div class="selection-block"><label>Colour <b>'+S.esc(state.color)+'</b></label><div class="colour-options">'+p.colors.map(c=>'<button class="'+(state.color===c?'active':'')+'" data-product-color="'+S.esc(c)+'"><span style="background:'+(S.palette[c]||'#ddd')+'"></span>'+S.esc(c)+'</button>').join('')+'</div></div>':'')+(sizes.length?'<div class="selection-block"><label>'+S.esc(p.optionTitle||'Size')+' <b>'+S.esc(state.size)+'</b></label><div class="size-options">'+sizes.map(v=>'<button class="'+(state.size===v?'active':'')+'" data-product-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div></div>':'')+subPanel+'<div class="product-action-row"><button class="primary detail-add" data-action="add-product">Add to cart '+I('bag')+'</button><button class="custom-enquiry-btn" data-action="whatsapp" data-message="Hi, I want to customize '+S.esc(p.name)+'. Please share the customization options and price.">'+I('whatsapp')+' Contact to customize</button></div><div class="ready-made-note"><b>Ready-made item</b><span>This product itself is not edited in the customizer. Contact us for a custom version.</span></div></section></div></main>';
   }
   function customCartPreview(item){const faces=S.designedSurfaces(item.customDesign||{});const face=faces[0]||'front';return '<div class="cart-custom-preview">'+S.designPreview(item.customDesign,face,'cart-design-preview')+'<span>'+face.replace('Sleeve',' sleeve')+'</span></div>';}
   function cartItem(item){
@@ -162,6 +179,17 @@
       sync();
     });
   }
+  function bindDetailSliders(){
+    root.querySelectorAll('[data-detail-slider]').forEach(slider=>{
+      const track=slider.querySelector('.detail-slide-track'),bars=slider.querySelectorAll('.detail-slide-progress i');if(!track)return;
+      const sync=()=>{const w=track.clientWidth||1,idx=Math.max(0,Math.min((bars?.length||1)-1,Math.round(track.scrollLeft/w)));bars?.forEach((b,i)=>b.classList.toggle('active',i===idx));};
+      let drag=null;
+      track.addEventListener('scroll',sync,{passive:true});
+      track.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;drag={id:e.pointerId,x:e.clientX,left:track.scrollLeft};track.setPointerCapture(e.pointerId);});
+      track.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;track.scrollLeft=drag.left-(e.clientX-drag.x);});
+      const end=e=>{if(!drag)return;try{track.releasePointerCapture(e.pointerId);}catch(_){}drag=null;requestAnimationFrame(sync);};track.addEventListener('pointerup',end);track.addEventListener('pointercancel',end);sync();
+    });
+  }
   function bind(){
     root.querySelectorAll('[data-go]').forEach(x=>x.addEventListener('click',()=>go(x.dataset.go)));
     root.querySelectorAll('[data-open-product]').forEach(x=>x.addEventListener('click',e=>{if(e.target.closest('.product-slide-track'))return;e.stopPropagation();openProduct(x.dataset.openProduct,x.dataset.audience);}));
@@ -169,6 +197,7 @@
     root.querySelectorAll('[data-legal]').forEach(x=>x.addEventListener('click',()=>{state.legal=x.dataset.legal;render();}));
     root.querySelectorAll('[data-product-color]').forEach(x=>x.addEventListener('click',()=>{state.color=x.dataset.productColor;state.previewImage='';const sizes=currentSizes(state.selected);if(!sizes.includes(state.size))state.size=sizes[0]||'';render();}));
     root.querySelectorAll('[data-product-size]').forEach(x=>x.addEventListener('click',()=>{state.size=x.dataset.productSize;render();}));
+    root.querySelectorAll('[data-sub-color]').forEach(x=>x.addEventListener('click',()=>{state.subColor=x.dataset.subColor;const sizes=currentSubSizes(state.selected);if(!sizes.includes(state.subSize))state.subSize=sizes[0]||'';render();}));
     root.querySelectorAll('[data-sub-size]').forEach(x=>x.addEventListener('click',()=>{state.subSize=x.dataset.subSize;render();}));
     root.querySelectorAll('[data-product-image]').forEach(x=>x.addEventListener('click',()=>{if(state.selected)state.previewImage=x.dataset.productImage;render();}));
     root.querySelectorAll('[data-qty]').forEach(x=>x.addEventListener('click',()=>{const item=state.cart.find(i=>i.key===x.dataset.key);if(item)item.qty=Math.max(1,item.qty+Number(x.dataset.qty));saveCart();render();}));
@@ -176,7 +205,7 @@
     root.querySelectorAll('[data-delivery]').forEach(x=>x.addEventListener('click',()=>{state.delivery=x.dataset.delivery;render();}));
     root.querySelectorAll('[data-payment]').forEach(x=>x.addEventListener('click',()=>{state.payment=x.dataset.payment;render();}));
     root.querySelectorAll('[data-remove-filter]').forEach(x=>x.addEventListener('click',()=>removeFilter(x.dataset.removeFilter,x.dataset.value)));
-    const sub=root.querySelector('[data-subitem]');if(sub)sub.addEventListener('change',()=>{state.subItem=sub.checked;render();});
+    const sub=root.querySelector('[data-subitem]');if(sub)sub.addEventListener('change',()=>{state.subItem=sub.checked;if(state.subItem){const sizes=currentSubSizes(state.selected);if(!state.subSize||!sizes.includes(state.subSize))state.subSize=sizes[0]||'';}render();});
     const b2bForm=root.querySelector('[data-b2b-login]');if(b2bForm)b2bForm.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(b2bForm);const settings=S.getSettings();if(String(fd.get('id')).trim()===String(settings.b2bId)&&String(fd.get('password'))===String(settings.b2bPassword)){state.b2bAuthed=true;state.b2bError='';sessionStorage.setItem('one-line-b2b-auth','1');render();}else{state.b2bError='Invalid B2B login ID or password.';render();}});
     root.querySelectorAll('[data-filter-choice]').forEach(x=>x.addEventListener('click',()=>{const d=state.filterDraft,k=x.dataset.filterChoice,v=x.dataset.value;const arr=d[k];const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);if(k==='categories'){const allowedSubs=filterPool(state.screen.startsWith('b2b')?'b2b':'retail').filter(p=>!d.categories.length||d.categories.includes(p.category)).map(p=>p.subcategory);d.subs=d.subs.filter(s=>allowedSubs.includes(s));}render();}));
     root.querySelectorAll('[data-action]').forEach(x=>x.addEventListener('click',()=>{
@@ -190,7 +219,7 @@
       else if(a==='reset-filter-draft'){state.filterDraft={categories:[],subs:[],options:[]};render();}
       else if(a==='apply-filter'){commitFilterDraft();state.filterOpen=false;state.filterDraft=null;render();}
       else if(a==='clear-filters'){resetFilters();render();}
-      else if(a==='add-product'){const p=state.selected;const image=selectedProductImage(p);addCart({key:p.id+'-'+state.color+'-'+state.size+'-'+state.subItem+'-'+Date.now(),productId:p.id,name:p.name,price:p.price+(state.subItem?p.subItem?.price||0:0),qty:1,image,color:state.color,size:state.size,detail:state.subItem?'Includes '+p.subItem.name+' · '+state.subSize:''},true);}
+      else if(a==='add-product'){const p=state.selected;const image=selectedProductImage(p),sub=p.subItem;const subDetail=state.subItem&&sub?['Includes '+sub.name,state.subColor,state.subSize].filter(Boolean).join(' · '):'';addCart({key:p.id+'-'+state.color+'-'+state.size+'-'+state.subItem+'-'+state.subColor+'-'+state.subSize+'-'+Date.now(),productId:p.id,name:p.name,price:Number(p.price||0)+(state.subItem?Number(sub?.price||0):0),qty:1,image,color:state.color,size:state.size,detail:subDetail,subItemSelection:state.subItem&&sub?{name:sub.name,color:state.subColor,size:state.subSize,image:currentSubImage(p),price:Number(sub.price||0)}:null},true);}
       else if(a==='checkout'){const ok=state.cart.every(item=>item.custom||!item.productId||(state.products.find(p=>p.id===item.productId)?.stock||0)>=item.qty);if(!ok)showToast('Please reduce the quantity of the limited-stock item');else{state.checkoutStep=1;state.orderPlaced=false;go('checkout');}}
       else if(a==='delivery-step'){const form=root.querySelector('[data-checkout-form]');if(form?.reportValidity()){const fd=new FormData(form);state.details=Object.fromEntries(fd.entries());state.checkoutStep=2;render();}}
       else if(a==='submit-order'){if(state.payment==='Online payment'){state.paymentDemo=true;render();}else completeOrder();}
@@ -202,14 +231,20 @@
       else if(a==='b2b-logout'){state.b2bAuthed=false;sessionStorage.removeItem('one-line-b2b-auth');state.b2bError='';render();}
     }));
     const overlay=root.querySelector('.catalog-filter-overlay');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeFilter(true);});
-    bindWhatsappDrag();bindProductSliders();
+    bindWhatsappDrag();bindProductSliders();bindDetailSliders();
   }
   async function install(){if(state.installPrompt){await state.installPrompt.prompt();state.installPrompt=null;}else showToast('Use your browser menu and choose “Install app”');}
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;});
   window.addEventListener('storage',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();render();});
   window.addEventListener('one-line-change',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();});
   document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.filterOpen){closeFilter(true);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
-  try{const valid=['home','catalog','product','cart','checkout','orders','customize','b2b','b2bProduct'];const hash=location.hash.replace('#','');const initial=valid.includes(hash)?hash:'home';state.screen=initial;history.replaceState({oneLine:true,screen:initial},'',location.pathname+location.search+'#'+initial);}catch(_){}
-  window.addEventListener('popstate',e=>{const next=e.state?.oneLine?e.state.screen:'home';state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;window.scrollTo({top:0,behavior:'auto'});render();});
+  try{
+    const valid=['home','catalog','product','cart','checkout','orders','customize','b2b','b2bProduct'];const hash=location.hash.replace('#','');const initial=valid.includes(hash)?hash:'home';state.screen=initial;
+    if(!history.state?.oneLineGuard){history.replaceState({oneLine:true,oneLineGuard:true,guardBase:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');history.pushState({oneLine:true,oneLineGuard:true,screen:initial,scrollY:0},'',location.pathname+location.search+'#'+initial);}else history.replaceState({...history.state,oneLine:true,oneLineGuard:true,screen:initial},'',location.pathname+location.search+'#'+initial);
+  }catch(_){}
+  window.addEventListener('popstate',e=>{
+    if(e.state?.guardBase){state.screen='home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'smooth'}));setTimeout(()=>{try{history.pushState({oneLine:true,oneLineGuard:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');}catch(_){}},0);return;}
+    const next=e.state?.oneLine?e.state.screen:'home';state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo({top:state.screen==='home'?0:Number(e.state?.scrollY||0),behavior:'smooth'}));
+  });
   if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
 })();

@@ -48,7 +48,7 @@
       colors:["Green","White","Yellow"], sizes:["S","M","L","XL"], optionTitle:"Size", stock:28,
       colorVariants:[cv("Green",onlineImages.jerseyGreen,["S","M","L","XL"]),cv("White",onlineImages.jerseyWhite,["S","M","L","XL"]),cv("Yellow",onlineImages.jerseyYellow,["S","M","L","XL"])],
       description:"Breathable team jersey ready to order. Ask us on WhatsApp for custom names, numbers or full team artwork.",
-      subItem:{name:"Matching sports shorts",price:299,sizes:["S","M","L","XL"]}
+      subItem:{name:"Matching sports shorts",price:299,type:"Colour + Option",optionTitle:"Size",colors:["Green","White","Yellow"],sizes:["S","M","L","XL"],image:onlineImages.jerseyGreen,images:[onlineImages.jerseyGreen,onlineImages.jerseyWhite,onlineImages.jerseyYellow],colorVariants:[cv("Green",onlineImages.jerseyGreen,["S","M","L","XL"]),cv("White",onlineImages.jerseyWhite,["S","M","L","XL"]),cv("Yellow",onlineImages.jerseyYellow,["S","M","L","XL"])]}
     },
     {
       id:3, audience:"retail", name:"Executive Uniform Shirt", category:"Uniforms", subcategory:"Office",

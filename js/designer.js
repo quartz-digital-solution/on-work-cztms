@@ -21,7 +21,7 @@
   const blank=text=>({text:text||"",font:"Impact",textColor:"#ffffff",textSize:30,textRotation:0,uploadedImage:"",imageSize:82,imageRotation:0,positions:{text:{x:50,y:38},image:{x:50,y:62}},textScale:18,imageScale:38});
   const clone=v=>typeof structuredClone==="function"?structuredClone(v):JSON.parse(JSON.stringify(v));
   const clampMin=(v,min)=>Math.max(min,Number(v)||0);
-  const resizeMax=()=>Math.max(300,Math.min(1600,Math.round((window.visualViewport?.width||window.innerWidth||390)*.94)));
+  const resizeMax=()=>{const v=window.visualViewport,w=v?.width||window.innerWidth||390,h=v?.height||window.innerHeight||720;return Math.max(280,Math.round(Math.min(w,h)*.94));};
 
   function loadDraft(){
     try{const d=JSON.parse(localStorage.getItem(draftKey)||"null");if(!d)return null;return d;}catch(_){return null;}
