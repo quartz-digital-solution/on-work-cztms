@@ -80,6 +80,11 @@
   function currentSizes(p){const row=p.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.color).toLowerCase());return row?.sizes?.length?row.sizes:(p.sizes||[]);}
   function currentSubSizes(p){const sub=p?.subItem;if(!sub)return[];const row=sub.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.subColor).toLowerCase());return row?.sizes?.length?row.sizes:(sub.sizes||[]);}
   function currentSubImage(p){const sub=p?.subItem;if(!sub)return'';const row=sub.colorVariants?.find(v=>String(v.color).toLowerCase()===String(state.subColor).toLowerCase());return row?.image||sub.image||sub.images?.[0]||p.image||'assets/crew-tee.webp';}
+  function productImages(p){
+    if(!p)return ['assets/crew-tee.webp'];
+    const images=[p.image,...(Array.isArray(p.images)?p.images:[]),...(Array.isArray(p.colorVariants)?p.colorVariants.map(v=>v&&v.image):[])].filter(Boolean);
+    return [...new Set(images)].slice(0,10);
+  }
   function productGallery(p){const preferred=state.color?S.productImageForColor(p,state.color):selectedProductImage(p);return [...new Set([preferred,...productImages(p)].filter(Boolean))];}
   function detailSlider(images,name){
     images=(images||[]).filter(Boolean);if(!images.length)images=['assets/crew-tee.webp'];
