@@ -21,20 +21,22 @@ Change or block accounts in **Admin → Access accounts** before handing the pre
 
 - Professional Buy now checkout for ready-made products and admin-toggleable customization
 - Front, back, right sleeve and left sleeve design areas
-- Product-specific side/sleeve photography for crew tees, polos, sports jerseys and uniform shirts
+- Separate close-up right and left sleeve photography for crew tees, polos, sports jerseys and uniform shirts; sleeve views are never mirrored
 - Multiple text and image elements on the same side
 - Unrestricted drag positioning plus independent resize, rotate, edit, delete and print method per element
 - Animated visual garment picker and direct WhatsApp support for advanced customization
 - Separate admin-controlled image and text print prices
 - Budget, Standard and Premium cloth qualities with editable descriptions and rates
 - Sublimation automatically disabled for dark colours
-- Colour-specific uploaded product images, price, quantity and optional barcode
+- Colour-specific front, back and sleeve uploads, price, quantity and optional barcode
+- Uploaded garment colours are displayed unchanged and locked inside the customizer
 - A colour image is reused consistently for every size belonging to that colour
 - Existing size-variant inventory remains supported by the staff stock desk
 - School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer
 - Real product cut-outs for garments, school belts and identification tags; no placeholder catalogue photos
-- Editable quantity offers and protected B2B account discounts
-- Configurable WhatsApp support and cart enquiry
+- Editable quantity offers, protected B2B account discounts and B2B-only catalogue items
+- Premium category photography with admin uploads
+- Configurable WhatsApp support, a movable customer contact control and cart enquiry
 - Customer callback requests shown in admin
 - Direct staff orders reduce the selected colour or variant stock
 - PWA manifest and offline shell
