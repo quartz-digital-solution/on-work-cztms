@@ -1097,3 +1097,132 @@ footer { background:radial-gradient(circle at 80% 0,#57145f 0,#251029 35%,#150d1
 @media(max-width:1199px){.real-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 @media(max-width:899px){.real-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.real-category-card.category-block{min-height:260px}.real-category-card .category-photo{min-height:185px}}
 @media(max-width:599px){.real-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.real-category-card.category-block:first-child{grid-column:span 2}.real-category-card.category-block{min-height:245px}.real-category-card .category-photo{min-height:175px}.real-category-card.category-block:first-child .category-photo{min-height:240px}.real-category-card>div:last-of-type h3{font-size:15px}}
+
+/* =========================================================
+   v10 DEVICE RESPONSIVE + TARGETED UX REFINEMENTS
+   No visual redesign of the customizer; only requested fixes.
+   ========================================================= */
+html,body{max-width:100%;overflow-x:hidden}
+*,*:before,*:after{box-sizing:border-box}
+img,svg,video,canvas{max-width:100%}
+
+/* Remove hard black category rules without changing the old card arrangement. */
+.borderless-categories .real-category-grid{border:0!important;background:transparent!important;gap:12px!important}
+.borderless-categories .real-category-card.category-block{border:0!important;border-radius:12px!important;overflow:hidden!important;box-shadow:0 8px 24px rgba(57,36,62,.07)!important;background:#fff!important}
+.borderless-categories .real-category-card .category-photo{border:0!important}
+.borderless-categories .real-category-card .category-code{border:0!important;border-radius:999px!important;background:rgba(255,255,255,.9)!important;box-shadow:0 3px 12px rgba(29,18,31,.08)!important}
+
+/* Ready-made categories are distinct catalogue sections: T-shirts first, then the rest. */
+.catalog-category-group{margin:0 0 48px;min-width:0}
+.catalog-category-group:last-child{margin-bottom:10px}
+.catalog-category-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:0 0 13px;padding:0 2px;border:0!important}
+.catalog-category-heading>div{min-width:0}
+.catalog-category-heading small{display:block;margin:0 0 4px;color:#8b818c;font-size:7px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.catalog-category-heading h2{margin:0;font-size:clamp(23px,2.35vw,34px);line-height:.95;letter-spacing:-.035em}
+.catalog-category-heading p{margin:5px 0 0;color:#817681;font-size:9px;line-height:1.4}
+
+/* Swipeable product imagery and a slim responsive position line. */
+.product-card-slider{position:relative!important;overflow:hidden!important;touch-action:pan-x pan-y pinch-zoom!important}
+.product-slide-track{width:100%;height:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab}
+.product-slide-track::-webkit-scrollbar{display:none}
+.product-slide-track:active{cursor:grabbing}
+.product-slide{position:relative;flex:0 0 100%;width:100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#ece9e4}
+.product-slide img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:cover!important}
+.product-slide-progress{height:7px;margin:0 9px;display:flex;align-items:center;gap:3px;background:transparent!important}
+.product-slide-progress i{display:block;flex:1;height:2px;border-radius:999px;background:#ddd4df;transition:background .15s ease,transform .15s ease}
+.product-slide-progress i.active{background:#64116f;transform:scaleY(1.35)}
+.product-slide-progress.single{opacity:.62}
+
+/* Theme and WhatsApp actions. */
+.product-action-row .detail-add{border-color:#64116f!important;background:#64116f!important;color:#fff!important}
+.whatsapp-enquiry-button,.product-action-row .custom-enquiry-btn{border-color:#20b85c!important;background:#25d366!important;color:#fff!important;box-shadow:0 8px 20px rgba(30,158,80,.15)!important}
+.whatsapp-enquiry-button svg,.product-action-row .custom-enquiry-btn svg{color:#fff!important;fill:none}
+.whatsapp-float.whatsapp-icon-only{width:54px!important;min-width:54px!important;height:54px!important;padding:0!important;border-radius:50%!important;background:#25d366!important;color:#fff!important;display:grid!important;place-items:center!important;box-shadow:0 12px 26px rgba(24,142,72,.28)!important}
+.whatsapp-float.whatsapp-icon-only svg{width:22px!important;height:22px!important}
+
+/* Mobile menu outside click layer. */
+.menu-scrim{display:none;border:0;background:transparent}
+
+/* Filter is a true popup on touch sizes, drawer on large desktop. Filters persist in JS. */
+.catalog-filter-overlay{padding:0}
+.catalog-filter-drawer{max-width:100%}
+
+/* Requested customizer-only changes: fixed garment, one Type section + one Cloth type section. */
+.locked-garment-stage,.locked-garment-stage .compact-shirt-canvas,.locked-garment-stage .locked-garment{overscroll-behavior:contain}
+.locked-garment-stage .locked-garment{touch-action:manipulation!important}
+.locked-garment-stage .garment-photo,.locked-garment-stage .garment-tint,.locked-garment-stage .garment-depth,.locked-garment-stage .sleeve-photo{pointer-events:none!important;touch-action:none!important}
+.locked-garment-stage .print-area{touch-action:none!important}
+.garment-type-control,.material-quality-control{background:#fbf9fc}
+.garment-type-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.garment-type-cards button{min-width:0;min-height:50px;padding:8px;border:1px solid #ddd3df;border-radius:7px;background:#fff;display:grid;align-content:center;gap:3px;text-align:left;color:#332c34;cursor:pointer}
+.garment-type-cards button b{font-size:9px;line-height:1.1}.garment-type-cards button small{font-size:7px;color:#807582}.garment-type-cards button.active{border:2px solid #64116f;background:#f6edf7;color:#64116f}
+.material-quality-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.material-quality-cards button{min-width:0;min-height:74px;padding:9px;border:1px solid #ddd3df;border-radius:7px;background:#fff;display:grid;align-content:start;gap:7px;text-align:left;color:#332c34;cursor:pointer}
+.material-quality-cards button>span{display:flex;align-items:baseline;justify-content:space-between;gap:7px}.material-quality-cards button b{font-size:9px}.material-quality-cards button strong{font-size:9px;color:#64116f}.material-quality-cards button small{font-size:7px;line-height:1.45;color:#817683}.material-quality-cards button.active{border:2px solid #64116f;background:#f6edf7;color:#64116f}
+.practical-size-range{width:100%!important;min-width:0!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:6px 8px!important}
+.practical-size-range small{justify-self:end;color:#64116f!important;font-weight:900!important}
+.practical-size-range input[type=range]{grid-column:1/-1;width:100%!important;max-width:none!important;margin:2px 0 0!important;accent-color:#64116f}
+
+/* Desktop */
+@media (min-width:1200px){
+  .responsive-catalog-grid,.home-product-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+  .catalog-page{padding-left:max(28px,4vw)!important;padding-right:max(28px,4vw)!important}
+}
+
+/* Tablet landscape / small laptop */
+@media (min-width:900px) and (max-width:1199px){
+  .responsive-catalog-grid,.home-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .catalog-page{padding-left:22px!important;padding-right:22px!important}
+  .catalog-category-group{margin-bottom:42px}
+}
+
+/* Tablet portrait */
+@media (min-width:600px) and (max-width:899px){
+  .responsive-catalog-grid,.home-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important}
+  .catalog-page{padding-left:18px!important;padding-right:18px!important}
+  .compact-catalog-title{align-items:center}
+  .catalog-filter-overlay{align-items:center;justify-content:center;padding:24px}
+  .catalog-filter-drawer{width:min(560px,calc(100vw - 48px));height:min(760px,84dvh);border-radius:17px;box-shadow:0 24px 70px rgba(24,18,26,.23);transform:translateY(20px) scale(.985)}
+  .catalog-filter-overlay.open .catalog-filter-drawer{transform:translateY(0) scale(1)}
+  .material-quality-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* Phone */
+@media (max-width:599px){
+  .responsive-catalog-grid,.home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .wellone-card.product-card{border-color:#e5dde7!important;border-radius:9px!important}
+  .wellone-card .product-info{min-height:78px!important;padding:8px 7px 9px!important;gap:3px!important}
+  .wellone-card .product-info h3{font-size:11px!important;line-height:1.16!important;min-height:25px!important}
+  .wellone-card .product-info>p{font-size:6.5px!important}
+  .wellone-card .price-row strong{font-size:12px!important}
+  .product-slide-progress{margin:0 7px;height:6px;gap:2px}.product-slide-progress i{height:2px}
+  .catalog-category-group{margin-bottom:34px}
+  .catalog-category-heading{margin-bottom:10px;align-items:start;gap:10px}.catalog-category-heading h2{font-size:24px}.catalog-category-heading p{font-size:8px}
+  .catalog-page{padding-left:10px!important;padding-right:10px!important}
+  .compact-catalog-title{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:end!important;gap:10px!important;margin-bottom:13px!important}
+  .compact-catalog-title>div{min-width:0}.compact-catalog-title h1{font-size:clamp(34px,10.5vw,42px)!important;line-height:.92!important}.compact-catalog-title p{font-size:8px!important;line-height:1.35!important}
+  .wellone-filter-button{height:40px!important;padding:0 11px!important;border-color:#d5cad7!important;border-radius:9px!important;background:#fff!important;font-size:8px!important}.wellone-filter-button svg{width:14px!important}
+  .active-filter-chips{gap:5px;margin:-2px 0 12px}.active-filter-chips button{height:28px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .catalog-filter-overlay{align-items:center!important;justify-content:center!important;padding:10px!important}
+  .catalog-filter-drawer{width:100%!important;max-width:560px!important;height:min(780px,88dvh)!important;border-radius:16px!important;box-shadow:0 24px 70px rgba(24,18,26,.25)!important;transform:translateY(18px) scale(.985)!important}
+  .catalog-filter-overlay.open .catalog-filter-drawer{transform:translateY(0) scale(1)!important}
+  .catalog-filter-drawer>header{height:59px;padding:0 14px}.catalog-filter-drawer>header strong{font-size:15px}.catalog-filter-body{padding:14px 13px 22px}.filter-drawer-group{padding-bottom:16px;margin-bottom:16px}.filter-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}.catalog-filter-choice{min-width:0!important;min-height:39px!important;padding:6px 7px!important;font-size:7.5px!important}.catalog-filter-drawer>footer{padding:10px 10px max(10px,env(safe-area-inset-bottom));gap:7px}.filter-reset-button,.filter-apply-button{height:43px}
+  .whatsapp-float.whatsapp-icon-only{right:12px!important;bottom:82px!important;width:50px!important;min-width:50px!important;height:50px!important}
+  .whatsapp-enquiry-button{width:100%!important;min-width:0!important}
+  .product-action-row .detail-add,.product-action-row .custom-enquiry-btn{width:100%}
+  .menu-scrim{display:block;position:fixed;inset:0;z-index:43;background:rgba(17,12,18,.28);cursor:default}
+  .site-header{z-index:50}.site-header nav.open{z-index:52}
+  .garment-type-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.garment-type-cards button{padding:7px 6px;min-height:48px}.garment-type-cards button b{font-size:8px}.garment-type-cards button small{font-size:6.5px}
+  .material-quality-cards{grid-template-columns:1fr!important;gap:6px}.material-quality-cards button{min-height:58px;padding:8px 9px}.material-quality-cards button>span{justify-content:flex-start}.material-quality-cards button strong{margin-left:auto}.material-quality-cards button small{font-size:7px}
+  .practical-size-range input[type=range]{height:28px}
+  .borderless-categories .real-category-grid{gap:8px!important}.borderless-categories .real-category-card.category-block{border-radius:10px!important}.borderless-categories .real-category-card.category-block:first-child{grid-column:1/-1!important}
+}
+
+/* Very small phones */
+@media (max-width:360px){
+  .catalog-page{padding-left:8px!important;padding-right:8px!important}
+  .responsive-catalog-grid,.home-product-grid{gap:6px!important}
+  .wellone-card .product-info{padding:7px 6px 8px!important}.wellone-card .product-info h3{font-size:10px!important}.wellone-card .price-row strong{font-size:11px!important}
+  .compact-catalog-title h1{font-size:33px!important}.wellone-filter-button{padding:0 9px!important}
+  .filter-choice-grid{grid-template-columns:1fr 1fr!important}
+}

@@ -12,12 +12,17 @@
     tshirtWhite: "https://images.pexels.com/photos/11671964/pexels-photo-11671964.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     tshirtOlive: "https://images.pexels.com/photos/9594681/pexels-photo-9594681.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     polo: "https://images.pexels.com/photos/11100267/pexels-photo-11100267.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    polo2: "https://images.pexels.com/photos/7530916/pexels-photo-7530916.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     uniform: "https://images.pexels.com/photos/8301098/pexels-photo-8301098.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    uniform2: "https://images.pexels.com/photos/19345566/pexels-photo-19345566.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     jerseyWhite: "https://images.pexels.com/photos/31574996/pexels-photo-31574996.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     jerseyYellow: "https://images.pexels.com/photos/33110006/pexels-photo-33110006.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     jerseyGreen: "https://images.pexels.com/photos/20540696/pexels-photo-20540696.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     label: "https://images.pexels.com/photos/9594081/pexels-photo-9594081.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
-    shirt: "https://images.pexels.com/photos/2491123/pexels-photo-2491123.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop"
+    label2: "https://images.pexels.com/photos/28504904/pexels-photo-28504904.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    label3: "https://images.pexels.com/photos/28460403/pexels-photo-28460403.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    shirt: "https://images.pexels.com/photos/2491123/pexels-photo-2491123.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    shirt2: "https://images.pexels.com/photos/10041268/pexels-photo-10041268.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop"
   };
 
   const seedCategories = [
@@ -47,24 +52,24 @@
     },
     {
       id:3, audience:"retail", name:"Executive Uniform Shirt", category:"Uniforms", subcategory:"Office",
-      price:720, mrp:890, image:onlineImages.uniform, images:[onlineImages.uniform], type:"Colour + Option", colors:["White","Sky","Sand"], sizes:["38","40","42","44"], optionTitle:"Size", stock:35,
+      price:720, mrp:890, image:onlineImages.uniform, images:[onlineImages.uniform,onlineImages.uniform2], type:"Colour + Option", colors:["White","Sky","Sand"], sizes:["38","40","42","44"], optionTitle:"Size", stock:35,
       colorVariants:[cv("White",onlineImages.uniform,["38","40","42","44"]),cv("Sky",onlineImages.uniform,["38","40","42","44"]),cv("Sand",onlineImages.uniform,["38","40","42","44"])],
       description:"Professional ready-made uniform shirt for office and staff use. Contact us separately for logo embroidery or custom uniform production."
     },
     {
       id:4, audience:"retail", name:"Premium Polo T-Shirt", category:"T-Shirts", subcategory:"Polo",
-      price:599, mrp:749, image:onlineImages.polo, images:[onlineImages.polo], type:"Colour + Option", colors:["Grey","Green","Pink"], sizes:["M","L","XL","XXL"], optionTitle:"Size", stock:31,
+      price:599, mrp:749, image:onlineImages.polo, images:[onlineImages.polo,onlineImages.polo2], type:"Colour + Option", colors:["Grey","Green","Pink"], sizes:["M","L","XL","XXL"], optionTitle:"Size", stock:31,
       colorVariants:[cv("Grey",onlineImages.polo,["M","L","XL","XXL"]),cv("Green",onlineImages.polo,["M","L","XL"]),cv("Pink",onlineImages.polo,["M","L","XL"])],
       description:"Soft polo for staff, events and everyday business wear. Ready-made orders are not edited inside the customizer."
     },
     {
       id:5, audience:"retail", name:"Woven Brand Label Set", category:"Tags & Labels", subcategory:"Woven Labels",
-      price:380, mrp:450, image:onlineImages.label, images:[onlineImages.label], type:"One Option", colors:[], sizes:["50 pcs","100 pcs","250 pcs"], optionTitle:"Pack quantity", stock:18,
+      price:380, mrp:450, image:onlineImages.label, images:[onlineImages.label,onlineImages.label2,onlineImages.label3], type:"One Option", colors:[], sizes:["50 pcs","100 pcs","250 pcs"], optionTitle:"Pack quantity", stock:18,
       description:"Ready-made sample label packs. For your own logo, material or dimensions, use the WhatsApp customization enquiry."
     },
     {
       id:6, audience:"retail", name:"Classic Work Shirt", category:"Shirts", subcategory:"Formal",
-      price:799, mrp:999, image:onlineImages.shirt, images:[onlineImages.shirt], type:"Colour + Option", colors:["Blue","White"], sizes:["38","40","42","44"], optionTitle:"Size", stock:23,
+      price:799, mrp:999, image:onlineImages.shirt, images:[onlineImages.shirt,onlineImages.shirt2,onlineImages.uniform2], type:"Colour + Option", colors:["Blue","White"], sizes:["38","40","42","44"], optionTitle:"Size", stock:23,
       colorVariants:[cv("Blue",onlineImages.shirt,["38","40","42","44"]),cv("White",onlineImages.shirt,["38","40","42","44"])],
       description:"A formal ready-made shirt with a clean finish for office and uniform use."
     },

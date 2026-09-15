@@ -1,4 +1,4 @@
-const CACHE="one-line-old-look-v9-20260915";
+const CACHE='one-line-v10-20260915-2316';
 const CORE=[
   "./index.html","./admin.html","./receiver.html","./css/styles.css","./css/admin.css",
   "./js/data.js","./js/designer.js","./js/app.js","./js/admin.js","./js/receiver.js",
