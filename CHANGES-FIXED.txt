@@ -1,20 +1,3 @@
-CUSTOMIZED STORE — FIXED BUILD 2026-09-15
-Cache version: 20260915-1750-r4
+One-Line 20260915-r7
 
-Implemented:
-- Ready-made products are separate from the online custom editor.
-- Ready-made product images display in their uploaded full colour (no forced black/white filter).
-- Ready-made products can be purchased normally or sent as a customization enquiry.
-- Dedicated Admin > Customizable section controls only editor products.
-- Custom editor supports garment colour + text + uploaded image, with front/back/right sleeve/left sleeve surfaces.
-- Garment colours are admin-defined per customizable item.
-- Print method selector has stronger bold/dark visual states and a clear selected state.
-- Category image upload remains available in Admin > Categories.
-- Staff catalogue/direct order screens contain ready-made inventory only.
-- Removed legacy per-product Customizable checkbox/forms and old cloth/fabric selection from ready-made checkout.
-- Cache-busted HTML/CSS/JS references and service worker cache.
-
-Validation performed:
-- JavaScript syntax checks passed for all JS files.
-- Referenced local files/assets checked; none missing.
-- Data normalization test passed: ready-made and custom-section items remain separated.
+Supersedes r4. See README.md for routes and credentials, DATA_MODEL.md for the local data architecture, and TEST_REPORT.md for verified work and pending real-browser/device checks.

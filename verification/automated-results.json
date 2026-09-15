@@ -1,0 +1,234 @@
+[
+  {
+    "name": "Admin login rejects wrong password",
+    "status": "PASS"
+  },
+  {
+    "name": "Admin login and dashboard",
+    "status": "PASS"
+  },
+  {
+    "name": "All admin sections render",
+    "status": "PASS"
+  },
+  {
+    "name": "Simple product fields and dependent category",
+    "status": "PASS"
+  },
+  {
+    "name": "Simple product requires image",
+    "status": "PASS"
+  },
+  {
+    "name": "Save and edit simple product through shared data layer",
+    "status": "PASS"
+  },
+  {
+    "name": "One Option form preserves independent images, barcodes and stock",
+    "status": "PASS"
+  },
+  {
+    "name": "Colour + Option creates exact combinations and editing keeps stock",
+    "status": "PASS"
+  },
+  {
+    "name": "Reject duplicate product and variant barcodes",
+    "status": "PASS"
+  },
+  {
+    "name": "Create category, image reference and subcategory through forms",
+    "status": "PASS"
+  },
+  {
+    "name": "Rename linked category without orphaning products",
+    "status": "PASS"
+  },
+  {
+    "name": "Create each role through Admin account form",
+    "status": "PASS"
+  },
+  {
+    "name": "Suspension and password reset revoke sessions",
+    "status": "PASS"
+  },
+  {
+    "name": "Create/edit/disable cloth and print methods",
+    "status": "PASS"
+  },
+  {
+    "name": "Customization config saves exact hex, cloth and print choices",
+    "status": "PASS"
+  },
+  {
+    "name": "Combined size and colour filters never mix different variants",
+    "status": "PASS"
+  },
+  {
+    "name": "Keywords are searchable; variant barcode search is exact and internal",
+    "status": "PASS"
+  },
+  {
+    "name": "One Option variant image resolution",
+    "status": "PASS"
+  },
+  {
+    "name": "Staff permissions, exact stock changes and oversell rejection",
+    "status": "PASS"
+  },
+  {
+    "name": "Management can edit products but not accounts or categories",
+    "status": "PASS"
+  },
+  {
+    "name": "Customer catalogue, category and search render",
+    "status": "PASS"
+  },
+  {
+    "name": "Product options, gallery and enquiry message",
+    "status": "PASS"
+  },
+  {
+    "name": "Customer checkout reduces exact variant stock",
+    "status": "PASS"
+  },
+  {
+    "name": "B2B listing, detail and route guards have no prices or checkout",
+    "status": "PASS"
+  },
+  {
+    "name": "Staff portal only has stock operations and barcode search",
+    "status": "PASS"
+  },
+  {
+    "name": "Management uses shared editor without system tabs",
+    "status": "PASS"
+  },
+  {
+    "name": "Customizer opens separately with four base models, cloth and print methods",
+    "status": "PASS"
+  },
+  {
+    "name": "Cloth type and colour update and remain selected across surfaces",
+    "status": "PASS"
+  },
+  {
+    "name": "Add and edit multiple independent text objects",
+    "status": "PASS"
+  },
+  {
+    "name": "Double tap targets the exact text after deselection",
+    "status": "PASS"
+  },
+  {
+    "name": "Drag preserves grab offset and moves selected item",
+    "status": "PASS"
+  },
+  {
+    "name": "Two-pointer pinch resizes and rotates the object",
+    "status": "PASS"
+  },
+  {
+    "name": "Text font, colour, size and rotation controls update selected object",
+    "status": "PASS"
+  },
+  {
+    "name": "Each view keeps its independent text design",
+    "status": "PASS"
+  },
+  {
+    "name": "Saved cart design retains exact hex, cloth, print and all four sides",
+    "status": "PASS"
+  },
+  {
+    "name": "Removal only deletes selected object",
+    "status": "PASS"
+  },
+  {
+    "name": "Light-only print is disabled for dark hex colours",
+    "status": "PASS"
+  },
+  {
+    "name": "Filter dialog renders all groups, resets and applies with loading state",
+    "status": "PASS"
+  },
+  {
+    "name": "Filter apply callback receives selected sizes and loader closes",
+    "status": "PASS"
+  },
+  {
+    "name": "Real image decoding, resizing and WebP compression using native canvas",
+    "status": "PASS"
+  },
+  {
+    "name": "Main and variant file uploads, option image inheritance, form save and persistence",
+    "status": "PASS"
+  },
+  {
+    "name": "Category image upload and saved preview source",
+    "status": "PASS"
+  },
+  {
+    "name": "Customizer artwork file upload, canvas conversion and saved artwork data",
+    "status": "PASS"
+  },
+  {
+    "name": "Every HTML entry has valid local scripts, styles, manifest and icons",
+    "status": "PASS"
+  },
+  {
+    "name": "CSS stylesheets parse including responsive overrides",
+    "status": "PASS"
+  },
+  {
+    "name": "Fresh service worker core resolves every local file",
+    "status": "PASS"
+  },
+  {
+    "name": "Cache activation deletes older app caches and preserves unrelated caches",
+    "status": "PASS"
+  },
+  {
+    "name": "Product ratios are 3:4 and category images stay square in release CSS",
+    "status": "PASS"
+  },
+  {
+    "name": "No stale CSS or JS version in entry pages",
+    "status": "PASS"
+  },
+  {
+    "name": "Missing variants cannot fall back to aggregate stock",
+    "status": "PASS"
+  },
+  {
+    "name": "An order with multiple lines cannot oversell a single variant",
+    "status": "PASS"
+  },
+  {
+    "name": "Suspended active staff session is rejected immediately",
+    "status": "PASS"
+  },
+  {
+    "name": "Legacy aggregate inventory migration preserves totals and custom-model removal",
+    "status": "PASS"
+  },
+  {
+    "name": "Order receiving compatibility route: order board and detailed order drawer",
+    "status": "PASS"
+  },
+  {
+    "name": "Order receiving still supports direct orders",
+    "status": "PASS"
+  },
+  {
+    "name": "Service worker install precaches all portal assets (simulated lifecycle)",
+    "status": "PASS"
+  },
+  {
+    "name": "Service worker activation removes old app caches while preserving unrelated caches (simulated lifecycle)",
+    "status": "PASS"
+  },
+  {
+    "name": "Offline admin navigation returns admin shell rather than customer shell (simulated fetch)",
+    "status": "PASS"
+  }
+]

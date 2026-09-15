@@ -1,78 +1,48 @@
-# One-Line Custom Apparel Commerce
+# One-Line — Complete r7
 
-A mobile-first custom apparel storefront with separate customer, staff, admin and protected B2B experiences. The project uses plain HTML, CSS and JavaScript, so it can be previewed or deployed without npm or a build command.
+This release upgrades the supplied r4 project. It keeps the existing customer branding and page structure, adds the requested catalogue and portal workflows, and uses WellOne v107.1 as the product-management reference.
 
-## Pages
+**Current mode: local browser demo. Supabase is not required.** This ZIP is ready to upload for a hosted preview; live backend authentication, shared inventory and payments are not connected.
 
-- `index.html` — customer storefront, B2B login, customizer, cart, checkout, callbacks and order history
-- `staff.html` — authenticated order board, exact production files, colour/variant stock, image upload, product editing and direct orders
-- `admin.html` — authenticated full control for product galleries, colour images/rates/quantity/barcodes, categories, fabric, printing, bulk offers, B2B access, callbacks, orders and WhatsApp settings
-- `receiver.html` — compatibility redirect to the protected staff console
+## Open the pages
 
-## First preview logins
+| Page | URL | Demo username | Demo password |
+| --- | --- | --- | --- |
+| Customer | `/index.html` | No login required | — |
+| Customize | `/index.html#customize` | No login required | — |
+| Admin | `/admin.html` | `admin` | `admin123` |
+| Staff stock desk | `/staff.html` | `staff` | `staff123` |
+| Management | `/management.html` | `manager` | `manager123` |
+| B2B catalogue | `/b2b.html` | `bluepeak` | `b2b123` |
+| Order receiving | `/receiver.html` | `admin` | `admin123` |
 
-- Admin: `admin` / `admin123`
-- Staff: `staff` / `staff123`
-- B2B: `bluepeak` / `b2b123`
+Accounts created in Admin work in the corresponding portal on the same browser and origin. Staff only handles Sold/Add Stock. Management uses the same product editor as Admin. Admin alone manages categories, customization, accounts and settings. B2B only browses, selects options and enquires on WhatsApp; its screens contain no prices or checkout.
 
-Change or block accounts in **Admin → Access accounts** before handing the preview to a client.
+## Upload or preview
 
-## Implemented commerce rules
+Extract the ZIP and upload **all its contents together**. `index.html` is directly at the project root. No build command, npm installation or manual merging is needed. Use a static host such as Cloudflare Pages, Netlify or GitHub Pages. For local preview, run `python3 -m http.server 8080` from the extracted folder, then open `http://localhost:8080`.
 
-- Ready-made catalogue products are never opened in the editor; they can be bought normally or sent as a customization enquiry
-- Front, back, right sleeve and left sleeve design areas
-- Practical side-profile sleeve editing for the colour-changeable garments, with independent right- and left-sleeve design data
-- Multiple text and image elements on the same side
-- Unrestricted drag positioning plus independent resize, rotate, edit and delete controls
-- Animated visual garment picker and direct WhatsApp support for advanced customization
-- One clearly styled print-method selector appears whenever a design element exists; it does not depend on selecting a text or image
-- Every text and image remains separately charged using the chosen method's admin-controlled text/image rates
-- Budget, Standard and Premium cloth qualities with editable descriptions and rates
-- Sublimation automatically disabled for dark colours
-- Colour-specific front, back and sleeve uploads, price, quantity and optional barcode
-- A separate Admin → Customizable area manages the dedicated editor products, colours, mockups, sizes and print methods
-- Ready-made shop images and fixed-colour customizer images are never automatically recoloured
-- The customer editor is intentionally limited to garment colour + text + image customization, with a clear print-method selector
-- A colour image is reused consistently for every size belonging to that colour
-- Existing size-variant inventory remains supported by the staff stock desk
-- School belts and identification tags are enquiry/callback items and are not sent into the apparel customizer
-- Real product cut-outs for garments, school belts and identification tags; no placeholder catalogue photos
-- Editable quantity offers, protected B2B account discounts and B2B-only catalogue items
-- Premium category photography with admin uploads
-- Configurable WhatsApp support, a movable customer contact control and cart enquiry
-- Customer callback requests shown in admin
-- Direct staff orders reduce the selected colour or variant stock
-- PWA manifest and offline shell
+The release version is **20260915-r7**. All script and stylesheet references, the manifest and service worker use the new version. The worker removes old One-Line app caches, while retaining browser data and unrelated app caches. Existing open pages reload once when the new worker takes control. Service workers need HTTPS or localhost.
 
-## Preview locally
+## Using Admin
 
-Run any static server in this folder. For example:
+- Products → Add product: select Category, then Subcategory. Choose Simple Item, One Option, or Colour + Option. Add images, price and stock. Each option can have its own barcode, image, availability and rate. A colour image can be copied to every size of that colour.
+- Category and subcategory pages: add images, rename, set order, activate/deactivate, and delete unused entries. Reassign linked products before deletion.
+- Customization: manage the separate T-shirt, polo, shirt and jersey bases. Select their cloth and print methods, and supply neutral front/back/side-profile mockups. Colour entries use `Name=#RRGGBB`, one per line. The bundled side-profile assets are reused and mirrored for the opposite sleeve.
+- Cloth types and Print types: create, edit, enable/disable or remove choices. After adding one, enable it for the relevant model in Customization.
+- Staff / Management / B2B accounts: create, edit, suspend, reactivate or delete accounts. A blank password when editing keeps the existing one; a new password revokes the old session.
+- Settings: check the WhatsApp number before client use. Existing contact settings have been retained.
 
-```bash
-python3 -m http.server 8080
-```
+Ready-made products remain outside the editor. Enabling **Ask For Price** switches a retail item to WhatsApp enquiries and hides its fixed price. Products use 3:4 image frames; categories stay square. Search keywords are hidden from customers. Size and colour filters must match the same available variant.
 
-Then open `http://localhost:8080`.
+## Data and migration
 
-## Static deployment
+The app keeps products, accounts, categories and orders in `localStorage`; login state uses `sessionStorage`. Uploaded images are compressed into browser data. Data is shared between tabs on the same origin, but **does not sync across devices or separate browsers**. Replacing static caches does not clear records. Changing domains or clearing browser site data creates a separate demo dataset.
 
-Upload the folder contents to the root of Netlify, Cloudflare Pages or GitHub Pages.
+Existing v3 records are migrated once. Existing variant stock is retained. Older records that only had an aggregate colour/product stock are distributed across their options without changing the total; review that size allocation if you had live demo stock. Deleting a customization model no longer recreates it automatically.
 
-- Build command: leave empty
-- Publish/output directory: `/`
-- HTTPS: required for PWA installation
+For the future Supabase connection, see `DATA_MODEL.md`. Demo accounts and UI role checks are not production security; prices are hidden in B2B screens but remain in the local demo dataset. Replace this with server-enforced access and price-free B2B responses before a public business launch.
 
-## Important production requirement
+## Verification
 
-This package is a complete functional front-end/client preview. Its records and role accounts use browser storage so every workflow can be tested immediately without a server.
-
-Before accepting live public orders, connect the storage functions in `js/data.js` to a secure backend such as Supabase:
-
-1. Store products, variants, categories, fabric, printing, offers, accounts, callbacks and orders in database tables.
-2. Use server-side authentication and role policies for admin, staff and B2B accounts.
-3. Store uploaded artwork in private object storage and expose signed production URLs.
-4. Make order creation and stock reduction one database transaction.
-5. Add a verified payment gateway and webhook before enabling online payment.
-6. Remove the first-preview passwords from the seeded data.
-
-Do not use the browser-storage account system as production security across different devices.
+`TEST_REPORT.md` records the checks actually performed. Automated DOM, logic, image-conversion, syntax and file-path tests passed. Rendered browser layouts, physical Android/iPhone gestures, actual service-worker installation and WhatsApp sending remain unverified because local files were blocked by the available browser's security policy.
