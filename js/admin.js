@@ -2,7 +2,9 @@
   "use strict";
   const S=window.OneLineStore;
   const root=document.getElementById("admin-app");
-  const state={view:"products",menu:false,products:S.getProducts(),categories:S.getCategories(),settings:S.getSettings(),prints:S.getPrints(),editingId:null,editingCategoryId:null,formImages:[],colourGroups:[],subColourGroups:[],subBaseImage:"",toast:""};
+  const role=(document.body.dataset.portalRole||"admin").toLowerCase();
+  const roleLabel=role==="staff"?"Staff":role==="management"?"Management":"Admin";
+  const state={view:"products",menu:false,products:S.getProducts(),categories:S.getCategories(),orders:S.getOrders(),settings:S.getSettings(),prints:S.getPrints(),editingId:null,editingCategoryId:null,formImages:[],colourGroups:[],subColourGroups:[],subBaseImage:"",orderFilter:"All",orderQuery:"",toast:""};
   const fallback="assets/crew-tee.webp";
   const esc=S.esc;
   const imageTag=(src,alt,cls)=>'<img '+(cls?'class="'+cls+'" ':'')+'src="'+esc(src||fallback)+'" alt="'+esc(alt||'')+'" onerror="this.onerror=null;this.src=\''+fallback+'\'">';
@@ -17,16 +19,23 @@
   function toast(msg){state.toast=msg;renderToast();clearTimeout(toast.timer);toast.timer=setTimeout(()=>{state.toast="";renderToast();},2300);}
   function renderToast(){let el=document.getElementById("adminToast");if(!el)return;el.textContent=state.toast;el.classList.toggle("show",!!state.toast);}
 
+  function allowed(v){
+    if(role==="staff")return ["products","add","orders"].includes(v);
+    if(role==="management")return ["products","add","categories","orders"].includes(v);
+    return ["products","add","categories","orders","settings"].includes(v);
+  }
   function shell(){
-    root.innerHTML='<div class="admin-shell">'+
-      '<header class="admin-head"><a class="admin-logo" href="index.html">'+imageTag("one-line-mark.svg","One-Line")+'<span><b>ONE-LINE</b><small>Admin</small></span></a><button class="menu-toggle" data-action="menu">☰</button><nav class="admin-menu '+(state.menu?'open':'')+'">'+
-      nav("products","Products")+nav("add","Add Product")+nav("categories","Categories")+nav("settings","Settings")+'<button data-action="open-store">Open store</button></nav></header>'+
-      '<div class="status-card"><span>Local catalog manager · '+state.products.length+' products · '+state.categories.length+' categories</span></div>'+
+    if(!allowed(state.view))state.view="products";
+    state.orders=S.getOrders();
+    root.innerHTML='<div class="admin-shell portal-'+role+'">'+
+      '<header class="admin-head"><a class="admin-logo" href="index.html">'+imageTag("one-line-mark.svg","One-Line")+'<span><b>ONE-LINE</b><small>'+roleLabel+'</small></span></a><button class="menu-toggle" data-action="menu">☰</button><nav class="admin-menu '+(state.menu?'open':'')+'">'+
+      nav("products","Products")+nav("add","Add Product")+(allowed("categories")?nav("categories","Categories"):"")+nav("orders","Orders")+(allowed("settings")?nav("settings","Settings"):"")+'<button data-action="open-store">Open store</button></nav></header>'+
+      '<div class="status-card"><span>'+roleLabel+' portal · '+state.products.length+' products · '+state.categories.length+' categories · '+state.orders.length+' orders</span><div class="portal-switcher"><a href="admin.html">Admin</a><a href="staff.html">Staff</a><a href="management.html">Management</a><a href="receiver.html">Order receiving</a></div></div>'+
       '<main class="admin-main">'+view()+'</main><div class="toast" id="adminToast"></div></div>';
     bind();renderToast();
   }
   function nav(v,label){return '<button data-view="'+v+'" class="'+(state.view===v?'active':'')+'">'+label+'</button>';}
-  function view(){if(state.view==="add")return editorView();if(state.view==="categories")return categoriesView();if(state.view==="settings")return settingsView();return productsView();}
+  function view(){if(state.view==="add")return editorView();if(state.view==="categories")return categoriesView();if(state.view==="orders")return ordersView();if(state.view==="settings")return settingsView();return productsView();}
 
   function productsView(){
     const cats=[...new Set(state.products.map(p=>p.category).filter(Boolean))];
@@ -36,7 +45,7 @@
   }
   function productRows(items){
     if(!items.length)return '<div class="empty-admin">No products found.</div>';
-    return items.map(p=>'<article class="admin-product">'+imageTag(p.image||p.images?.[0],p.name)+'<div class="admin-product-copy"><span class="audience-pill '+(p.audience==="b2b"?'b2b':'')+'">'+esc(p.audience==="b2b"?'B2B only':'Retail')+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.category||'')+(p.subcategory?' · '+esc(p.subcategory):'')+'</small></div><div class="admin-product-meta"><b>'+esc(p.type||'Simple')+'</b><small>'+esc(p.optionTitle||'')+(S.productOptions(p).length?' · '+S.productOptions(p).length+' options':'')+'</small></div><div class="admin-product-price">'+(p.audience==="b2b"?'<b>Ask price</b><small>Hidden from retail</small>':'<b>'+S.money(p.price)+'</b>'+(p.mrp?'<del>'+S.money(p.mrp)+'</del>':''))+'</div><div class="row-actions"><button data-action="edit-product" data-id="'+p.id+'">Edit</button><button data-action="delete-product" data-id="'+p.id+'">Delete</button></div></article>').join('');
+    return items.map(p=>'<article class="admin-product">'+imageTag(p.image||p.images?.[0],p.name)+'<div class="admin-product-copy"><span class="audience-pill '+(p.audience==="b2b"?'b2b':'')+'">'+esc(p.audience==="b2b"?'B2B only':'Retail')+'</span><b>'+esc(p.name)+'</b><small>'+esc(p.category||'')+(p.subcategory?' · '+esc(p.subcategory):'')+'</small></div><div class="admin-product-meta"><b>'+esc(p.type||'Simple')+'</b><small>'+esc(p.optionTitle||'')+(S.productOptions(p).length?' · '+S.productOptions(p).length+' options':'')+'</small></div><div class="admin-product-price">'+(p.audience==="b2b"?'<b>Ask price</b><small>Hidden from retail</small>':'<b>'+S.money(p.price)+'</b>'+(p.mrp?'<del>'+S.money(p.mrp)+'</del>':''))+'</div><div class="row-actions"><button data-action="edit-product" data-id="'+p.id+'">Edit</button>'+(role==="staff"?'':'<button data-action="delete-product" data-id="'+p.id+'">Delete</button>')+'</div></article>').join('');
   }
 
   function editorView(){
@@ -84,6 +93,21 @@
 
   function settingsView(){
     return '<section class="clean-card"><div class="panel-head"><div><p class="tag">store controls</p><h1>Settings</h1></div></div><div class="settings-grid"><form class="settings-box" id="settingsForm"><h2>WhatsApp & B2B</h2><p>Used by ready-made customization enquiries and B2B “Ask for price”.</p><label class="field"><span>WhatsApp number</span><input id="setWhatsapp" value="'+esc(state.settings.whatsapp||'')+'" placeholder="919876543210"></label><label class="field" style="margin-top:10px"><span>B2B login ID</span><input id="setB2bId" value="'+esc(state.settings.b2bId||'B2B')+'"></label><label class="field" style="margin-top:10px"><span>B2B password</span><input id="setB2bPassword" value="'+esc(state.settings.b2bPassword||'1234')+'"></label><button class="settings-save" type="submit">Save settings</button></form><form class="settings-box" id="printsForm"><h2>Printing types</h2><p>These appear in the customizer. Sublimation remains light-colour only automatically.</p><div class="print-admin-list">'+state.prints.map((p,i)=>'<div class="print-admin-row"><label class="field"><span>'+esc(p.name)+'</span><input data-print-note="'+i+'" value="'+esc(p.note||'')+'"></label><label class="field"><span>Price</span><input data-print-price="'+i+'" type="number" min="0" value="'+Number(p.price||0)+'"></label></div>').join('')+'</div><button class="settings-save" type="submit">Save print settings</button></form></div></section>';
+  }
+
+  function orderStatusTrack(status){
+    const steps=["Confirmed","Packed","Ready","Shipped","Delivered"],active=Math.max(0,steps.indexOf(status));
+    if(status==="Cancelled")return '<div class="admin-order-track cancelled"><span class="done">Confirmed</span><i></i><span class="cancelled-step">Cancelled</span></div>';
+    return '<div class="admin-order-track">'+steps.map((s,i)=>'<span class="'+(i<=active?'done':'')+'">'+s+'</span>'+(i<steps.length-1?'<i class="'+(i<active?'done':'')+'"></i>':'')).join('')+'</div>';
+  }
+  function ordersView(){
+    const filters=["All","Confirmed","Packed","Ready","Shipped","Delivered","Cancelled"];
+    const q=state.orderQuery.trim().toLowerCase();
+    const list=state.orders.filter(o=>(state.orderFilter==="All"||o.status===state.orderFilter)&&(!q||(String(o.id)+" "+String(o.customer)+" "+String(o.phone)).toLowerCase().includes(q)));
+    const inProgress=state.orders.filter(o=>["Confirmed","Packed","Ready","Shipped"].includes(o.status)).length;
+    return '<section class="clean-card admin-orders-card"><div class="panel-head"><div><p class="tag">order tracking</p><h1>Orders</h1><small class="panel-subcopy">Track customer orders from confirmation to delivery. Status changes sync with the order receiving page.</small></div><div class="order-admin-metrics"><span><b>'+state.orders.length+'</b>Total</span><span><b>'+inProgress+'</b>Active</span><span><b>'+state.orders.filter(o=>o.status==="Delivered").length+'</b>Delivered</span></div></div>'+
+      '<div class="order-admin-tools"><label><input id="adminOrderSearch" type="search" value="'+esc(state.orderQuery)+'" placeholder="Order ID, customer or phone"></label><div>'+filters.map(f=>'<button data-order-filter="'+f+'" class="'+(state.orderFilter===f?'active':'')+'">'+f+'</button>').join('')+'</div><a href="receiver.html">Open receiving board</a></div>'+
+      '<div class="admin-order-list">'+(list.length?list.map(o=>'<article class="admin-order-row"><div class="admin-order-top"><div><span>#'+esc(o.id)+'</span><h3>'+esc(o.customer||"Customer")+'</h3><small>'+esc(o.phone||"")+'</small></div><div class="admin-order-total"><strong>'+S.money(o.total)+'</strong><small>'+Number(o.items||o.orderItems?.length||0)+' item'+(Number(o.items||o.orderItems?.length||0)===1?'':'s')+'</small></div></div>'+orderStatusTrack(o.status)+'<div class="admin-order-facts"><span><small>Delivery</small><b>'+esc(o.delivery||"-")+'</b></span><span><small>Payment</small><b>'+esc(o.payment||"-")+'</b></span><span><small>Address</small><b>'+esc(o.address||"-")+'</b></span></div><div class="admin-order-actions"><label>Status<select data-order-status="'+esc(o.id)+'">'+filters.slice(1).map(s=>'<option '+(s===o.status?'selected':'')+'>'+s+'</option>').join('')+'</select></label></div></article>').join(''):'<div class="empty-admin">No orders match this filter.</div>')+'</div></section>';
   }
 
   function readForm(){
@@ -136,9 +160,12 @@
     root.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{readForm();state.view=b.dataset.view;state.menu=false;if(state.view==='add'&&!state.editingId&&form.name==='')startNew();else shell();}));
     root.querySelector('[data-action="menu"]')?.addEventListener('click',()=>{state.menu=!state.menu;shell();});
     root.querySelector('[data-action="open-store"]')?.addEventListener('click',()=>location.href='index.html');
+    root.querySelectorAll('[data-order-filter]').forEach(b=>b.addEventListener('click',()=>{state.orderFilter=b.dataset.orderFilter;state.menu=false;shell();}));
+    root.querySelector('#adminOrderSearch')?.addEventListener('input',e=>{state.orderQuery=e.target.value;const pos=e.target.selectionStart;shell();const n=root.querySelector('#adminOrderSearch');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(_){}}});
+    root.querySelectorAll('[data-order-status]').forEach(sel=>sel.addEventListener('change',()=>{state.orders=state.orders.map(o=>String(o.id)===String(sel.dataset.orderStatus)?{...o,status:sel.value}:o);S.save('custom-store-orders-v3',state.orders);toast('Order status updated to '+sel.value+'.');shell();}));
     root.querySelector('[data-action="new-product"]')?.addEventListener('click',startNew);
     root.querySelectorAll('[data-action="edit-product"]').forEach(b=>b.addEventListener('click',()=>startEdit(b.dataset.id)));
-    root.querySelectorAll('[data-action="delete-product"]').forEach(b=>b.addEventListener('click',()=>{const p=productById(b.dataset.id);if(!p||!confirm('Delete '+p.name+'?'))return;state.products=state.products.filter(x=>String(x.id)!==String(p.id));saveProducts();shell();toast('Product deleted.');}));
+    root.querySelectorAll('[data-action="delete-product"]').forEach(b=>b.addEventListener('click',()=>{if(role==="staff")return;const p=productById(b.dataset.id);if(!p||!confirm('Delete '+p.name+'?'))return;state.products=state.products.filter(x=>String(x.id)!==String(p.id));saveProducts();shell();toast('Product deleted.');}));
     root.querySelector('[data-action="apply-product-filter"]')?.addEventListener('click',filterAdminProducts);root.querySelector('#adminSearch')?.addEventListener('input',filterAdminProducts);root.querySelector('#adminCatFilter')?.addEventListener('change',filterAdminProducts);
     root.querySelector('#fType')?.addEventListener('change',e=>{readForm();form.type=e.target.value;if(form.type==='Colour + Option'&&!state.colourGroups.length)state.colourGroups=[{color:'',options:'',image:'',url:''}];shell();});
     root.querySelector('#fAudience')?.addEventListener('change',e=>{readForm();form.audience=e.target.value;shell();});
@@ -166,6 +193,6 @@
     e.preventDefault();const name=document.getElementById('catName').value.trim(),sub=document.getElementById('catSub').value.trim(),url=document.getElementById('catImageUrl').value.trim(),file=document.getElementById('catImageFile').files?.[0];if(!name){toast('Category name is required.');return;}let image=file?await compress(file):url;const old=state.categories.find(c=>String(c.id)===String(state.editingCategoryId));if(!image)image=old?.image||S.onlineImages?.tshirtBlack||fallback;const obj={...(old||{}),id:old?.id||('cat-'+uid()),name,sub,code:old?.code||String(state.categories.length+1).padStart(2,'0'),tone:old?.tone||'paper',image};if(old){const previousName=old.name;const idx=state.categories.findIndex(c=>String(c.id)===String(old.id));state.categories[idx]=obj;if(previousName!==name){state.products=state.products.map(p=>p.category===previousName?{...p,category:name}:p);saveProducts();}}else state.categories.push(obj);saveCategories();state.editingCategoryId=null;shell();toast(old?'Category updated.':'Category added.');
   }
 
-  window.addEventListener('storage',e=>{if(['custom-store-products-v3','custom-store-categories-v3','custom-store-settings-v3','custom-store-print-types-v3'].includes(e.key)){state.products=S.getProducts();state.categories=S.getCategories();state.settings=S.getSettings();state.prints=S.getPrints();shell();}});
+  window.addEventListener('storage',e=>{if(['custom-store-products-v3','custom-store-categories-v3','custom-store-settings-v3','custom-store-print-types-v3','custom-store-orders-v3'].includes(e.key)){state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();state.prints=S.getPrints();shell();}});window.addEventListener('one-line-change',e=>{if(e.detail?.key==='custom-store-orders-v3'){state.orders=S.getOrders();if(state.view==='orders')shell();}});
   shell();
 })();

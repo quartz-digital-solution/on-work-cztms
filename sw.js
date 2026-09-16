@@ -1,6 +1,6 @@
-const CACHE='one-line-v12-20260916-runtime-fix';
+const CACHE='one-line-v13-20260916-responsive-portals';
 const CORE=[
-  './index.html','./admin.html','./receiver.html','./css/styles.css','./css/admin.css',
+  './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./css/styles.css','./css/admin.css',
   './js/data.js','./js/designer.js','./js/app.js','./js/admin.js','./js/receiver.js',
   './one-line-mark.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest',
   './assets/crew-tee.webp','./assets/crew-tee-back.webp','./assets/polo-shirt.webp',

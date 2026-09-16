@@ -1255,7 +1255,6 @@ body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;overs
 .borderless-categories .real-category-card .category-code{border:0!important;border-radius:999px!important;background:rgba(255,255,255,.92)!important;box-shadow:0 3px 12px rgba(29,18,31,.08)!important}
 
 /* Ready-made product cards use compact 4:3 swipe galleries. */
-.product-image-wrap.ratio-4x3{position:relative!important;width:100%!important;aspect-ratio:4/3!important;height:auto!important;overflow:hidden!important;background:#ece9e4!important;border:0!important;border-bottom:1px solid #e8e1e9!important}
 .responsive-catalog-grid,.home-product-grid{border:0!important;gap:12px!important;background:transparent!important}
 .wellone-card.product-card{border:1px solid #e1d9e3!important;border-radius:11px!important;box-shadow:0 6px 18px rgba(56,31,61,.055)!important}
 .wellone-card .product-info{padding:10px 10px 12px!important;min-height:100px!important}
@@ -1280,7 +1279,7 @@ body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;overs
 .product-full-inner{width:min(1500px,94vw);min-height:calc(100svh - 142px)!important;margin:0 auto!important;display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(380px,.92fr)!important;gap:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;overflow:visible!important}
 .product-full-media{min-width:0!important;padding:clamp(12px,2vw,24px)!important;display:block!important;border:0!important;border-right:1px solid #e4dde5!important;background:#f0ece8!important}
 .detail-slider{width:100%;max-width:100%;margin:0 auto}
-.detail-slider-frame{width:100%;aspect-ratio:4/3;overflow:hidden;background:#e8e3df;border-radius:10px}
+.detail-slider-frame{width:100%;aspect-ratio:3/4;overflow:hidden;background:#e8e3df;border-radius:10px}
 .detail-slide-track{height:100%!important;touch-action:pan-x pan-y!important}
 .detail-slide{height:100%!important;aspect-ratio:auto!important}.detail-slide img{object-fit:cover!important}
 .detail-slide-progress{margin:9px 2px 0!important;height:8px!important;gap:4px!important}.detail-slide-progress i{height:3px!important;background:#d8d0da!important}.detail-slide-progress i.active{background:#64116f!important}
@@ -1295,10 +1294,10 @@ body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;overs
 .advanced-subitem{margin:22px 0 0!important;padding:0!important;border:1px solid #e0d8e1!important;border-radius:11px!important;background:#fbf9fb!important;overflow:hidden}
 .advanced-subitem .subitem-toggle{min-height:68px;padding:13px 14px!important;display:grid!important;grid-template-columns:auto 1fr auto!important;align-items:center!important;gap:12px!important;background:#fff!important;cursor:pointer}
 .advanced-subitem .subitem-toggle input{width:18px;height:18px;accent-color:#64116f}.advanced-subitem .subitem-toggle span{display:grid;gap:3px}.advanced-subitem .subitem-toggle b{font-size:13px}.advanced-subitem .subitem-toggle small{color:#847a86;font-size:8px}.advanced-subitem .subitem-toggle strong{font-size:13px}
-.subitem-config{padding:12px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border-top:1px solid #e8e1e9}.subitem-media{width:120px;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#eee}.subitem-media img{width:100%;height:100%;object-fit:cover}.subitem-controls{min-width:0}.sub-selection{margin-top:0!important}.sub-selection+.sub-selection{margin-top:12px!important}
+.subitem-config{padding:12px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border-top:1px solid #e8e1e9}.subitem-media{width:120px;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#eee}.subitem-media img{width:100%;height:100%;object-fit:cover}.subitem-controls{min-width:0}.sub-selection{margin-top:0!important}.sub-selection+.sub-selection{margin-top:12px!important}
 
 /* Cart ready-made photos also follow the compact 4:3 image section. */
-.cart-ready-preview{width:160px!important;height:auto!important;aspect-ratio:4/3!important;min-width:160px!important}.cart-ready-preview img{width:100%!important;height:100%!important;object-fit:cover!important}
+.cart-ready-preview{width:160px!important;height:auto!important;aspect-ratio:3/4!important;min-width:160px!important}.cart-ready-preview img{width:100%!important;height:100%!important;object-fit:cover!important}
 
 /* WhatsApp remains compact, movable, and clear of primary actions. */
 .whatsapp-float.whatsapp-icon-only{right:max(12px,env(safe-area-inset-right))!important;bottom:calc(82px + env(safe-area-inset-bottom))!important;border:0!important}
@@ -1343,4 +1342,57 @@ body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;overs
 @media (max-width:360px){
   .borderless-categories .real-category-card:first-child{grid-template-columns:1fr 1fr!important}.borderless-categories .real-category-card:first-child h3{font-size:16px!important}
   .subitem-config{grid-template-columns:80px minmax(0,1fr)!important}.subitem-media{width:80px!important}
+}
+
+/* v13 targeted fixes: scrollable customizer, 3:4 imagery, featured first category, real WhatsApp glyph. */
+.icon.whatsapp-brand{fill:currentColor!important;stroke:none!important;stroke-width:0!important}
+
+/* Garment stays visually fixed, but vertical swipes on the garment area scroll the page. */
+.locked-garment-stage,.locked-garment-stage .compact-shirt-canvas,.locked-garment-stage .locked-garment,.locked-garment-stage .print-area{
+  touch-action:pan-y!important;
+  overscroll-behavior-y:auto!important;
+}
+.locked-garment-stage .design-layer,.locked-garment-stage .design-layer *{touch-action:none!important}
+.locked-garment-stage .garment-photo,.locked-garment-stage .garment-tint,.locked-garment-stage .garment-depth{pointer-events:none!important}
+
+/* Type selector belongs above Front / Back / sleeve tabs, not below the garment. */
+.compact-designer-bar{grid-template-columns:1fr!important;height:auto!important;gap:7px!important;align-items:stretch!important}
+.stage-garment-type{padding:7px 8px;border:1px solid rgba(78,35,86,.13);border-radius:12px;background:rgba(255,255,255,.92);box-shadow:0 8px 22px rgba(57,28,62,.07);backdrop-filter:blur(12px)}
+.stage-garment-type>label{display:block;margin:0 0 5px;color:#77697b;font-size:7px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.stage-garment-type .garment-type-cards{gap:5px!important}
+.stage-garment-type .garment-type-cards button{min-height:42px!important;padding:6px 8px!important}
+.stage-garment-type .garment-type-cards button b{font-size:8px!important}
+.stage-garment-type .garment-type-cards button small{font-size:6px!important}
+
+/* Every ready-made/category/product visual uses portrait 3:4. */
+.product-image-wrap.ratio-3x4{position:relative!important;width:100%!important;height:auto!important;aspect-ratio:3/4!important;overflow:hidden!important;background:#ece9e4!important;border:0!important;border-bottom:1px solid #e8e1e9!important}
+.product-image-wrap.ratio-3x4 .product-slide-track,.product-image-wrap.ratio-3x4 .product-slide{height:100%!important}
+.product-image-wrap.ratio-3x4 img{width:100%!important;height:100%!important;object-fit:cover!important}
+.detail-slider-frame{aspect-ratio:3/4!important;max-height:min(78svh,860px)!important}
+.subitem-media{aspect-ratio:3/4!important}
+.cart-ready-preview{aspect-ratio:3/4!important}
+.b2b-product .product-full-media>img{display:block!important;width:min(100%,720px)!important;aspect-ratio:3/4!important;height:auto!important;margin:0 auto!important;object-fit:cover!important;border-radius:10px!important}
+
+/* First home category is a real featured card, while the grid still stays 2-up on mobile. */
+.borderless-categories .real-category-card:first-child{position:relative!important;z-index:2!important;transform:translateY(-5px) scale(1.025)!important;transform-origin:center!important;box-shadow:0 18px 38px rgba(67,28,73,.16)!important}
+.borderless-categories .real-category-card:first-child:after{content:"FEATURED";position:absolute;left:9px;top:9px;z-index:4;padding:5px 7px;border-radius:999px;background:#64116f;color:#fff;font-size:6px;font-weight:900;letter-spacing:.12em}
+.borderless-categories .real-category-card:first-child h3{color:#64116f!important}
+
+/* Movable WhatsApp enquiry: JS always controls left/top, so no fixed right/bottom fights dragging. */
+.whatsapp-float.whatsapp-icon-only{right:auto!important;bottom:auto!important;width:52px!important;min-width:52px!important;height:52px!important;padding:0!important;border-radius:50%!important;background:#25D366!important;color:#fff!important;box-shadow:0 12px 28px rgba(20,133,67,.32)!important;touch-action:none!important}
+.whatsapp-float.whatsapp-icon-only .whatsapp-brand{width:23px!important;height:23px!important}
+.whatsapp-enquiry-button .whatsapp-brand,.custom-enquiry-btn .whatsapp-brand,.b2b-enquiry .whatsapp-brand{width:17px!important;height:17px!important}
+
+@media (max-width:899px){
+  .borderless-categories .real-category-card:first-child{grid-column:auto!important}
+}
+@media (max-width:599px){
+  .compact-stage{height:auto!important;min-height:620px!important;max-height:none!important;justify-content:flex-start!important;padding-top:8px!important}
+  .compact-designer-bar{width:100%!important;margin:0!important}
+  .compact-stage .stage-topline{position:relative!important;inset:auto!important;width:100%!important;margin:6px 0 0!important}
+  .compact-shirt-canvas{height:450px!important;min-height:450px!important}
+  .borderless-categories .real-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .borderless-categories .real-category-card:first-child{grid-column:auto!important;display:flex!important;flex-direction:column!important;transform:translateY(-3px) scale(1.02)!important}
+  .borderless-categories .real-category-card:first-child .category-photo{width:100%!important;aspect-ratio:3/4!important}
+  .whatsapp-float.whatsapp-icon-only{width:49px!important;min-width:49px!important;height:49px!important}
 }
