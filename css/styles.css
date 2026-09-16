@@ -1509,3 +1509,80 @@ button,a{-webkit-tap-highlight-color:transparent}
   .compact-catalog-title{grid-template-columns:1fr!important}.catalog-title-actions{justify-content:flex-start}.compact-catalog-title h1{font-size:49px!important}
   .borderless-categories .real-category-grid{gap:7px!important}.borderless-categories .real-category-card:first-child{transform:scale(1.018)!important}
 }
+
+/* ===== Requested interaction + responsive fixes ===== */
+html{max-width:100%;overflow-x:hidden!important;-webkit-text-size-adjust:100%}
+body{max-width:100%;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important;-webkit-overflow-scrolling:touch;touch-action:pan-y;background-attachment:scroll!important}
+.screen,.section-wrap,.catalog-page,.product-fullscreen,.designer-page{min-width:0;max-width:100%}
+.compact-controls input,.compact-controls textarea,.compact-controls [contenteditable="true"]{user-select:text!important;-webkit-user-select:text!important;-webkit-touch-callout:default!important}
+.compact-controls .input-with-icon input{touch-action:manipulation!important}
+.locked-garment-stage .design-layer{will-change:left,top,transform;backface-visibility:hidden;transform-style:preserve-3d}
+
+/* Full-bleed ready-made category cards: the photo itself fills the card. */
+.borderless-categories .real-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;padding:4px!important;align-items:stretch!important}
+.borderless-categories .real-category-card.category-block,
+.borderless-categories .real-category-card:first-child{position:relative!important;display:block!important;min-width:0!important;min-height:0!important;width:100%!important;aspect-ratio:3/4!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:16px!important;background:#e9e3ea!important;box-shadow:0 12px 30px rgba(55,29,61,.10)!important;color:#fff!important;transform:none!important}
+.borderless-categories .real-category-card:first-child{transform:scale(1.025)!important;z-index:3!important;box-shadow:0 18px 38px rgba(66,29,72,.17)!important}
+.borderless-categories .real-category-card .category-photo,
+.borderless-categories .real-category-card:first-child .category-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;aspect-ratio:auto!important;background:#e9e3ea!important}
+.borderless-categories .real-category-card .category-photo img,
+.borderless-categories .real-category-card:first-child .category-photo img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;transform:scale(1.002)}
+.borderless-categories .real-category-card>div:last-of-type,
+.borderless-categories .real-category-card:first-child>div:last-of-type{position:absolute!important;z-index:4!important;left:0!important;right:0!important;bottom:0!important;min-height:38%!important;padding:42px 13px 13px!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;background:linear-gradient(180deg,rgba(18,9,20,0),rgba(18,9,20,.76))!important;color:#fff!important;pointer-events:none}
+.borderless-categories .real-category-card h3,
+.borderless-categories .real-category-card:first-child h3{margin:0!important;color:#fff!important;font-size:18px!important;line-height:1.05!important;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.borderless-categories .real-category-card p{margin:5px 0 0!important;color:rgba(255,255,255,.86)!important;font-size:8px!important;line-height:1.35!important}
+.borderless-categories .real-category-card .category-code{z-index:5!important;left:9px!important;top:9px!important;background:rgba(255,255,255,.92)!important;color:#4d1456!important}
+.borderless-categories .real-category-card:first-child:after{z-index:6!important}
+.borderless-categories .category-arrow{z-index:6!important;right:12px!important;bottom:13px!important;color:#fff!important}
+.borderless-categories .category-share-button{z-index:7!important;background:rgba(255,255,255,.94)!important}
+
+/* Real WhatsApp logo asset with a light button so the green icon stays visible. */
+.wa-logo{display:block;width:19px;height:19px;flex:0 0 19px;object-fit:contain}
+.whatsapp-enquiry-button,.product-action-row .custom-enquiry-btn,.custom-enquiry-btn.b2b-enquiry,.card-enquiry-button{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;border:1px solid #bde8cb!important;background:#fff!important;color:#196b37!important;box-shadow:0 8px 20px rgba(31,126,67,.10)!important;font-weight:900!important}
+.whatsapp-enquiry-button:hover,.product-action-row .custom-enquiry-btn:hover,.custom-enquiry-btn.b2b-enquiry:hover,.card-enquiry-button:hover{background:#f4fff7!important;border-color:#8bd6a4!important}
+.whatsapp-float.whatsapp-icon-only{display:grid!important;place-items:center!important;background:#fff!important;border:1px solid #bde8cb!important;box-shadow:0 12px 28px rgba(26,122,63,.22)!important}
+.whatsapp-float.whatsapp-icon-only .wa-logo{width:27px;height:27px}
+.card-enquiry-button{width:100%;min-height:35px;margin-top:9px;padding:0 10px;border-radius:9px;font-size:8px;cursor:pointer}
+.card-enquiry-button .wa-logo{width:15px;height:15px;flex-basis:15px}
+.wellone-card .product-info{height:auto!important;min-height:118px!important}
+
+/* Cleaner custom-uniform enquiry block and spacing. */
+.bulk-banner{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:36px!important;padding:38px 42px!important;border-radius:22px!important;overflow:hidden!important}
+.bulk-banner>div{min-width:0!important;max-width:760px}
+.bulk-banner h2{margin:8px 0 10px!important;line-height:.95!important}
+.bulk-banner p{max-width:660px!important;line-height:1.55!important}
+.bulk-banner .whatsapp-enquiry-button{min-width:220px!important;height:50px!important;padding:0 20px!important;border-radius:13px!important;white-space:nowrap}
+
+/* Full-screen image: tap product image to open, tap again to return; pinch changes scale. */
+.zoom-image-stage{touch-action:none!important;cursor:zoom-out!important;overflow:hidden!important}
+.zoom-image-stage img{max-width:96%!important;max-height:96%!important;transition:transform .12s ease-out!important;will-change:transform;pointer-events:none!important}
+
+/* Mobile and small tablet sizing. */
+@media (max-width:980px){
+  .borderless-categories .real-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important}
+}
+@media (max-width:760px){
+  .borderless-categories .real-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;padding:2px!important}
+  .borderless-categories .real-category-card.category-block,.borderless-categories .real-category-card:first-child{aspect-ratio:3/4!important;border-radius:13px!important;transform:none!important}
+  .borderless-categories .real-category-card:first-child{transform:scale(1.015)!important}
+  .borderless-categories .real-category-card h3,.borderless-categories .real-category-card:first-child h3{font-size:14px!important}
+  .borderless-categories .real-category-card>div:last-of-type,.borderless-categories .real-category-card:first-child>div:last-of-type{min-height:42%!important;padding:36px 9px 9px!important}
+  .bulk-banner{grid-template-columns:1fr!important;gap:18px!important;margin-left:10px!important;margin-right:10px!important;padding:24px 18px!important}
+  .bulk-banner .whatsapp-enquiry-button{width:100%!important;min-width:0!important;height:49px!important}
+  .wellone-card .product-info{min-height:112px!important}
+}
+
+/* A phone requesting a browser "desktop site" still receives a usable single-column/touch layout. */
+.mobile-device-layout body{min-width:0!important;max-width:100%!important;overflow-x:hidden!important}
+.mobile-device-layout .compact-designer-layout{display:block!important;grid-template-columns:1fr!important;min-height:auto!important}
+.mobile-device-layout .compact-stage{position:relative!important;top:0!important;height:auto!important;min-height:620px!important;max-height:none!important;padding:8px 10px 12px!important;justify-content:flex-start!important}
+.mobile-device-layout .compact-shirt-canvas{width:100%!important;max-width:620px!important;height:450px!important;min-height:450px!important}
+.mobile-device-layout .compact-controls{width:100%!important;max-width:none!important;overflow:visible!important;border-left:0!important;border-top:1px solid rgba(76,46,82,.13)!important}
+.mobile-device-layout .hero{display:block!important;grid-template-columns:1fr!important;min-width:0!important}
+.mobile-device-layout .hero-copy,.mobile-device-layout .hero-visual{width:100%!important;min-width:0!important}
+.mobile-device-layout .responsive-catalog-grid,.mobile-device-layout .home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.mobile-device-layout .product-full-inner{grid-template-columns:1fr!important;width:100%!important;max-width:100%!important}
+.mobile-device-layout .product-full-media,.mobile-device-layout .product-full-info{width:100%!important;min-width:0!important}
+.mobile-device-layout .borderless-categories .real-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.mobile-device-layout .bulk-banner{grid-template-columns:1fr!important}

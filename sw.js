@@ -1,8 +1,8 @@
-const CACHE='one-line-v14-20260916-share-zoom-mobile-fix';
+const CACHE='one-line-v15-20260916-smooth-customizer-wa-categories';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./css/styles.css','./css/admin.css',
   './js/data.js','./js/designer.js','./js/app.js','./js/admin.js','./js/receiver.js',
-  './one-line-mark.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest',
+  './one-line-mark.svg','./assets/whatsapp-logo.png','./icon-192.png','./icon-512.png','./manifest.webmanifest',
   './assets/tshirts-category.webp','./assets/crew-tee.webp','./assets/crew-tee-back.webp','./assets/polo-shirt.webp',
   './assets/polo-shirt-back.webp','./assets/sports-jersey.webp','./assets/sports-jersey-back.webp','./assets/sleeve-side-neutral.webp'
 ];
