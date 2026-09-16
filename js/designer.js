@@ -100,7 +100,7 @@
     }
     function layerPosition(layer,clientX,clientY){const area=root.querySelector('[data-print-area]')?.getBoundingClientRect();if(!area)return;const x=(clientX-area.left)/area.width*100,y=(clientY-area.top)/area.height*100;current().positions[layer]={x:Math.max(-30,Math.min(130,x)),y:Math.max(-30,Math.min(130,y))};const el=root.querySelector('[data-layer="'+layer+'"]');if(el){el.style.left=current().positions[layer].x+'%';el.style.top=current().positions[layer].y+'%';}saveDraft();}
     function layerStyle(layer){const d=current(),el=root.querySelector('[data-layer="'+layer+'"]');if(!el)return;if(layer==='text'){d.textSize=clampText(d.textSize);el.style.fontSize=d.textSize+'px';el.style.transform='translate(-50%,-50%) rotate('+d.textRotation+'deg)';}else{el.style.width=d.imageSize+'px';el.style.transform='translate(-50%,-50%) rotate('+d.imageRotation+'deg)';}syncCurrentScale();}
-    function focusTextEditor(){state.active='text';render();setTimeout(()=>{const input=root.querySelector('[data-text]');input?.focus();input?.select();input?.scrollIntoView({behavior:'smooth',block:'center'});},20);}
+    function focusTextEditor(){state.active='text';render();setTimeout(()=>{const input=root.querySelector('[data-text]');if(!input)return;input.focus({preventScroll:true});input.select();input.scrollIntoView({behavior:'auto',block:'nearest'});},20);}
 
     function bind(){
       root.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',e=>{
@@ -142,7 +142,16 @@
       const stage=root.querySelector('[data-stage]');if(stage)stage.addEventListener('pointerdown',e=>{if(!e.target.closest('.design-layer')&&!e.target.closest('.custom-picker')&&state.active){state.active=null;render();}});
     }
     let resizeTimer=null;
-    const onResize=()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>render(),90);};
+    let lastViewportWidth=Math.round(window.visualViewport?.width||window.innerWidth||0);
+    const onResize=()=>{
+      const active=document.activeElement;
+      if(active&&(active.matches?.('input, textarea, select')||active.isContentEditable))return;
+      const nextWidth=Math.round(window.visualViewport?.width||window.innerWidth||0);
+      if(Math.abs(nextWidth-lastViewportWidth)<2)return;
+      lastViewportWidth=nextWidth;
+      clearTimeout(resizeTimer);
+      resizeTimer=setTimeout(()=>render(),90);
+    };
     window.addEventListener('resize',onResize);
     window.visualViewport?.addEventListener?.('resize',onResize);
     render();

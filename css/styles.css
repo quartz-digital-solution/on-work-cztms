@@ -47,7 +47,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; }
 button, input, textarea, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
@@ -186,8 +186,7 @@ footer { background:#1a1b1a;color:#fff; }.footer-main { padding:65px 4vw;display
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto!important;transition:none!important; } }
 
 /* Production-ready touch editor and app navigation */
-html { touch-action:pan-x pan-y; }
-body { user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior-y:none; }
+body { user-select:none;-webkit-user-select:none;-webkit-touch-callout:none; }
 input,textarea,[contenteditable="true"] { user-select:text;-webkit-user-select:text; }
 img { -webkit-user-drag:none; }
 
@@ -1231,8 +1230,8 @@ img,svg,video,canvas{max-width:100%}
 /* =========================================================
    v11 FINAL RESPONSIVE PASS — targeted fixes only
    ========================================================= */
-html{scroll-behavior:smooth!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch}
-body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;overscroll-behavior-y:auto;touch-action:pan-y;background-attachment:scroll}
+html{scroll-behavior:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch}
+body{overflow-y:auto!important;overflow-x:hidden!important;min-height:100%;background-attachment:scroll}
 .view-root,.screen,.catalog-page,.product-fullscreen{overflow:visible!important;max-width:100%}
 
 /* Customizer garment is completely locked. Only print layers accept drag gestures. */
@@ -1508,4 +1507,103 @@ button,a{-webkit-tap-highlight-color:transparent}
   .hero-copy{padding-left:16px!important;padding-right:16px!important}.hero-visual{min-height:480px!important}
   .compact-catalog-title{grid-template-columns:1fr!important}.catalog-title-actions{justify-content:flex-start}.compact-catalog-title h1{font-size:49px!important}
   .borderless-categories .real-category-grid{gap:7px!important}.borderless-categories .real-category-card:first-child{transform:scale(1.018)!important}
+}
+
+
+/* ===== Requested stability / responsive refinement ===== */
+
+/* Keep normal browser scrolling natural. Only actual draggable design layers and the
+   movable contact control capture gestures. */
+html,body{scroll-behavior:auto!important;overscroll-behavior:auto!important}
+body{touch-action:auto!important}
+.view-root,.screen,.catalog-page,.product-fullscreen,.compact-designer,.compact-designer-layout,.compact-controls{overscroll-behavior:auto!important}
+.locked-garment-stage,.locked-garment-stage .compact-shirt-canvas,.locked-garment-stage .locked-garment,.locked-garment-stage .print-area{overscroll-behavior:auto!important}
+
+/* Header back control: icon only, no tile/background. */
+.designer-back,.designer-back:hover,.designer-back:focus-visible{
+  width:42px;height:42px;padding:0;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;color:#372c3a
+}
+
+/* Customizer proportions on desktop: controls should feel like controls, not long bars. */
+@media (min-width:1051px){
+  .compact-designer-layout{grid-template-columns:minmax(0,1fr) 390px!important}
+  .compact-designer-bar{width:min(720px,100%)!important}
+  .stage-garment-type{padding:9px 10px!important}
+  .stage-garment-type .garment-type-cards{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  .stage-garment-type .garment-type-cards button{height:50px!important;min-height:50px!important;padding:7px 10px!important}
+  .compact-surface-tabs{height:48px!important}
+  .compact-surface-tabs button{min-height:38px!important}
+  .material-quality-cards button{min-height:78px!important}
+  .quick-layer-tools button{height:48px!important}
+  .compact-controls .print-options button{min-height:48px!important}
+}
+
+/* Tablet / compact desktop: stack the preview and controls rather than squeezing both
+   into narrow columns. */
+@media (min-width:761px) and (max-width:1050px){
+  .compact-designer-layout{display:block!important;min-height:auto!important}
+  .compact-stage{position:relative!important;top:0!important;height:auto!important;min-height:650px!important;padding:16px 18px 24px!important;overflow:visible!important}
+  .compact-designer-bar{width:min(720px,100%)!important;margin:0 auto!important}
+  .compact-shirt-canvas{height:500px!important;min-height:500px!important}
+  .compact-controls{width:min(760px,calc(100% - 32px))!important;margin:0 auto 28px!important;padding:16px!important;border:1px solid rgba(75,43,80,.13)!important;border-radius:16px!important;overflow:visible!important}
+  .compact-controls .control-block{padding:15px!important}
+  .material-quality-cards{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .material-quality-cards button{min-height:76px!important}
+  .quick-layer-tools button{height:50px!important}
+  .compact-surface-tabs{height:48px!important}
+  .stage-garment-type .garment-type-cards button{height:50px!important;min-height:50px!important}
+}
+
+/* Ready-made area: fewer decorative controls and clearer main actions. */
+.catalog-view-button,.section-heading>button{
+  min-height:42px!important;padding:0 15px!important;border:1px solid #d8cedb!important;
+  border-radius:11px!important;background:#fff!important;color:#4b3e4e!important;
+  box-shadow:0 6px 16px rgba(55,31,60,.06)!important;font-size:9px!important;
+  font-weight:900!important;letter-spacing:.02em!important
+}
+.catalog-view-button:hover,.section-heading>button:hover{border-color:#64116f!important;color:#64116f!important;background:#fbf7fc!important}
+.wellone-filter-button{
+  min-height:42px!important;padding:0 14px!important;border:1px solid #d5cad8!important;
+  border-radius:11px!important;background:#fff!important;box-shadow:0 6px 16px rgba(55,31,60,.055)!important
+}
+.catalog-category-heading{padding-bottom:9px!important;border-bottom:1px solid #eee7ef!important}
+.category-subline{margin:5px 0 0!important;color:#8a7e8d!important;font-size:7px!important;font-weight:700!important;letter-spacing:.04em!important}
+.category-heading-actions small{padding:6px 9px;border-radius:999px;background:#f4edf5;color:#64116f;font-size:7px;font-weight:900}
+
+/* Custom uniform CTA opens the customizer directly. */
+.uniform-order-banner{border-radius:18px!important;border:1px solid #ded4e1!important;box-shadow:0 16px 40px rgba(59,26,65,.08)!important}
+.uniform-customize-button{
+  min-width:205px!important;height:50px!important;padding:0 17px!important;display:flex!important;
+  align-items:center!important;justify-content:space-between!important;gap:18px!important;
+  border:0!important;border-radius:12px!important;background:linear-gradient(145deg,#71197d,#4b0c56)!important;
+  color:#fff!important;box-shadow:0 11px 22px rgba(80,16,92,.18)!important;font-size:10px!important;
+  font-weight:900!important;cursor:pointer!important
+}
+.uniform-customize-button .icon{width:17px;height:17px}
+
+/* Product page: keep Add to cart primary and make customization enquiry a cleaner,
+   recognizable WhatsApp action. */
+.product-action-row{align-items:stretch!important}
+.product-action-row .custom-enquiry-btn,.b2b-enquiry{
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;
+  border:1px solid #b8ddc4!important;border-radius:10px!important;background:#f7fff9!important;
+  color:#176b35!important;box-shadow:none!important;font-size:9px!important;font-weight:900!important
+}
+.product-action-row .custom-enquiry-btn:hover,.b2b-enquiry:hover{border-color:#25d366!important;background:#f0fff5!important}
+.whatsapp-logo{width:20px!important;height:20px!important;object-fit:contain!important;flex:0 0 auto!important}
+
+/* Movable support button uses the provided contact artwork, not a generated glyph. */
+.whatsapp-float.contact-float{
+  width:58px!important;min-width:58px!important;height:58px!important;padding:0!important;
+  border:0!important;border-radius:50%!important;background:transparent!important;
+  box-shadow:0 12px 28px rgba(44,16,50,.22)!important;overflow:hidden!important
+}
+.whatsapp-float.contact-float img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;border-radius:50%!important;pointer-events:none!important}
+
+@media (max-width:760px){
+  .designer-back,.designer-back:hover,.designer-back:focus-visible{width:39px!important;height:39px!important}
+  .uniform-customize-button{width:100%!important;min-width:0!important}
+  .whatsapp-float.contact-float{width:52px!important;min-width:52px!important;height:52px!important}
+  .catalog-view-button,.section-heading>button{min-height:40px!important;padding:0 12px!important}
 }
