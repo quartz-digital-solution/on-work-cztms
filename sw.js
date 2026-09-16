@@ -1,4 +1,4 @@
-const CACHE='one-line-v18-20260916-native-scroll-solid-filter-pinch';
+const CACHE='one-line-v19-20260916-true-native-scroll-gallery-history';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./css/styles.css','./css/admin.css',
   './js/data.js','./js/designer.js','./js/app.js','./js/admin.js','./js/receiver.js',

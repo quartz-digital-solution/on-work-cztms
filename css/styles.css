@@ -1904,3 +1904,62 @@ html.modal-scroll-lock,body.modal-scroll-lock{
     padding:10px 12px max(10px,env(safe-area-inset-bottom))!important;
   }
 }
+
+/* =========================================================
+   v19 — true single document scroller + gallery history/swipe
+   ========================================================= */
+/* Important: overflow-x:hidden together with overflow-y:visible computes the
+   visible axis to auto in Chromium, making nested elements scroll containers.
+   Use overflow-x:clip so only the root document owns vertical scrolling. */
+html{
+  overflow-x:clip!important;
+  overflow-y:auto!important;
+  height:auto!important;
+  min-height:100%!important;
+  scroll-behavior:auto!important;
+  overscroll-behavior-y:auto!important;
+  -webkit-overflow-scrolling:auto!important;
+}
+body{
+  overflow-x:clip!important;
+  overflow-y:visible!important;
+  height:auto!important;
+  min-height:100vh!important;
+  overscroll-behavior-y:auto!important;
+  touch-action:auto!important;
+}
+#app,.view-root,.screen{
+  overflow-x:clip!important;
+  overflow-y:visible!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  overscroll-behavior-y:auto!important;
+}
+/* Carousels only reserve the horizontal gesture. Vertical movement is handed
+   straight to the page scroller, avoiding the first-swipe dead stop. */
+@media (max-width:760px){
+  .product-card-slider,
+  .product-card-slider .product-slide-track,
+  .detail-slide-track{
+    touch-action:pan-y!important;
+    overscroll-behavior-x:contain!important;
+    overscroll-behavior-y:auto!important;
+  }
+  .product-slide-track{scroll-behavior:auto!important}
+  .product-slide{scroll-snap-stop:normal!important}
+}
+
+/* Gallery navigation inside the solid image viewer. */
+.zoom-nav{
+  width:44px!important;height:44px!important;position:absolute!important;z-index:5!important;top:50%!important;
+  display:grid!important;place-items:center!important;border:0!important;border-radius:50%!important;
+  background:rgba(255,255,255,.94)!important;color:#421449!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important;
+  transform:translateY(-50%)!important;cursor:pointer!important;
+}
+.zoom-prev{left:14px!important}.zoom-next{right:14px!important}.zoom-nav .icon{width:18px!important;height:18px!important}
+.zoom-count{min-width:54px!important;text-align:center!important;color:rgba(255,255,255,.72)!important;font-size:10px!important;font-weight:800!important}
+@media (max-width:760px){
+  .zoom-nav{width:40px!important;height:40px!important;background:rgba(255,255,255,.88)!important}
+  .zoom-prev{left:10px!important}.zoom-next{right:10px!important}
+}

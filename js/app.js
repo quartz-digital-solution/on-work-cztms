@@ -6,7 +6,7 @@
     screen:'home',products:S.getProducts(),categories:S.getCategories(),cart:S.getCart(),orders:S.getOrders(),settings:S.getSettings(),
     filterCategories:[],filterSubs:[],filterOptions:[],filterOpen:false,filterDraft:null,selected:null,previewImage:'',color:'',size:'',subItem:false,subColor:'',subSize:'',menu:false,
     toast:'',legal:'',checkoutStep:1,details:{name:'',phone:'',address:'',business:''},delivery:'Courier',payment:'Cash on delivery',paymentDemo:false,
-    orderPlaced:false,orderReference:'',installPrompt:null,zoomImage:'',zoomAlt:'',zoomScale:1,zoomX:0,zoomY:0,b2bAuthed:sessionStorage.getItem('one-line-b2b-auth')==='1',b2bError:''
+    orderPlaced:false,orderReference:'',installPrompt:null,zoomImage:'',zoomAlt:'',zoomImages:[],zoomIndex:0,zoomScale:1,zoomX:0,zoomY:0,b2bAuthed:sessionStorage.getItem('one-line-b2b-auth')==='1',b2bError:''
   };
   const filterKey='one-line-catalog-filters-v1';
   try{const saved=JSON.parse(localStorage.getItem(filterKey)||'null');if(saved){state.filterCategories=Array.isArray(saved.categories)?saved.categories:[];state.filterSubs=Array.isArray(saved.subs)?saved.subs:[];state.filterOptions=Array.isArray(saved.options)?saved.options:[];}}catch(_){}
@@ -101,6 +101,24 @@
     return [...new Set(images)].slice(0,10);
   }
   function productGallery(p){const preferred=state.color?S.productImageForColor(p,state.color):selectedProductImage(p);return [...new Set([preferred,...productImages(p)].filter(Boolean))];}
+  function resetZoomState(){state.zoomImage='';state.zoomAlt='';state.zoomImages=[];state.zoomIndex=0;state.zoomScale=1;state.zoomX=0;state.zoomY=0;}
+  function openZoom(src,alt){
+    const gallery=state.selected?productGallery(state.selected):[src];
+    const images=(gallery||[]).filter(Boolean);let index=Math.max(0,images.indexOf(src));if(index<0)index=0;
+    state.zoomImages=images.length?images:[src];state.zoomIndex=index;state.zoomImage=state.zoomImages[index]||src;state.zoomAlt=alt||'Product image';state.zoomScale=1;state.zoomX=0;state.zoomY=0;
+    try{
+      if(history.state?.oneLineZoom)history.replaceState({...history.state,zoomIndex:index,zoomSrc:state.zoomImage,zoomAlt:state.zoomAlt},'',location.href);
+      else{history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);history.pushState({...history.state,oneLine:true,oneLineGuard:true,oneLineZoom:true,screen:state.screen,scrollY:window.scrollY,zoomIndex:index,zoomSrc:state.zoomImage,zoomAlt:state.zoomAlt},'',location.href);}
+    }catch(_){}
+    render();
+  }
+  function changeZoomImage(step){
+    const images=state.zoomImages||[];if(images.length<2)return;
+    state.zoomIndex=(state.zoomIndex+step+images.length)%images.length;state.zoomImage=images[state.zoomIndex];state.zoomAlt=(state.selected?.name||'Product image')+' '+(state.zoomIndex+1);state.zoomScale=1;state.zoomX=0;state.zoomY=0;
+    try{if(history.state?.oneLineZoom)history.replaceState({...history.state,zoomIndex:state.zoomIndex,zoomSrc:state.zoomImage,zoomAlt:state.zoomAlt},'',location.href);}catch(_){}
+    render();
+  }
+  function closeZoom(){if(history.state?.oneLineZoom){history.back();return;}resetZoomState();render();}
   function detailSlider(images,name){
     images=(images||[]).filter(Boolean);if(!images.length)images=['assets/crew-tee.webp'];
     return '<div class="detail-slider" data-detail-slider><div class="detail-slider-frame"><div class="product-slide-track detail-slide-track">'+images.map((src,i)=>'<div class="product-slide detail-slide" data-detail-index="'+i+'"><button type="button" class="detail-zoom-target" data-zoom-image="'+S.esc(src)+'" data-zoom-alt="'+S.esc(name+' '+(i+1))+'" aria-label="Open product image">'+img(src,name+' '+(i+1),'product-image','assets/crew-tee.webp')+'<span>'+I('zoom')+'</span></button></div>').join('')+'</div></div>'+(images.length>1?'<div class="product-slide-progress detail-slide-progress">'+images.map((_,i)=>'<i class="'+(i===0?'active':'')+'"></i>').join('')+'</div>':'<div class="product-slide-progress detail-slide-progress single"><i class="active"></i></div>')+'</div>';
@@ -168,7 +186,7 @@
     return '<div class="catalog-filter-overlay open"><aside class="catalog-filter-drawer"><header><div><p>'+(audience==='b2b'?'B2B catalogue':'Ready-made catalogue')+'</p><h2>Filters</h2></div><button class="filter-drawer-close" data-action="close-filter" aria-label="Close">×</button></header><div class="catalog-filter-body"><section class="filter-drawer-group"><div class="filter-group-title"><span>Category</span><small>Select one or more</small></div><div class="filter-choice-grid">'+choices.cats.map(v=>choice('categories',v,draft.categories.includes(v))).join('')+'</div></section>'+(choices.subs.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Subcategory</span><small>Available for selected categories</small></div><div class="filter-choice-grid">'+choices.subs.map(v=>choice('subs',v,draft.subs.includes(v))).join('')+'</div></section>':'')+(choices.options.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Size / option</span><small>Only available values are shown</small></div><div class="filter-choice-grid option-choice-grid">'+choices.options.map(v=>choice('options',v,draft.options.includes(v))).join('')+'</div></section>':'')+'</div><footer><div><button class="filter-reset-button" data-action="reset-filter-draft">Clear</button><small>'+(draft.categories.length+draft.subs.length+draft.options.length)+' selected</small></div><button class="filter-apply-button" data-action="apply-filter">Apply filters</button></footer></aside></div>';
   }
   function legal(){const lines=legalCopy[state.legal]||legalCopy.About;return '<div class="overlay"><div class="legal-panel"><button class="close" data-action="close-legal">'+I('close')+'</button><span class="eyebrow">STORE INFORMATION</span><h2>'+S.esc(state.legal)+'</h2>'+lines.map(x=>'<p>'+S.esc(x)+'</p>').join('')+'</div></div>';}
-  function imageZoomModal(){if(!state.zoomImage)return'';return '<div class="image-zoom-overlay" data-zoom-overlay><div class="image-zoom-shell" role="dialog" aria-modal="true"><button type="button" class="zoom-close" data-action="close-zoom" aria-label="Close image">'+I('close')+'</button><div class="zoom-image-stage" data-zoom-stage><img data-zoom-view src="'+S.esc(state.zoomImage)+'" alt="'+S.esc(state.zoomAlt||'Product image')+'" style="transform:translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')"></div><div class="zoom-controls"><button type="button" data-action="zoom-out" aria-label="Zoom out">'+I('minus')+'</button><span data-zoom-label>'+Math.round(state.zoomScale*100)+'%</span><button type="button" data-action="zoom-in" aria-label="Zoom in">'+I('plus')+'</button></div></div></div>';}
+  function imageZoomModal(){if(!state.zoomImage)return'';const many=(state.zoomImages||[]).length>1,count=(state.zoomImages||[]).length||1;return '<div class="image-zoom-overlay" data-zoom-overlay><div class="image-zoom-shell" role="dialog" aria-modal="true" aria-label="Product image viewer"><button type="button" class="zoom-close" data-action="close-zoom" aria-label="Close image">'+I('close')+'</button>'+(many?'<button type="button" class="zoom-nav zoom-prev" data-action="zoom-prev" aria-label="Previous image">'+I('back')+'</button><button type="button" class="zoom-nav zoom-next" data-action="zoom-next" aria-label="Next image">'+I('arrow')+'</button>':'')+'<div class="zoom-image-stage" data-zoom-stage><img data-zoom-view src="'+S.esc(state.zoomImage)+'" alt="'+S.esc(state.zoomAlt||'Product image')+'" style="transform:translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')"></div><div class="zoom-controls"><button type="button" data-action="zoom-out" aria-label="Zoom out">'+I('minus')+'</button><span data-zoom-label>'+Math.round(state.zoomScale*100)+'%</span><span class="zoom-count">'+(state.zoomIndex+1)+' / '+count+'</span><button type="button" data-action="zoom-in" aria-label="Zoom in">'+I('plus')+'</button></div></div></div>'; }
   function paymentModal(){return '<div class="overlay"><div class="payment-modal"><button class="close" data-action="close-payment">'+I('close')+'</button><div class="demo-tag">DEMO PAYMENT</div>'+I('card')+'<h2>'+S.money(subtotal())+'</h2><p>This build simulates successful online payment. No real money is collected.</p><button class="primary wide" data-action="complete-order">Simulate successful payment</button><button class="text-button" data-action="close-payment">Cancel</button></div></div>';}
   function toast(){return state.toast?'<div class="toast">'+I('check')+S.esc(state.toast)+'<button data-go="cart">View cart</button></div>':'';}
   function whatsappFloat(){if(state.screen==='customize')return'';return '<button class="whatsapp-float whatsapp-icon-only contact-float" data-whatsapp-float aria-label="Contact enquiry"><img src="assets/contact-support.png" alt="Contact"></button>';}
@@ -197,34 +215,45 @@
     el.style.left=left+'px';el.style.top=top+'px';el.style.right='auto';el.style.bottom='auto';
   }
   function bindWhatsappDrag(){const el=root.querySelector('[data-whatsapp-float]');if(!el)return;let drag=null,moved=false;el.addEventListener('pointerdown',e=>{moved=false;const r=el.getBoundingClientRect();drag={id:e.pointerId,dx:e.clientX-r.left,dy:e.clientY-r.top,startX:e.clientX,startY:e.clientY};el.setPointerCapture(e.pointerId);});el.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const left=Math.max(8,Math.min(window.innerWidth-el.offsetWidth-8,e.clientX-drag.dx)),top=Math.max(72,Math.min(window.innerHeight-el.offsetHeight-90,e.clientY-drag.dy));if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)moved=true;el.style.left=left+'px';el.style.top=top+'px';el.style.right='auto';el.style.bottom='auto';});el.addEventListener('pointerup',e=>{if(!drag)return;const r=el.getBoundingClientRect();localStorage.setItem('one-line-wa-position',JSON.stringify({left:r.left,top:r.top}));drag=null;if(!moved)openWhatsApp('Hi, I need a custom apparel quotation.');});el.addEventListener('pointercancel',()=>{drag=null;});}
+  function bindHorizontalSlider(track,onChange,onActivate){
+    if(!track)return;
+    let drag=null,dragged=false;
+    const sync=()=>{if(onChange)onChange();};
+    track.addEventListener('scroll',sync,{passive:true});
+    track.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:track.scrollLeft,axis:null};dragged=false;
+      if(e.pointerType==='mouse'){try{track.setPointerCapture(e.pointerId);}catch(_){}}
+    });
+    track.addEventListener('pointermove',e=>{
+      if(!drag||drag.id!==e.pointerId)return;
+      const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+      if(!drag.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)drag.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
+      if(drag.axis!=='x')return;
+      dragged=true;track.scrollLeft=drag.left-dx;
+    });
+    const finish=e=>{
+      if(!drag||drag.id!==e.pointerId)return;
+      try{if(track.hasPointerCapture?.(e.pointerId))track.releasePointerCapture(e.pointerId);}catch(_){}
+      if(dragged){const w=track.clientWidth||1,idx=Math.round(track.scrollLeft/w);track.scrollTo({left:idx*w,behavior:'smooth'});}
+      drag=null;requestAnimationFrame(sync);
+    };
+    track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
+    if(onActivate)track.addEventListener('click',e=>{e.stopPropagation();if(dragged){dragged=false;return;}onActivate(e);});
+    sync();
+  }
   function bindProductSliders(){
     root.querySelectorAll('[data-card-slider]').forEach(slider=>{
       const track=slider.querySelector('.product-slide-track'),card=slider.closest('[data-open-product]'),bars=card?.querySelectorAll('.product-slide-progress i');if(!track||!card)return;
       const sync=()=>{const w=track.clientWidth||1,idx=Math.max(0,Math.min((bars?.length||1)-1,Math.round(track.scrollLeft/w)));bars?.forEach((b,i)=>b.classList.toggle('active',i===idx));};
-      let drag=null,dragged=false,touchStartX=0,touchMoved=false;
-      track.addEventListener('scroll',sync,{passive:true});
-      track.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;drag={x:e.clientX,left:track.scrollLeft};dragged=false;track.setPointerCapture(e.pointerId);});
-      track.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>5)dragged=true;track.scrollLeft=drag.left-dx;});
-      const finish=e=>{if(!drag)return;try{track.releasePointerCapture(e.pointerId);}catch(_){}drag=null;requestAnimationFrame(sync);};
-      track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
-      /* Touch scrolling is deliberately left to the browser. We only remember whether
-         the user moved so a swipe does not accidentally open a product. */
-      track.addEventListener('touchstart',e=>{touchStartX=e.touches?.[0]?.clientX||0;touchMoved=false;},{passive:true});
-      track.addEventListener('touchmove',e=>{const x=e.touches?.[0]?.clientX||touchStartX;if(Math.abs(x-touchStartX)>7)touchMoved=true;},{passive:true});
-      track.addEventListener('click',e=>{e.stopPropagation();if(dragged||touchMoved){dragged=false;touchMoved=false;return;}openProduct(card.dataset.openProduct,card.dataset.audience);});
-      sync();
+      bindHorizontalSlider(track,sync,()=>openProduct(card.dataset.openProduct,card.dataset.audience));
     });
   }
   function bindDetailSliders(){
     root.querySelectorAll('[data-detail-slider]').forEach(slider=>{
       const track=slider.querySelector('.detail-slide-track'),bars=slider.querySelectorAll('.detail-slide-progress i');if(!track)return;
       const sync=()=>{const w=track.clientWidth||1,idx=Math.max(0,Math.min((bars?.length||1)-1,Math.round(track.scrollLeft/w)));bars?.forEach((b,i)=>b.classList.toggle('active',i===idx));};
-      let drag=null;
-      track.addEventListener('scroll',sync,{passive:true});
-      track.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;drag={id:e.pointerId,x:e.clientX,left:track.scrollLeft};track.setPointerCapture(e.pointerId);});
-      track.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;track.scrollLeft=drag.left-(e.clientX-drag.x);});
-      const end=e=>{if(!drag)return;try{track.releasePointerCapture(e.pointerId);}catch(_){}drag=null;requestAnimationFrame(sync);};
-      track.addEventListener('pointerup',end);track.addEventListener('pointercancel',end);sync();
+      bindHorizontalSlider(track,sync,null);
     });
   }
   function bind(){
@@ -243,7 +272,7 @@
     root.querySelectorAll('[data-payment]').forEach(x=>x.addEventListener('click',()=>{state.payment=x.dataset.payment;render();}));
     root.querySelectorAll('[data-remove-filter]').forEach(x=>x.addEventListener('click',()=>removeFilter(x.dataset.removeFilter,x.dataset.value)));
     root.querySelectorAll('[data-share-kind]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();shareItem(x.dataset.shareKind,x.dataset.shareValue||'',x.dataset.shareLabel||'',x.dataset.shareExtra||'');}));
-    root.querySelectorAll('[data-zoom-image]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();state.zoomImage=x.dataset.zoomImage;state.zoomAlt=x.dataset.zoomAlt||'';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}));
+    root.querySelectorAll('[data-zoom-image]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openZoom(x.dataset.zoomImage,x.dataset.zoomAlt||'');}));
     const sub=root.querySelector('[data-subitem]');if(sub)sub.addEventListener('change',()=>{state.subItem=sub.checked;if(state.subItem){const sizes=currentSubSizes(state.selected);if(!state.subSize||!sizes.includes(state.subSize))state.subSize=sizes[0]||'';}render();});
     const b2bForm=root.querySelector('[data-b2b-login]');if(b2bForm)b2bForm.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(b2bForm);const settings=S.getSettings();if(String(fd.get('id')).trim()===String(settings.b2bId)&&String(fd.get('password'))===String(settings.b2bPassword)){state.b2bAuthed=true;state.b2bError='';sessionStorage.setItem('one-line-b2b-auth','1');render();}else{state.b2bError='Invalid B2B login ID or password.';render();}});
     root.querySelectorAll('[data-filter-choice]').forEach(x=>x.addEventListener('click',()=>{const d=state.filterDraft,k=x.dataset.filterChoice,v=x.dataset.value;const arr=d[k];const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);if(k==='categories'){const allowedSubs=filterPool(state.screen.startsWith('b2b')?'b2b':'retail').filter(p=>!d.categories.length||d.categories.includes(p.category)).map(p=>p.subcategory);d.subs=d.subs.filter(s=>allowedSubs.includes(s));}render();}));
@@ -267,13 +296,15 @@
       else if(a==='close-legal'){state.legal='';render();}
       else if(a==='view-order'){state.orderPlaced=false;go('orders');}
       else if(a==='whatsapp')openWhatsApp(x.dataset.message||'Hi, I need a custom apparel quotation.');
-      else if(a==='close-zoom'){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}
+      else if(a==='close-zoom')closeZoom();
+      else if(a==='zoom-prev')changeZoomImage(-1);
+      else if(a==='zoom-next')changeZoomImage(1);
       else if(a==='zoom-in'){state.zoomScale=Math.min(4,Math.round((state.zoomScale+.25)*100)/100);if(state.zoomScale===1){state.zoomX=0;state.zoomY=0;}render();}
       else if(a==='zoom-out'){state.zoomScale=Math.max(1,Math.round((state.zoomScale-.25)*100)/100);if(state.zoomScale===1){state.zoomX=0;state.zoomY=0;}render();}
       else if(a==='b2b-logout'){state.b2bAuthed=false;sessionStorage.removeItem('one-line-b2b-auth');state.b2bError='';render();}
     }));
     const overlay=root.querySelector('.catalog-filter-overlay');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeFilter(false);});
-    const zoomOverlay=root.querySelector('[data-zoom-overlay]');if(zoomOverlay)zoomOverlay.addEventListener('click',e=>{if(e.target===zoomOverlay){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}});
+    const zoomOverlay=root.querySelector('[data-zoom-overlay]');if(zoomOverlay)zoomOverlay.addEventListener('click',e=>{if(e.target===zoomOverlay)closeZoom();});
     bindWhatsappDrag();bindProductSliders();bindDetailSliders();
   }
   function syncModalScrollLock(){
@@ -285,30 +316,29 @@
     const stage=root.querySelector('[data-zoom-stage]'),image=root.querySelector('[data-zoom-view]'),label=root.querySelector('[data-zoom-label]');
     if(!stage||!image)return;
     const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-    let pinchStart=0,pinchScale=state.zoomScale,panStart=null,lastTap=0,moved=false;
+    let pinchStart=0,pinchScale=state.zoomScale,panStart=null,swipeStart=null,lastTap=0,gestureMoved=false;
     const distance=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
     const limits=()=>({x:Math.max(0,(stage.clientWidth*(state.zoomScale-1))/2),y:Math.max(0,(stage.clientHeight*(state.zoomScale-1))/2)});
     const apply=()=>{
-      const lim=limits();
-      state.zoomX=clamp(state.zoomX,-lim.x,lim.x);state.zoomY=clamp(state.zoomY,-lim.y,lim.y);
-      image.style.transform='translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')';
-      if(label)label.textContent=Math.round(state.zoomScale*100)+'%';
+      const lim=limits();state.zoomX=clamp(state.zoomX,-lim.x,lim.x);state.zoomY=clamp(state.zoomY,-lim.y,lim.y);
+      image.style.transform='translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')';if(label)label.textContent=Math.round(state.zoomScale*100)+'%';
     };
     stage.addEventListener('touchstart',e=>{
-      moved=false;
-      if(e.touches.length===2){e.preventDefault();pinchStart=distance(e.touches);pinchScale=state.zoomScale;panStart=null;}
-      else if(e.touches.length===1&&state.zoomScale>1){const t=e.touches[0];panStart={x:t.clientX,y:t.clientY,ox:state.zoomX,oy:state.zoomY};}
+      gestureMoved=false;
+      if(e.touches.length===2){e.preventDefault();pinchStart=distance(e.touches);pinchScale=state.zoomScale;panStart=null;swipeStart=null;}
+      else if(e.touches.length===1){const t=e.touches[0];if(state.zoomScale>1)panStart={x:t.clientX,y:t.clientY,ox:state.zoomX,oy:state.zoomY};else swipeStart={x:t.clientX,y:t.clientY};}
     },{passive:false});
     stage.addEventListener('touchmove',e=>{
-      if(e.touches.length===2&&pinchStart){e.preventDefault();moved=true;state.zoomScale=clamp(pinchScale*(distance(e.touches)/pinchStart),1,4);if(state.zoomScale<=1.01){state.zoomScale=1;state.zoomX=0;state.zoomY=0;}apply();}
-      else if(e.touches.length===1&&panStart&&state.zoomScale>1){e.preventDefault();moved=true;const t=e.touches[0];state.zoomX=panStart.ox+(t.clientX-panStart.x);state.zoomY=panStart.oy+(t.clientY-panStart.y);apply();}
+      if(e.touches.length===2&&pinchStart){e.preventDefault();gestureMoved=true;state.zoomScale=clamp(pinchScale*(distance(e.touches)/pinchStart),1,5);if(state.zoomScale<=1.01){state.zoomScale=1;state.zoomX=0;state.zoomY=0;}apply();}
+      else if(e.touches.length===1&&panStart&&state.zoomScale>1){e.preventDefault();gestureMoved=true;const t=e.touches[0];state.zoomX=panStart.ox+(t.clientX-panStart.x);state.zoomY=panStart.oy+(t.clientY-panStart.y);apply();}
+      else if(e.touches.length===1&&swipeStart&&state.zoomScale===1){const t=e.touches[0],dx=t.clientX-swipeStart.x,dy=t.clientY-swipeStart.y;if(Math.max(Math.abs(dx),Math.abs(dy))>8)gestureMoved=true;e.preventDefault();}
     },{passive:false});
     stage.addEventListener('touchend',e=>{
       if(e.touches.length<2){pinchStart=0;pinchScale=state.zoomScale;}
       if(e.touches.length===0){
-        panStart=null;
-        const now=Date.now();
-        if(!moved&&now-lastTap<320){state.zoomScale=state.zoomScale>1?1:2;state.zoomX=0;state.zoomY=0;apply();lastTap=0;}else if(!moved){lastTap=now;}
+        const end=e.changedTouches?.[0],start=swipeStart;panStart=null;swipeStart=null;
+        if(state.zoomScale===1&&start&&end){const dx=end.clientX-start.x,dy=end.clientY-start.y;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15&&(state.zoomImages||[]).length>1){changeZoomImage(dx<0?1:-1);return;}}
+        const now=Date.now();if(!gestureMoved&&now-lastTap<320){state.zoomScale=state.zoomScale>1?1:2;state.zoomX=0;state.zoomY=0;apply();lastTap=0;}else if(!gestureMoved){lastTap=now;}
       }
     },{passive:true});
     stage.addEventListener('dblclick',e=>{e.preventDefault();state.zoomScale=state.zoomScale>1?1:2;state.zoomX=0;state.zoomY=0;apply();});
@@ -318,7 +348,7 @@
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;});
   window.addEventListener('storage',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();render();});
   window.addEventListener('one-line-change',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();});
-  document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.filterOpen){closeFilter(false);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
+  document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.zoomImage){closeZoom();}else if(e.key==='Escape'&&state.filterOpen){closeFilter(false);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
   try{
     const valid=['home','catalog','product','cart','checkout','orders','customize','b2b','b2bProduct'];const hash=location.hash.replace('#','');const params=new URLSearchParams(location.search);let initial=valid.includes(hash)?hash:'home';
     const sharedCategory=params.get('category'),sharedSub=params.get('subcategory'),sharedProduct=params.get('product'),sharedAudience=params.get('audience');
@@ -328,8 +358,10 @@
     if(!history.state?.oneLineGuard){history.replaceState({oneLine:true,oneLineGuard:true,guardBase:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');history.pushState({oneLine:true,oneLineGuard:true,screen:initial,scrollY:0},'',location.pathname+location.search+'#'+initial);}else history.replaceState({...history.state,oneLine:true,oneLineGuard:true,screen:initial},'',location.pathname+location.search+'#'+initial);
   }catch(_){}
   window.addEventListener('popstate',e=>{
-    if(e.state?.guardBase){state.screen='home';state.menu=false;state.filterOpen=false;state.filterDraft=null;state.zoomImage='';syncModalScrollLock();render();requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>{try{history.pushState({oneLine:true,oneLineGuard:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');}catch(_){}},0);return;}
-    const next=e.state?.oneLine?e.state.screen:'home';state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo(0,Number(e.state?.scrollY||0)));
+    if(e.state?.guardBase){state.screen='home';state.menu=false;state.filterOpen=false;state.filterDraft=null;resetZoomState();syncModalScrollLock();render();requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>{try{history.pushState({oneLine:true,oneLineGuard:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');}catch(_){}},0);return;}
+    const next=e.state?.oneLine?e.state.screen:'home';
+    if(e.state?.oneLineZoom){state.screen=next||state.screen;const gallery=state.selected?productGallery(state.selected):[];state.zoomImages=gallery.length?gallery:[e.state.zoomSrc].filter(Boolean);state.zoomIndex=Math.max(0,Math.min(state.zoomImages.length-1,Number(e.state.zoomIndex||0)));state.zoomImage=e.state.zoomSrc||state.zoomImages[state.zoomIndex]||'';state.zoomAlt=e.state.zoomAlt||'Product image';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();return;}
+    resetZoomState();state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo(0,Number(e.state?.scrollY||0)));
   });
   if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
 })();
