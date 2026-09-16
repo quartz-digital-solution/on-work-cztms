@@ -6,7 +6,7 @@
     screen:'home',products:S.getProducts(),categories:S.getCategories(),cart:S.getCart(),orders:S.getOrders(),settings:S.getSettings(),
     filterCategories:[],filterSubs:[],filterOptions:[],filterOpen:false,filterDraft:null,selected:null,previewImage:'',color:'',size:'',subItem:false,subColor:'',subSize:'',menu:false,
     toast:'',legal:'',checkoutStep:1,details:{name:'',phone:'',address:'',business:''},delivery:'Courier',payment:'Cash on delivery',paymentDemo:false,
-    orderPlaced:false,orderReference:'',installPrompt:null,zoomImage:'',zoomAlt:'',zoomScale:1,b2bAuthed:sessionStorage.getItem('one-line-b2b-auth')==='1',b2bError:''
+    orderPlaced:false,orderReference:'',installPrompt:null,zoomImage:'',zoomAlt:'',zoomScale:1,zoomX:0,zoomY:0,b2bAuthed:sessionStorage.getItem('one-line-b2b-auth')==='1',b2bError:''
   };
   const filterKey='one-line-catalog-filters-v1';
   try{const saved=JSON.parse(localStorage.getItem(filterKey)||'null');if(saved){state.filterCategories=Array.isArray(saved.categories)?saved.categories:[];state.filterSubs=Array.isArray(saved.subs)?saved.subs:[];state.filterOptions=Array.isArray(saved.options)?saved.options:[];}}catch(_){}
@@ -32,13 +32,13 @@
   function go(screen,options){
     options=options||{};
     state.menu=false;state.filterOpen=false;state.filterDraft=null;
-    if(screen===state.screen&&!options.force){window.scrollTo({top:0,behavior:'smooth'});render();return;}
+    if(screen===state.screen&&!options.force){window.scrollTo(0,0);render();return;}
     rememberScroll();state.screen=screen;
     if(!options.fromHistory){try{history.pushState({oneLine:true,oneLineGuard:true,screen,scrollY:0},'',location.pathname+location.search+'#'+screen);}catch(_){}}
-    window.scrollTo({top:0,behavior:options.instant?'auto':'smooth'});render();
+    window.scrollTo(0,0);render();
   }
   function navigateBack(fallback){
-    if(state.screen==='home'){window.scrollTo({top:0,behavior:'smooth'});return;}
+    if(state.screen==='home'){window.scrollTo(0,0);return;}
     if(history.state?.oneLine){history.back();return;}
     go(fallback||'home');
   }
@@ -81,7 +81,7 @@
   }
   function resetFilters(category){state.filterCategories=category&&category!=='All'?[category]:[];state.filterSubs=[];state.filterOptions=[];saveFilters();}
   function commitFilterDraft(){if(!state.filterDraft)return;state.filterCategories=clone(state.filterDraft.categories||[]);state.filterSubs=clone(state.filterDraft.subs||[]);state.filterOptions=clone(state.filterDraft.options||[]);saveFilters();}
-  function closeFilter(saveDraft){if(saveDraft!==false)commitFilterDraft();state.filterOpen=false;state.filterDraft=null;render();}
+  function closeFilter(applyDraft){if(applyDraft===true)commitFilterDraft();state.filterOpen=false;state.filterDraft=null;render();}
   function openProduct(id,audience){
     const p=state.products.find(x=>String(x.id)===String(id));if(!p)return;
     state.selected=p;state.previewImage='';state.color=p.colors?.[0]||p.colorVariants?.[0]?.color||'';
@@ -161,14 +161,14 @@
     if(!state.b2bAuthed)return '<main class="b2b-login-page section-wrap screen screen-enter"><section class="b2b-login-card"><span class="eyebrow">WHOLESALE ACCESS</span><h1>B2B login</h1><p>Use the single B2B login supplied by the admin. Wholesale prices are not displayed; each item goes to WhatsApp for a quotation.</p><form data-b2b-login><label>Login ID<input name="id" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label>'+(state.b2bError?'<p class="b2b-error">'+S.esc(state.b2bError)+'</p>':'')+'<button class="primary wide" type="submit">Open B2B catalogue '+I('arrow')+'</button></form></section></main>';
     const list=filtered('b2b');return '<main class="catalog-page section-wrap screen screen-enter wellone-catalog b2b-catalog grouped-catalog"><div class="catalog-title compact-catalog-title"><div><span class="eyebrow">B2B ONLY / '+String(list.length).padStart(2,'0')+'</span><h1>Wholesale catalogue</h1><p>No fixed rate is shown. Select an item and ask for the current wholesale price on WhatsApp.</p></div><div class="b2b-actions"><button class="filter-button wellone-filter-button" data-action="open-filter">'+I('filter')+' Filter</button><button class="secondary" data-action="b2b-logout">Logout</button></div></div>'+activeFilterChips()+(list.length?groupedProductSections(list,'b2b'):'<div class="empty-state"><h2>No matching B2B items</h2><button data-action="clear-filters">Clear filters</button></div>')+'</main>';
   }
-  function b2bProduct(){const p=state.selected;if(!p||p.audience!=='b2b')return b2b();return '<main class="product-fullscreen screen screen-enter b2b-product"><div class="product-full-back"><button class="back-button" data-action="nav-back" data-fallback="b2b">'+I('back')+' Back</button></div><div class="product-full-inner"><section class="product-full-media">'+img(p.image,p.name,'','assets/crew-tee.webp')+'</section><section class="product-full-info"><span class="eyebrow">B2B / '+S.esc(p.category)+'</span><h1>'+S.esc(p.name)+'</h1><div class="b2b-price-label">ASK FOR PRICE</div><p>'+S.esc(p.description)+'</p>'+(p.sizes?.length?'<div class="selection-block"><label>'+S.esc(p.optionTitle||'Available options')+'</label><div class="size-options">'+p.sizes.map(v=>'<button class="'+(state.size===v?'active':'')+'" data-product-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div></div>':'')+'<button class="custom-enquiry-btn b2b-enquiry" data-action="whatsapp" data-message="Hi, I need the B2B price for '+S.esc(p.name)+(state.size?' - '+S.esc(state.size):'')+'. Please send the current wholesale rate and minimum quantity.">'+whatsappLogo()+'<span>Ask for price on WhatsApp</span></button></section></div></main>';}
+  function b2bProduct(){const p=state.selected;if(!p||p.audience!=='b2b')return b2b();return '<main class="product-fullscreen screen screen-enter b2b-product"><div class="product-full-back"><button class="back-button" data-action="nav-back" data-fallback="b2b">'+I('back')+' Back</button></div><div class="product-full-inner"><section class="product-full-media">'+detailSlider([p.image],p.name)+'</section><section class="product-full-info"><span class="eyebrow">B2B / '+S.esc(p.category)+'</span><h1>'+S.esc(p.name)+'</h1><div class="b2b-price-label">ASK FOR PRICE</div><p>'+S.esc(p.description)+'</p>'+(p.sizes?.length?'<div class="selection-block"><label>'+S.esc(p.optionTitle||'Available options')+'</label><div class="size-options">'+p.sizes.map(v=>'<button class="'+(state.size===v?'active':'')+'" data-product-size="'+S.esc(v)+'">'+S.esc(v)+'</button>').join('')+'</div></div>':'')+'<button class="custom-enquiry-btn b2b-enquiry" data-action="whatsapp" data-message="Hi, I need the B2B price for '+S.esc(p.name)+(state.size?' - '+S.esc(state.size):'')+'. Please send the current wholesale rate and minimum quantity.">'+whatsappLogo()+'<span>Ask for price on WhatsApp</span></button></section></div></main>';}
   function filterModal(audience){
     if(!state.filterOpen)return'';const draft=state.filterDraft||{categories:clone(state.filterCategories),subs:clone(state.filterSubs),options:clone(state.filterOptions)};state.filterDraft=draft;const choices=filterChoices(audience);
     const choice=(kind,val,active)=>'<button type="button" class="catalog-filter-choice '+(active?'is-selected':'')+'" data-filter-choice="'+kind+'" data-value="'+S.esc(val)+'"><span class="filter-check">'+(active?I('check'):'')+'</span><span>'+S.esc(val)+'</span></button>';
-    return '<div class="catalog-filter-overlay open"><aside class="catalog-filter-drawer"><header><div><p>'+(audience==='b2b'?'B2B catalogue':'Ready-made catalogue')+'</p><h2>Filters</h2></div><button class="filter-drawer-close" data-action="close-filter" aria-label="Close">×</button></header><div class="catalog-filter-body"><section class="filter-drawer-group"><div class="filter-group-title"><span>Category</span><small>Select one or more</small></div><div class="filter-choice-grid">'+choices.cats.map(v=>choice('categories',v,draft.categories.includes(v))).join('')+'</div></section>'+(choices.subs.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Subcategory</span><small>Available for selected categories</small></div><div class="filter-choice-grid">'+choices.subs.map(v=>choice('subs',v,draft.subs.includes(v))).join('')+'</div></section>':'')+(choices.options.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Size / option</span><small>Only available values are shown</small></div><div class="filter-choice-grid option-choice-grid">'+choices.options.map(v=>choice('options',v,draft.options.includes(v))).join('')+'</div></section>':'')+'</div><footer><div><button class="filter-reset-button" data-action="reset-filter-draft">Clear all</button><small>'+(draft.categories.length+draft.subs.length+draft.options.length)+' selected</small></div><button class="filter-apply-button" data-action="apply-filter">Apply filters</button></footer></aside></div>';
+    return '<div class="catalog-filter-overlay open"><aside class="catalog-filter-drawer"><header><div><p>'+(audience==='b2b'?'B2B catalogue':'Ready-made catalogue')+'</p><h2>Filters</h2></div><button class="filter-drawer-close" data-action="close-filter" aria-label="Close">×</button></header><div class="catalog-filter-body"><section class="filter-drawer-group"><div class="filter-group-title"><span>Category</span><small>Select one or more</small></div><div class="filter-choice-grid">'+choices.cats.map(v=>choice('categories',v,draft.categories.includes(v))).join('')+'</div></section>'+(choices.subs.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Subcategory</span><small>Available for selected categories</small></div><div class="filter-choice-grid">'+choices.subs.map(v=>choice('subs',v,draft.subs.includes(v))).join('')+'</div></section>':'')+(choices.options.length?'<section class="filter-drawer-group"><div class="filter-group-title"><span>Size / option</span><small>Only available values are shown</small></div><div class="filter-choice-grid option-choice-grid">'+choices.options.map(v=>choice('options',v,draft.options.includes(v))).join('')+'</div></section>':'')+'</div><footer><div><button class="filter-reset-button" data-action="reset-filter-draft">Clear</button><small>'+(draft.categories.length+draft.subs.length+draft.options.length)+' selected</small></div><button class="filter-apply-button" data-action="apply-filter">Apply filters</button></footer></aside></div>';
   }
   function legal(){const lines=legalCopy[state.legal]||legalCopy.About;return '<div class="overlay"><div class="legal-panel"><button class="close" data-action="close-legal">'+I('close')+'</button><span class="eyebrow">STORE INFORMATION</span><h2>'+S.esc(state.legal)+'</h2>'+lines.map(x=>'<p>'+S.esc(x)+'</p>').join('')+'</div></div>';}
-  function imageZoomModal(){if(!state.zoomImage)return'';return '<div class="image-zoom-overlay" data-zoom-overlay><div class="image-zoom-shell" role="dialog" aria-modal="true"><button type="button" class="zoom-close" data-action="close-zoom" aria-label="Close image">'+I('close')+'</button><div class="zoom-image-stage"><img src="'+S.esc(state.zoomImage)+'" alt="'+S.esc(state.zoomAlt||'Product image')+'" style="transform:scale('+state.zoomScale+')"></div><div class="zoom-controls"><button type="button" data-action="zoom-out" aria-label="Zoom out">'+I('minus')+'</button><span>'+Math.round(state.zoomScale*100)+'%</span><button type="button" data-action="zoom-in" aria-label="Zoom in">'+I('plus')+'</button></div></div></div>';}
+  function imageZoomModal(){if(!state.zoomImage)return'';return '<div class="image-zoom-overlay" data-zoom-overlay><div class="image-zoom-shell" role="dialog" aria-modal="true"><button type="button" class="zoom-close" data-action="close-zoom" aria-label="Close image">'+I('close')+'</button><div class="zoom-image-stage" data-zoom-stage><img data-zoom-view src="'+S.esc(state.zoomImage)+'" alt="'+S.esc(state.zoomAlt||'Product image')+'" style="transform:translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')"></div><div class="zoom-controls"><button type="button" data-action="zoom-out" aria-label="Zoom out">'+I('minus')+'</button><span data-zoom-label>'+Math.round(state.zoomScale*100)+'%</span><button type="button" data-action="zoom-in" aria-label="Zoom in">'+I('plus')+'</button></div></div></div>';}
   function paymentModal(){return '<div class="overlay"><div class="payment-modal"><button class="close" data-action="close-payment">'+I('close')+'</button><div class="demo-tag">DEMO PAYMENT</div>'+I('card')+'<h2>'+S.money(subtotal())+'</h2><p>This build simulates successful online payment. No real money is collected.</p><button class="primary wide" data-action="complete-order">Simulate successful payment</button><button class="text-button" data-action="close-payment">Cancel</button></div></div>';}
   function toast(){return state.toast?'<div class="toast">'+I('check')+S.esc(state.toast)+'<button data-go="cart">View cart</button></div>':'';}
   function whatsappFloat(){if(state.screen==='customize')return'';return '<button class="whatsapp-float whatsapp-icon-only contact-float" data-whatsapp-float aria-label="Contact enquiry"><img src="assets/contact-support.png" alt="Contact"></button>';}
@@ -178,7 +178,7 @@
     state.products=S.getProducts();state.categories=S.getCategories();state.settings=S.getSettings();
     if(state.screen==='customize'){root.innerHTML='<div id="designer-root"></div>';window.OneLineDesigner.mount(document.getElementById('designer-root'),{onBack:()=>navigateBack('home'),onAdd:item=>{addCart(item,false);go('cart');}});return;}
     const audience=state.screen.startsWith('b2b')?'b2b':'retail';
-    root.innerHTML='<div class="view-root">'+header()+page()+footer()+bottom()+filterModal(audience)+(state.legal?legal():'')+(state.paymentDemo?paymentModal():'')+imageZoomModal()+toast()+whatsappFloat()+'</div>';bind();positionWhatsapp();
+    root.innerHTML='<div class="view-root">'+header()+page()+footer()+bottom()+filterModal(audience)+(state.legal?legal():'')+(state.paymentDemo?paymentModal():'')+imageZoomModal()+toast()+whatsappFloat()+'</div>';syncModalScrollLock();bind();bindZoomViewer();positionWhatsapp();
   }
   function completeOrder(){const id='CS-'+String(1050+Math.floor(Math.random()*8000));const order={id,customer:state.details.business||state.details.name,phone:state.details.phone,total:subtotal(),items:totalQty(),delivery:state.delivery,payment:state.payment==='Online payment'?'Online · Demo paid':state.payment,status:'Confirmed',time:'Just now',address:state.details.address,orderItems:clone(state.cart)};state.orders=[order,...S.getOrders()];S.save('custom-store-orders-v3',state.orders);state.cart=[];saveCart();state.paymentDemo=false;state.orderPlaced=true;state.orderReference=id;render();}
   function whatsAppUrl(message){const number=String(state.settings.whatsapp||'').replace(/\D/g,'');const text=encodeURIComponent(message||'Hi, I need a customization quotation.');return number?'https://wa.me/'+number+'?text='+text:'https://wa.me/?text='+text;}
@@ -243,7 +243,7 @@
     root.querySelectorAll('[data-payment]').forEach(x=>x.addEventListener('click',()=>{state.payment=x.dataset.payment;render();}));
     root.querySelectorAll('[data-remove-filter]').forEach(x=>x.addEventListener('click',()=>removeFilter(x.dataset.removeFilter,x.dataset.value)));
     root.querySelectorAll('[data-share-kind]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();shareItem(x.dataset.shareKind,x.dataset.shareValue||'',x.dataset.shareLabel||'',x.dataset.shareExtra||'');}));
-    root.querySelectorAll('[data-zoom-image]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();state.zoomImage=x.dataset.zoomImage;state.zoomAlt=x.dataset.zoomAlt||'';state.zoomScale=1;render();}));
+    root.querySelectorAll('[data-zoom-image]').forEach(x=>x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();state.zoomImage=x.dataset.zoomImage;state.zoomAlt=x.dataset.zoomAlt||'';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}));
     const sub=root.querySelector('[data-subitem]');if(sub)sub.addEventListener('change',()=>{state.subItem=sub.checked;if(state.subItem){const sizes=currentSubSizes(state.selected);if(!state.subSize||!sizes.includes(state.subSize))state.subSize=sizes[0]||'';}render();});
     const b2bForm=root.querySelector('[data-b2b-login]');if(b2bForm)b2bForm.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(b2bForm);const settings=S.getSettings();if(String(fd.get('id')).trim()===String(settings.b2bId)&&String(fd.get('password'))===String(settings.b2bPassword)){state.b2bAuthed=true;state.b2bError='';sessionStorage.setItem('one-line-b2b-auth','1');render();}else{state.b2bError='Invalid B2B login ID or password.';render();}});
     root.querySelectorAll('[data-filter-choice]').forEach(x=>x.addEventListener('click',()=>{const d=state.filterDraft,k=x.dataset.filterChoice,v=x.dataset.value;const arr=d[k];const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);if(k==='categories'){const allowedSubs=filterPool(state.screen.startsWith('b2b')?'b2b':'retail').filter(p=>!d.categories.length||d.categories.includes(p.category)).map(p=>p.subcategory);d.subs=d.subs.filter(s=>allowedSubs.includes(s));}render();}));
@@ -254,7 +254,7 @@
       else if(a==='nav-back')navigateBack(x.dataset.fallback||'home');
       else if(a==='install')install();
       else if(a==='open-filter'){state.filterDraft={categories:clone(state.filterCategories),subs:clone(state.filterSubs),options:clone(state.filterOptions)};state.filterOpen=true;render();}
-      else if(a==='close-filter')closeFilter(true);
+      else if(a==='close-filter')closeFilter(false);
       else if(a==='reset-filter-draft'){state.filterDraft={categories:[],subs:[],options:[]};render();}
       else if(a==='apply-filter'){commitFilterDraft();state.filterOpen=false;state.filterDraft=null;render();}
       else if(a==='clear-filters'){resetFilters();render();}
@@ -267,20 +267,58 @@
       else if(a==='close-legal'){state.legal='';render();}
       else if(a==='view-order'){state.orderPlaced=false;go('orders');}
       else if(a==='whatsapp')openWhatsApp(x.dataset.message||'Hi, I need a custom apparel quotation.');
-      else if(a==='close-zoom'){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;render();}
-      else if(a==='zoom-in'){state.zoomScale=Math.min(3,Math.round((state.zoomScale+.25)*100)/100);render();}
-      else if(a==='zoom-out'){state.zoomScale=Math.max(1,Math.round((state.zoomScale-.25)*100)/100);render();}
+      else if(a==='close-zoom'){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}
+      else if(a==='zoom-in'){state.zoomScale=Math.min(4,Math.round((state.zoomScale+.25)*100)/100);if(state.zoomScale===1){state.zoomX=0;state.zoomY=0;}render();}
+      else if(a==='zoom-out'){state.zoomScale=Math.max(1,Math.round((state.zoomScale-.25)*100)/100);if(state.zoomScale===1){state.zoomX=0;state.zoomY=0;}render();}
       else if(a==='b2b-logout'){state.b2bAuthed=false;sessionStorage.removeItem('one-line-b2b-auth');state.b2bError='';render();}
     }));
-    const overlay=root.querySelector('.catalog-filter-overlay');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeFilter(true);});
-    const zoomOverlay=root.querySelector('[data-zoom-overlay]');if(zoomOverlay)zoomOverlay.addEventListener('click',e=>{if(e.target===zoomOverlay){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;render();}});
+    const overlay=root.querySelector('.catalog-filter-overlay');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeFilter(false);});
+    const zoomOverlay=root.querySelector('[data-zoom-overlay]');if(zoomOverlay)zoomOverlay.addEventListener('click',e=>{if(e.target===zoomOverlay){state.zoomImage='';state.zoomAlt='';state.zoomScale=1;state.zoomX=0;state.zoomY=0;render();}});
     bindWhatsappDrag();bindProductSliders();bindDetailSliders();
+  }
+  function syncModalScrollLock(){
+    const locked=!!(state.filterOpen||state.zoomImage);
+    document.documentElement.classList.toggle('modal-scroll-lock',locked);
+    document.body.classList.toggle('modal-scroll-lock',locked);
+  }
+  function bindZoomViewer(){
+    const stage=root.querySelector('[data-zoom-stage]'),image=root.querySelector('[data-zoom-view]'),label=root.querySelector('[data-zoom-label]');
+    if(!stage||!image)return;
+    const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+    let pinchStart=0,pinchScale=state.zoomScale,panStart=null,lastTap=0,moved=false;
+    const distance=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+    const limits=()=>({x:Math.max(0,(stage.clientWidth*(state.zoomScale-1))/2),y:Math.max(0,(stage.clientHeight*(state.zoomScale-1))/2)});
+    const apply=()=>{
+      const lim=limits();
+      state.zoomX=clamp(state.zoomX,-lim.x,lim.x);state.zoomY=clamp(state.zoomY,-lim.y,lim.y);
+      image.style.transform='translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')';
+      if(label)label.textContent=Math.round(state.zoomScale*100)+'%';
+    };
+    stage.addEventListener('touchstart',e=>{
+      moved=false;
+      if(e.touches.length===2){e.preventDefault();pinchStart=distance(e.touches);pinchScale=state.zoomScale;panStart=null;}
+      else if(e.touches.length===1&&state.zoomScale>1){const t=e.touches[0];panStart={x:t.clientX,y:t.clientY,ox:state.zoomX,oy:state.zoomY};}
+    },{passive:false});
+    stage.addEventListener('touchmove',e=>{
+      if(e.touches.length===2&&pinchStart){e.preventDefault();moved=true;state.zoomScale=clamp(pinchScale*(distance(e.touches)/pinchStart),1,4);if(state.zoomScale<=1.01){state.zoomScale=1;state.zoomX=0;state.zoomY=0;}apply();}
+      else if(e.touches.length===1&&panStart&&state.zoomScale>1){e.preventDefault();moved=true;const t=e.touches[0];state.zoomX=panStart.ox+(t.clientX-panStart.x);state.zoomY=panStart.oy+(t.clientY-panStart.y);apply();}
+    },{passive:false});
+    stage.addEventListener('touchend',e=>{
+      if(e.touches.length<2){pinchStart=0;pinchScale=state.zoomScale;}
+      if(e.touches.length===0){
+        panStart=null;
+        const now=Date.now();
+        if(!moved&&now-lastTap<320){state.zoomScale=state.zoomScale>1?1:2;state.zoomX=0;state.zoomY=0;apply();lastTap=0;}else if(!moved){lastTap=now;}
+      }
+    },{passive:true});
+    stage.addEventListener('dblclick',e=>{e.preventDefault();state.zoomScale=state.zoomScale>1?1:2;state.zoomX=0;state.zoomY=0;apply();});
+    apply();
   }
   async function install(){if(state.installPrompt){await state.installPrompt.prompt();state.installPrompt=null;}else showToast('Use your browser menu and choose “Install app”');}
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;});
   window.addEventListener('storage',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();render();});
   window.addEventListener('one-line-change',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();});
-  document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.filterOpen){closeFilter(true);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
+  document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.filterOpen){closeFilter(false);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
   try{
     const valid=['home','catalog','product','cart','checkout','orders','customize','b2b','b2bProduct'];const hash=location.hash.replace('#','');const params=new URLSearchParams(location.search);let initial=valid.includes(hash)?hash:'home';
     const sharedCategory=params.get('category'),sharedSub=params.get('subcategory'),sharedProduct=params.get('product'),sharedAudience=params.get('audience');
@@ -290,8 +328,8 @@
     if(!history.state?.oneLineGuard){history.replaceState({oneLine:true,oneLineGuard:true,guardBase:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');history.pushState({oneLine:true,oneLineGuard:true,screen:initial,scrollY:0},'',location.pathname+location.search+'#'+initial);}else history.replaceState({...history.state,oneLine:true,oneLineGuard:true,screen:initial},'',location.pathname+location.search+'#'+initial);
   }catch(_){}
   window.addEventListener('popstate',e=>{
-    if(e.state?.guardBase){state.screen='home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'smooth'}));setTimeout(()=>{try{history.pushState({oneLine:true,oneLineGuard:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');}catch(_){}},0);return;}
-    const next=e.state?.oneLine?e.state.screen:'home';state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo({top:state.screen==='home'?0:Number(e.state?.scrollY||0),behavior:'smooth'}));
+    if(e.state?.guardBase){state.screen='home';state.menu=false;state.filterOpen=false;state.filterDraft=null;state.zoomImage='';syncModalScrollLock();render();requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>{try{history.pushState({oneLine:true,oneLineGuard:true,screen:'home',scrollY:0},'',location.pathname+location.search+'#home');}catch(_){}},0);return;}
+    const next=e.state?.oneLine?e.state.screen:'home';state.screen=next||'home';state.menu=false;state.filterOpen=false;state.filterDraft=null;render();requestAnimationFrame(()=>window.scrollTo(0,Number(e.state?.scrollY||0)));
   });
   if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
 })();
