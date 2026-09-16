@@ -1512,13 +1512,6 @@ button,a{-webkit-tap-highlight-color:transparent}
 
 /* ===== Requested stability / responsive refinement ===== */
 
-/* Keep normal browser scrolling natural. Only actual draggable design layers and the
-   movable contact control capture gestures. */
-html,body{scroll-behavior:auto!important;overscroll-behavior:auto!important}
-body{touch-action:auto!important}
-.view-root,.screen,.catalog-page,.product-fullscreen,.compact-designer,.compact-designer-layout,.compact-controls{overscroll-behavior:auto!important}
-.locked-garment-stage,.locked-garment-stage .compact-shirt-canvas,.locked-garment-stage .locked-garment,.locked-garment-stage .print-area{overscroll-behavior:auto!important}
-
 /* Header back control: icon only, no tile/background. */
 .designer-back,.designer-back:hover,.designer-back:focus-visible{
   width:42px;height:42px;padding:0;border:0!important;border-radius:0!important;
@@ -1608,27 +1601,33 @@ body{touch-action:auto!important}
   .catalog-view-button,.section-heading>button{min-height:40px!important;padding:0 12px!important}
 }
 
-
-/* ===== v16 free-scroll / inline product zoom / selected-category sharing ===== */
-/* Never make normal page content behave like a nested scroll surface. */
-html,body{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important;scroll-behavior:auto!important;overscroll-behavior:auto!important}
-#app,.view-root,.screen,.catalog-page,.product-fullscreen,.section-wrap,.products-section,.category-section{overflow-y:visible!important;overscroll-behavior:auto!important}
-
-/* Product galleries allow a vertical swipe to continue the page immediately.
-   Horizontal image changes are handled only after a clearly horizontal gesture. */
-.product-card-slider,.product-slide-track,.detail-slider,.detail-slider-frame,.detail-slide-track,.detail-slide,.detail-inline-zoom{overscroll-behavior:auto!important}
-.product-card-slider,.product-slide-track,.detail-slide-track,.detail-inline-zoom{touch-action:pan-y!important}
-.product-slide-track{scroll-snap-type:none!important;scroll-behavior:auto!important;-webkit-overflow-scrolling:auto!important}
-.product-slide{scroll-snap-align:none!important;scroll-snap-stop:normal!important}
-
-/* Product ordering page image zoom stays inside the image — no popup/lightbox. */
-.detail-inline-zoom{width:100%;height:100%;position:relative;display:grid;place-items:center;overflow:hidden;background:#eee9ef;cursor:zoom-in;outline:none}
-.detail-inline-zoom .zoomable-product-image{width:100%!important;height:100%!important;object-fit:cover!important;transform:scale(1);transform-origin:center center;transition:transform .16s ease;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
-.detail-inline-zoom.zoomed{cursor:zoom-out}
-.inline-zoom-hint{width:38px;height:38px;position:absolute;right:11px;bottom:11px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.93);color:#64116f;box-shadow:0 6px 18px rgba(48,25,53,.14);pointer-events:none;transition:opacity .15s ease}
-.inline-zoom-hint .icon{width:17px;height:17px}
-.detail-inline-zoom.zoomed .inline-zoom-hint{opacity:.22}
+/* Selected-category share control retained. */
 .selected-category-share{flex:0 0 42px!important;width:42px!important;height:42px!important}
 
-/* The movable contact control is intentionally the only non-customizer element that captures drag gestures. */
-.whatsapp-float.contact-float{touch-action:none!important}
+
+/* ===== v17 native scrolling / image viewer / home CTA spacing ===== */
+/* Main-page catalogue CTAs: actual button padding and vertically centered text/icon. */
+.category-section .catalog-view-button,
+.products-section .section-heading>button{
+  margin-top:12px!important;
+  min-height:44px!important;
+  padding:0 16px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+  line-height:1.15!important;
+  text-align:center!important;
+}
+.category-section .catalog-view-button .icon,
+.products-section .section-heading>button .icon{flex:0 0 auto!important}
+
+/* Give the custom-uniform CTA breathing room from the content beside it. */
+@media (min-width:761px){
+  .uniform-customize-button{margin-left:20px!important}
+}
+@media (max-width:760px){
+  .category-section .catalog-view-button,
+  .products-section .section-heading>button{margin-top:10px!important;min-height:42px!important;padding:0 14px!important}
+  .uniform-customize-button{margin-left:0!important}
+}
