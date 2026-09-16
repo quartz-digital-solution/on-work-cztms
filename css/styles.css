@@ -1607,3 +1607,28 @@ body{touch-action:auto!important}
   .whatsapp-float.contact-float{width:52px!important;min-width:52px!important;height:52px!important}
   .catalog-view-button,.section-heading>button{min-height:40px!important;padding:0 12px!important}
 }
+
+
+/* ===== v16 free-scroll / inline product zoom / selected-category sharing ===== */
+/* Never make normal page content behave like a nested scroll surface. */
+html,body{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important;scroll-behavior:auto!important;overscroll-behavior:auto!important}
+#app,.view-root,.screen,.catalog-page,.product-fullscreen,.section-wrap,.products-section,.category-section{overflow-y:visible!important;overscroll-behavior:auto!important}
+
+/* Product galleries allow a vertical swipe to continue the page immediately.
+   Horizontal image changes are handled only after a clearly horizontal gesture. */
+.product-card-slider,.product-slide-track,.detail-slider,.detail-slider-frame,.detail-slide-track,.detail-slide,.detail-inline-zoom{overscroll-behavior:auto!important}
+.product-card-slider,.product-slide-track,.detail-slide-track,.detail-inline-zoom{touch-action:pan-y!important}
+.product-slide-track{scroll-snap-type:none!important;scroll-behavior:auto!important;-webkit-overflow-scrolling:auto!important}
+.product-slide{scroll-snap-align:none!important;scroll-snap-stop:normal!important}
+
+/* Product ordering page image zoom stays inside the image — no popup/lightbox. */
+.detail-inline-zoom{width:100%;height:100%;position:relative;display:grid;place-items:center;overflow:hidden;background:#eee9ef;cursor:zoom-in;outline:none}
+.detail-inline-zoom .zoomable-product-image{width:100%!important;height:100%!important;object-fit:cover!important;transform:scale(1);transform-origin:center center;transition:transform .16s ease;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.detail-inline-zoom.zoomed{cursor:zoom-out}
+.inline-zoom-hint{width:38px;height:38px;position:absolute;right:11px;bottom:11px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.93);color:#64116f;box-shadow:0 6px 18px rgba(48,25,53,.14);pointer-events:none;transition:opacity .15s ease}
+.inline-zoom-hint .icon{width:17px;height:17px}
+.detail-inline-zoom.zoomed .inline-zoom-hint{opacity:.22}
+.selected-category-share{flex:0 0 42px!important;width:42px!important;height:42px!important}
+
+/* The movable contact control is intentionally the only non-customizer element that captures drag gestures. */
+.whatsapp-float.contact-float{touch-action:none!important}

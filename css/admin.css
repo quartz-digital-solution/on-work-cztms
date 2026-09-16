@@ -19,3 +19,45 @@
 @media(max-width:760px){.order-admin-metrics{width:100%}.panel-head{display:grid}.order-admin-tools{grid-template-columns:1fr}.order-admin-tools>div{order:2}.order-admin-tools>a{order:3}.admin-order-facts{grid-template-columns:1fr 1fr}.admin-order-facts>span:last-child{grid-column:1/-1}.admin-order-track{overflow-x:auto;padding-bottom:3px}.admin-order-track i{min-width:24px}.admin-order-actions{justify-content:stretch}.admin-order-actions label,.admin-order-actions select{width:100%}}
 .status-card{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.portal-switcher{display:flex;gap:6px;flex-wrap:wrap}.portal-switcher a{height:34px;padding:0 10px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;color:#4f5b3d;text-decoration:none;font-size:8px;font-weight:900}.portal-switcher a:hover{background:#f3f7e9}
 @media(max-width:760px){.status-card{align-items:stretch}.portal-switcher{width:100%;display:grid;grid-template-columns:1fr 1fr}.portal-switcher a{justify-content:center}}
+
+
+/* ===== v16 violet / purple portal theme ===== */
+:root{--ink:#372b3a;--green:#7b2786;--green-dark:#64116f;--soft:#f7f1f8;--line:#e2d7e5;--muted:#766a79;--shadow:0 16px 40px rgba(67,30,73,.08)}
+html,body{background:#f6f2f7;color:#241c27}
+.admin-head{border-bottom-color:#e3d9e5}
+.admin-logo small,.admin-menu button,.status-card span{color:#746777}
+.admin-menu button:hover{background:#f5edf7}
+.admin-menu button.active,.submit-small,.primary-btn,.add-group,.settings-save{background:linear-gradient(145deg,#7b2786,#64116f)!important;color:#fff!important}
+.clean-card,.admin-product,.category-card{border-color:#e4dbe6}
+.tag{color:#8a6f8e}
+.ghost-btn{border-color:#e0d5e3;color:#554659}
+.list-controls input,.list-controls select,.field input,.field select,.field textarea,.order-admin-tools input{border-color:#ddd1e0;color:#342737}
+.list-controls input:focus,.list-controls select:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:#8a3195!important;box-shadow:0 0 0 4px rgba(123,39,134,.11)!important}
+.list-controls button,.colour-image-control label,.order-admin-tools>a{background:#4e1058!important;color:#fff!important}
+.admin-product>img,.image-chip,.category-card img{background:#f0eaf1}
+.audience-pill{background:#f2e8f4;color:#64116f}
+.empty-admin{border-color:#d8c9dc;color:#786a7c}
+.field>span,.section-label{color:#514055}
+.editor-box,.category-form,.settings-box,.order-admin-metrics span{background:#fbf8fc}
+.upload-zone{border-color:#cdb6d2;background:#faf5fb}
+.upload-zone small,.variant-help{color:#766a79}
+.colour-group{border-color:#e3d7e5;border-left-color:#7b2786}
+.colour-image-control{border-color:#d6c5da;background:#faf6fb}
+.colour-image-control img{background:#eee7f0}
+.category-card{border-color:#e2d7e4}
+.toast{background:#4b0c56;box-shadow:0 14px 30px rgba(75,12,86,.24)}
+.order-admin-metrics b{color:#64116f}
+.order-admin-tools button{color:#6a5a6e}
+.order-admin-tools button.active{border-color:#7b2786;background:#7b2786;color:#fff}
+.subitem-admin-toggle input{accent-color:#7b2786!important}
+.subitem-base-image{border-color:#dfd3e2!important;background:#fbf8fc!important}
+.subitem-base-image label{border-color:#cdb9d2!important;background:#f3e9f5!important;color:#5b4660!important}
+.admin-order-row{border-color:#e2d7e4!important}
+.admin-order-top span{color:#8b7590!important}
+.admin-order-track span{background:#f1ebf2!important;color:#807384!important}
+.admin-order-track span.done{background:#eadcf0!important;color:#64116f!important}
+.admin-order-track i{background:#e6dde8!important}.admin-order-track i.done{background:#8b3796!important}
+.admin-order-facts>span{background:#faf7fb!important}.admin-order-facts small{color:#89778e!important}.admin-order-facts b{color:#4a3a4e!important}
+.admin-order-actions label{color:#66566a!important}.admin-order-actions select{border-color:#d9ccdc!important}
+.portal-staff .admin-head,.portal-management .admin-head{border-bottom-color:#e3d9e5!important}
+.portal-switcher a{color:#625266!important}.portal-switcher a:hover{background:#f4edf6!important}

@@ -1,4 +1,4 @@
-const CACHE='one-line-v15-20260916-scroll-text-contact-fix';
+const CACHE='one-line-v16-20260916-free-scroll-inline-zoom-purple-portals';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./css/styles.css','./css/admin.css',
   './js/data.js','./js/designer.js','./js/app.js','./js/admin.js','./js/receiver.js',
