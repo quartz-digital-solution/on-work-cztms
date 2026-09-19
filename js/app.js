@@ -18,13 +18,19 @@
   };
   const WHATSAPP_LOGO='https://upload.wikimedia.org/wikipedia/commons/4/4c/WhatsApp_Logo_green.svg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original';
   const whatsappLogo=()=>'<img class="whatsapp-logo" src="'+WHATSAPP_LOGO+'" alt="" aria-hidden="true">';
+  const quickUniforms=[
+    {id:'uniform-1',title:'Classic polo uniform',note:'Change the complete yellow shirt colour.',image:'assets/uniform-quick/uniform-1.webp',layers:[{label:'Shirt colour',mask:'assets/uniform-quick/uniform-1-shirt-mask.png',value:'#f3d51c'}]},
+    {id:'uniform-2',title:'Panel school uniform',note:'Change every blue uniform section with one colour.',image:'assets/uniform-quick/uniform-2.webp',layers:[{label:'Blue sections',mask:'assets/uniform-quick/uniform-2-blue-mask.png',value:'#2453bd'}]},
+    {id:'uniform-3',title:'Contrast collar polo',note:'Change only the yellow body section.',image:'assets/uniform-quick/uniform-3.webp',layers:[{label:'Shirt body',mask:'assets/uniform-quick/uniform-3-shirt-mask.png',value:'#dedc39'}]},
+    {id:'uniform-4',title:'Two-colour school uniform',note:'Choose the dark and light sections separately.',image:'assets/uniform-quick/uniform-4.webp',layers:[{label:'Navy section',mask:'assets/uniform-quick/uniform-4-navy-mask.png',value:'#171a43'},{label:'Cream section',mask:'assets/uniform-quick/uniform-4-cream-mask.png',value:'#ead2b6'}]}
+  ];
 
   const totalQty=()=>state.cart.reduce((n,x)=>n+Number(x.qty||0),0);
   const subtotal=()=>state.cart.reduce((n,x)=>n+Number(x.price||0)*Number(x.qty||0),0);
   const retailProducts=()=>state.products.filter(p=>(p.audience||'retail')!=='b2b');
   const b2bProducts=()=>state.products.filter(p=>p.audience==='b2b');
-  const img=(src,alt,cls,fallback)=>'<img src="'+S.esc(src||fallback||'assets/crew-tee.webp')+'" alt="'+S.esc(alt||'')+'" class="'+S.esc(cls||'')+'" loading="lazy" onerror="this.onerror=null;this.src=\''+S.esc(fallback||'assets/crew-tee.webp')+'\'">';
-  function logo(compact){return '<div class="brand" aria-label="One-Line"><img class="brand-mark" src="one-line-mark.svg" alt="">'+(compact?'':'<span class="brand-copy"><b>One-Line</b><small>CUSTOM APPAREL STUDIO</small></span>')+'</div>';}
+  const img=(src,alt,cls,fallback)=>'<img src="'+S.esc(src||fallback||'assets/crew-tee.webp')+'" alt="'+S.esc(alt||'')+'" class="'+S.esc(cls||'')+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+S.esc(fallback||'assets/crew-tee.webp')+'\'">';
+  function logo(compact){return '<div class="brand" aria-label="One-Line"><img class="brand-mark" src="one-line-logo.webp" alt="">'+(compact?'':'<span class="brand-copy"><b>One-Line</b><small>CUSTOM APPAREL STUDIO</small></span>')+'</div>';}
   function showToast(text){state.toast=text;render();setTimeout(()=>{if(state.toast===text){state.toast='';render();}},2200);}
   function rememberScroll(){
     try{if(history.state?.oneLine)history.replaceState({...history.state,scrollY:window.scrollY},'',location.href);}catch(_){}
@@ -135,12 +141,22 @@
   function groupedProductSections(list,audience){
     return orderedCategoryNames(list).map((name,index)=>{const items=list.filter(p=>p.category===name);if(!items.length)return'';const subs=[...new Set(items.map(p=>p.subcategory).filter(Boolean))];return '<section class="catalog-category-group '+(index===0?'first-category-group':'')+'"><div class="catalog-category-heading"><div><span class="eyebrow">'+(index===0?'FIRST CATEGORY':'CATEGORY '+String(index+1).padStart(2,'0'))+'</span><h2>'+S.esc(name)+'</h2>'+(subs.length?'<p class="category-subline">'+subs.map(S.esc).join(' · ')+'</p>':'')+'</div><div class="category-heading-actions"><small>'+items.length+' item'+(items.length===1?'':'s')+'</small></div></div><div class="product-grid catalog-grid responsive-catalog-grid">'+items.map(p=>productCard(p,audience)).join('')+'</div></section>';}).join('');
   }
-  function header(){return '<div class="announcement"><span>CUSTOM APPAREL · READY-MADE ESSENTIALS</span><b>PRINT YOUR IDEA</b></div><header class="site-header"><button class="mobile-menu" data-action="menu" aria-label="Open menu">'+I('menu')+'</button><button class="logo-button" data-go="home">'+logo(false)+'</button><nav class="'+(state.menu?'open':'')+'"><button data-go="home">Home</button><button data-go="catalog">Ready made</button><button data-go="customize">Customize</button><button data-go="b2b">B2B</button><button data-go="orders">My orders</button><button class="nav-install" data-action="install">'+I('download')+' Install app</button><button data-legal="About">About</button></nav><div class="header-actions"><button class="b2b-head-link" data-go="b2b">B2B</button><button class="install-link" data-action="install" aria-label="Install app">'+I('download')+'<span>Install</span></button><button data-go="cart" class="bag-link">'+I('bag')+'<span>'+totalQty()+'</span></button></div></header>'+(state.menu?'<button class="menu-scrim" data-action="close-menu" aria-label="Close menu"></button>':'');}
+  const isStandalone=()=>window.matchMedia?.('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  function header(){const installNav=isStandalone()?'':'<button class="nav-install" data-action="install">'+I('download')+' Install app</button>';const installHead=isStandalone()?'':'<button class="install-link" data-action="install" aria-label="Install app">'+I('download')+'<span>Install</span></button>';return '<div class="announcement"><span>CUSTOM APPAREL · READY-MADE ESSENTIALS</span><b>PRINT YOUR IDEA</b></div><header class="site-header"><button class="mobile-menu" data-action="menu" aria-label="Open menu">'+I('menu')+'</button><button class="logo-button" data-go="home">'+logo(false)+'</button><nav class="'+(state.menu?'open':'')+'"><button data-go="home">Home</button><button data-go="catalog">Ready made</button><button data-go="customize">Customize</button><button data-go="b2b">B2B</button><button data-go="orders">My orders</button>'+installNav+'<button data-legal="About">About</button></nav><div class="header-actions"><button class="b2b-head-link" data-go="b2b">B2B</button>'+installHead+'<button data-go="cart" class="bag-link">'+I('bag')+'<span>'+totalQty()+'</span></button></div></header>'+(state.menu?'<button class="menu-scrim" data-action="close-menu" aria-label="Close menu"></button>':'');}
   function footer(){return '<footer><div class="footer-main">'+logo(false)+'<p>Custom apparel designer plus a separate ready-made catalogue for T-shirts, uniforms, sportswear, shirts and labels.</p><div><b>SHOP</b><button data-go="catalog">Ready-made catalogue</button><button data-go="customize">Custom designer</button><button data-go="b2b">B2B catalogue</button></div><div><b>INFORMATION</b>'+Object.keys(legalCopy).map(x=>'<button data-legal="'+x+'">'+x+'</button>').join('')+'</div><div><b>PORTALS</b><a href="admin.html">Admin</a><a href="staff.html">Staff</a><a href="management.html">Management</a><a href="receiver.html">Order receiving</a></div></div><div class="footer-bottom"><span>© 2026 One-Line</span><span>Ready-made and custom ordering kept separate</span></div></footer>';}
   function bottom(){return '<nav class="mobile-bottom"><button data-go="home" class="'+(state.screen==='home'?'active':'')+'">'+I('home')+'Home</button><button data-go="catalog" class="'+(state.screen==='catalog'||state.screen==='product'?'active':'')+'">'+I('filter')+'Catalog</button><button data-go="customize">'+I('plus')+'Create</button><button data-go="b2b" class="'+(state.screen.startsWith('b2b')?'active':'')+'">'+I('box')+'B2B</button><button data-go="cart" class="'+(state.screen==='cart'?'active':'')+'">'+I('bag')+'<i>'+totalQty()+'</i>Cart</button></nav>';}
+  function uniformQuickSection(){
+    const cards=quickUniforms.map(u=>{
+      const vars=u.layers.map((l,i)=>'--uniform-c'+i+':'+l.value).join(';');
+      const overlays=u.layers.map((l,i)=>'<span class="uniform-recolour-layer" aria-hidden="true" style="background:var(--uniform-c'+i+');-webkit-mask-image:url('+l.mask+');mask-image:url('+l.mask+')"></span>').join('');
+      const controls=u.layers.map((l,i)=>'<label class="uniform-colour-control"><span><b>'+S.esc(l.label)+'</b><small data-uniform-value="'+i+'">'+S.esc(l.value.toUpperCase())+'</small></span><input type="color" value="'+S.esc(l.value)+'" data-uniform-color="'+i+'" aria-label="'+S.esc(l.label)+'"></label>').join('');
+      return '<article class="uniform-quick-card" data-uniform-card="'+u.id+'" data-default-colours="'+S.esc(u.layers.map(l=>l.value).join(','))+'" style="'+vars+'"><div class="uniform-live-preview"><img src="'+u.image+'" alt="'+S.esc(u.title)+'" loading="lazy" decoding="async">'+overlays+'<span class="uniform-live-badge">LIVE COLOUR PREVIEW</span></div><div class="uniform-quick-body"><div><span class="eyebrow">FAST CUSTOMIZE</span><h3>'+S.esc(u.title)+'</h3><p>'+S.esc(u.note)+'</p></div><div class="uniform-colour-controls">'+controls+'</div><button type="button" class="uniform-reset" data-uniform-reset>Reset colours</button></div></article>';
+    }).join('');
+    return '<section class="uniform-quick-section section-wrap"><div class="section-heading"><div><span class="eyebrow">FAST UNIFORM CUSTOMIZE</span><h2>Try any uniform colour live.</h2><p>Choose any colour and the fabric section changes instantly while the original folds, shadows and details stay visible.</p></div><button data-go="customize">Add logo / text '+I('arrow')+'</button></div><div class="uniform-quick-grid">'+cards+'</div></section>';
+  }
   function home(){
     const popular=retailProducts().slice(0,5);
-    return '<main class="screen screen-enter"><section class="hero"><div class="hero-copy"><span class="eyebrow">MADE FOR YOUR NAME, TEAM OR BUSINESS</span><h1>Wear your<br><em>own idea.</em></h1><p>Design one custom garment in the studio or order ready-made products from a clean mobile-friendly catalogue.</p><div class="hero-actions"><button class="primary" data-go="customize">Start customizing '+I('arrow')+'</button><button class="secondary" data-go="catalog">Shop ready-made</button></div><div class="hero-proof"><span>'+I('shield')+' Exact print position saved</span><span>'+I('package')+' Cart keeps your design</span></div></div><div class="hero-visual"><div class="hero-grid-label">ONE-LINE CUSTOM STUDIO</div><div class="hero-product-orbit"><div class="orbit-ring"></div><img src="assets/crew-tee.webp" alt="Premium blank T-shirt"><div class="hero-brand-badge"><img src="one-line-mark.svg" alt=""><span>BUILD YOUR OWN</span></div></div><div class="floating-tool tool-a">'+I('type')+'<span>Add text</span></div><div class="floating-tool tool-b">'+I('image')+'<span>Upload image</span></div><div class="floating-tool tool-c">'+I('sparkle')+'<span>Choose print</span></div><button class="visual-cta" data-go="customize"><span>OPEN DESIGNER</span>'+I('arrow')+'</button></div></section>'+categoriesSection()+processSection()+'<section class="products-section section-wrap"><div class="section-heading"><div><span class="eyebrow">READY TO ORDER</span><h2>Popular essentials.</h2></div><button data-go="catalog">See full catalogue '+I('arrow')+'</button></div><div class="product-grid home-product-grid">'+popular.map(p=>productCard(p,'retail')).join('')+'</div></section><section class="bulk-banner section-wrap uniform-order-banner"><div><span>BULK / TEAMS / INSTITUTIONS</span><h2>Need a custom uniform order?</h2><p>Build the garment, colour, print area and artwork in the customizer, then add the exact design to your cart.</p></div><button class="uniform-customize-button" data-go="customize"><span>Customize uniform</span>'+I('arrow')+'</button></section></main>';
+    return '<main class="screen screen-enter"><section class="hero"><div class="hero-copy"><span class="eyebrow">MADE FOR YOUR NAME, TEAM OR BUSINESS</span><h1>Wear your<br><em>own idea.</em></h1><p>Design one custom garment in the studio or order ready-made products from a clean mobile-friendly catalogue.</p><div class="hero-actions"><button class="primary" data-go="customize">Start customizing '+I('arrow')+'</button><button class="secondary" data-go="catalog">Shop ready-made</button></div><div class="hero-proof"><span>'+I('shield')+' Exact print position saved</span><span>'+I('package')+' Cart keeps your design</span></div></div><div class="hero-visual"><div class="hero-grid-label">ONE-LINE CUSTOM STUDIO</div><div class="hero-product-orbit"><div class="orbit-ring"></div><img src="assets/crew-tee.webp" alt="Premium blank T-shirt"><div class="hero-brand-badge"><img src="one-line-logo.webp" alt=""><span>BUILD YOUR OWN</span></div></div><div class="floating-tool tool-a">'+I('type')+'<span>Add text</span></div><div class="floating-tool tool-b">'+I('image')+'<span>Upload image</span></div><div class="floating-tool tool-c">'+I('sparkle')+'<span>Choose print</span></div><button class="visual-cta" data-go="customize"><span>OPEN DESIGNER</span>'+I('arrow')+'</button></div></section>'+categoriesSection()+processSection()+uniformQuickSection()+'<section class="products-section section-wrap"><div class="section-heading"><div><span class="eyebrow">READY TO ORDER</span><h2>Popular essentials.</h2></div><button data-go="catalog">See full catalogue '+I('arrow')+'</button></div><div class="product-grid home-product-grid">'+popular.map(p=>productCard(p,'retail')).join('')+'</div></section><section class="bulk-banner section-wrap uniform-order-banner"><div><span>BULK / TEAMS / INSTITUTIONS</span><h2>Need a custom uniform order?</h2><p>Build the garment, colour, print area and artwork in the customizer, then add the exact design to your cart.</p></div><button class="uniform-customize-button" data-go="customize"><span>Customize uniform</span>'+I('arrow')+'</button></section></main>';
   }
   function categoriesSection(){
     const cats=[...state.categories].sort((a,b)=>{const at=/t[- ]?shirts?/i.test(a.name||'')?0:1,bt=/t[- ]?shirts?/i.test(b.name||'')?0:1;return at-b;});
@@ -189,7 +205,7 @@
   function imageZoomModal(){if(!state.zoomImage)return'';const many=(state.zoomImages||[]).length>1,count=(state.zoomImages||[]).length||1;return '<div class="image-zoom-overlay" data-zoom-overlay><div class="image-zoom-shell" role="dialog" aria-modal="true" aria-label="Product image viewer"><button type="button" class="zoom-close" data-action="close-zoom" aria-label="Close image">'+I('close')+'</button>'+(many?'<button type="button" class="zoom-nav zoom-prev" data-action="zoom-prev" aria-label="Previous image">'+I('back')+'</button><button type="button" class="zoom-nav zoom-next" data-action="zoom-next" aria-label="Next image">'+I('arrow')+'</button>':'')+'<div class="zoom-image-stage" data-zoom-stage><img data-zoom-view src="'+S.esc(state.zoomImage)+'" alt="'+S.esc(state.zoomAlt||'Product image')+'" style="transform:translate3d('+state.zoomX+'px,'+state.zoomY+'px,0) scale('+state.zoomScale+')"></div><div class="zoom-controls"><button type="button" data-action="zoom-out" aria-label="Zoom out">'+I('minus')+'</button><span data-zoom-label>'+Math.round(state.zoomScale*100)+'%</span><span class="zoom-count">'+(state.zoomIndex+1)+' / '+count+'</span><button type="button" data-action="zoom-in" aria-label="Zoom in">'+I('plus')+'</button></div></div></div>'; }
   function paymentModal(){return '<div class="overlay"><div class="payment-modal"><button class="close" data-action="close-payment">'+I('close')+'</button><div class="demo-tag">DEMO PAYMENT</div>'+I('card')+'<h2>'+S.money(subtotal())+'</h2><p>This build simulates successful online payment. No real money is collected.</p><button class="primary wide" data-action="complete-order">Simulate successful payment</button><button class="text-button" data-action="close-payment">Cancel</button></div></div>';}
   function toast(){return state.toast?'<div class="toast">'+I('check')+S.esc(state.toast)+'<button data-go="cart">View cart</button></div>':'';}
-  function whatsappFloat(){if(state.screen==='customize')return'';return '<button class="whatsapp-float whatsapp-icon-only contact-float" data-whatsapp-float aria-label="Contact enquiry"><img src="assets/contact-support.png" alt="Contact"></button>';}
+  function whatsappFloat(){if(state.screen==='customize')return'';return '<button class="whatsapp-float whatsapp-icon-only contact-float" data-whatsapp-float aria-label="Contact enquiry"><img src="assets/contact-support.webp" alt="Contact"></button>';}
   function page(){return({home,catalog,product,cart,checkout,orders,b2b,b2bProduct})[state.screen]?.()||home();}
 
   function render(){
@@ -217,31 +233,29 @@
   function bindWhatsappDrag(){const el=root.querySelector('[data-whatsapp-float]');if(!el)return;let drag=null,moved=false;el.addEventListener('pointerdown',e=>{moved=false;const r=el.getBoundingClientRect();drag={id:e.pointerId,dx:e.clientX-r.left,dy:e.clientY-r.top,startX:e.clientX,startY:e.clientY};el.setPointerCapture(e.pointerId);});el.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const left=Math.max(8,Math.min(window.innerWidth-el.offsetWidth-8,e.clientX-drag.dx)),top=Math.max(72,Math.min(window.innerHeight-el.offsetHeight-90,e.clientY-drag.dy));if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)moved=true;el.style.left=left+'px';el.style.top=top+'px';el.style.right='auto';el.style.bottom='auto';});el.addEventListener('pointerup',e=>{if(!drag)return;const r=el.getBoundingClientRect();localStorage.setItem('one-line-wa-position',JSON.stringify({left:r.left,top:r.top}));drag=null;if(!moved)openWhatsApp('Hi, I need a custom apparel quotation.');});el.addEventListener('pointercancel',()=>{drag=null;});}
   function bindHorizontalSlider(track,onChange,onActivate){
     if(!track)return;
-    let drag=null,dragged=false;
-    const sync=()=>{if(onChange)onChange();};
+    let drag=null,dragged=false,resetTimer=0,raf=0,pendingLeft=0;
+    const sync=()=>onChange?.();
+    const setLeft=value=>{pendingLeft=value;if(raf)return;raf=requestAnimationFrame(()=>{raf=0;track.scrollLeft=pendingLeft;});};
     track.addEventListener('scroll',sync,{passive:true});
     track.addEventListener('pointerdown',e=>{
       if(e.pointerType==='mouse'&&e.button!==0)return;
-      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:track.scrollLeft,axis:null};dragged=false;
-      if(e.pointerType==='mouse'){try{track.setPointerCapture(e.pointerId);}catch(_){}}
+      clearTimeout(resetTimer);dragged=false;drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:track.scrollLeft,axis:null,lastX:e.clientX,lastTime:performance.now(),velocity:0};
     });
     track.addEventListener('pointermove',e=>{
       if(!drag||drag.id!==e.pointerId)return;
       const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
-      if(!drag.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)drag.axis=Math.abs(dx)>Math.abs(dy)*1.15?'x':'y';
+      if(!drag.axis&&Math.max(Math.abs(dx),Math.abs(dy))>6){drag.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';if(drag.axis==='x'){track.classList.add('is-dragging');try{track.setPointerCapture(e.pointerId);}catch(_){}}}
       if(drag.axis!=='x')return;
-      dragged=true;track.scrollLeft=drag.left-dx;
+      if(e.cancelable)e.preventDefault();dragged=true;const now=performance.now(),dt=Math.max(1,now-drag.lastTime);drag.velocity=(e.clientX-drag.lastX)/dt;drag.lastX=e.clientX;drag.lastTime=now;setLeft(drag.left-dx);
     });
     const finish=e=>{
-      if(!drag||drag.id!==e.pointerId)return;
-      try{if(track.hasPointerCapture?.(e.pointerId))track.releasePointerCapture(e.pointerId);}catch(_){}
-      if(dragged){const w=track.clientWidth||1,idx=Math.round(track.scrollLeft/w);track.scrollTo({left:idx*w,behavior:'smooth'});}
-      drag=null;requestAnimationFrame(sync);
+      if(!drag||drag.id!==e.pointerId)return;const d=drag;drag=null;track.classList.remove('is-dragging');try{if(track.hasPointerCapture?.(e.pointerId))track.releasePointerCapture(e.pointerId);}catch(_){}
+      if(d.axis==='x'){const w=track.clientWidth||1,count=Math.max(1,track.children.length),dx=e.clientX-d.x;let idx=Math.round(track.scrollLeft/w);if(Math.abs(dx)>w*.16||Math.abs(d.velocity)>.32)idx=Math.round(d.left/w)+(dx<0?1:-1);idx=Math.max(0,Math.min(count-1,idx));track.scrollTo({left:idx*w,behavior:'smooth'});requestAnimationFrame(sync);}resetTimer=setTimeout(()=>{dragged=false;},360);
     };
     track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
-    if(onActivate)track.addEventListener('click',e=>{e.stopPropagation();if(dragged){dragged=false;return;}onActivate(e);});
-    sync();
+    track.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false;return;}if(onActivate){e.stopPropagation();onActivate(e);}},true);sync();
   }
+
   function bindProductSliders(){
     root.querySelectorAll('[data-card-slider]').forEach(slider=>{
       const track=slider.querySelector('.product-slide-track'),card=slider.closest('[data-open-product]'),bars=card?.querySelectorAll('.product-slide-progress i');if(!track||!card)return;
@@ -254,6 +268,12 @@
       const track=slider.querySelector('.detail-slide-track'),bars=slider.querySelectorAll('.detail-slide-progress i');if(!track)return;
       const sync=()=>{const w=track.clientWidth||1,idx=Math.max(0,Math.min((bars?.length||1)-1,Math.round(track.scrollLeft/w)));bars?.forEach((b,i)=>b.classList.toggle('active',i===idx));};
       bindHorizontalSlider(track,sync,null);
+    });
+  }
+  function bindUniformQuick(){
+    root.querySelectorAll('[data-uniform-card]').forEach(card=>{
+      card.querySelectorAll('[data-uniform-color]').forEach(input=>input.addEventListener('input',()=>{const index=Number(input.dataset.uniformColor||0);card.style.setProperty('--uniform-c'+index,input.value);const value=card.querySelector('[data-uniform-value="'+index+'"]');if(value)value.textContent=input.value.toUpperCase();}));
+      card.querySelector('[data-uniform-reset]')?.addEventListener('click',()=>{const defaults=(card.dataset.defaultColours||'').split(',');card.querySelectorAll('[data-uniform-color]').forEach((input,index)=>{const value=defaults[index]||input.defaultValue;input.value=value;card.style.setProperty('--uniform-c'+index,value);const label=card.querySelector('[data-uniform-value="'+index+'"]');if(label)label.textContent=value.toUpperCase();});});
     });
   }
   function bind(){
@@ -305,7 +325,7 @@
     }));
     const overlay=root.querySelector('.catalog-filter-overlay');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeFilter(false);});
     const zoomOverlay=root.querySelector('[data-zoom-overlay]');if(zoomOverlay)zoomOverlay.addEventListener('click',e=>{if(e.target===zoomOverlay)closeZoom();});
-    bindWhatsappDrag();bindProductSliders();bindDetailSliders();
+    bindWhatsappDrag();bindProductSliders();bindDetailSliders();bindUniformQuick();
   }
   function syncModalScrollLock(){
     const locked=!!(state.filterOpen||state.zoomImage);
@@ -345,7 +365,8 @@
     apply();
   }
   async function install(){if(state.installPrompt){await state.installPrompt.prompt();state.installPrompt=null;}else showToast('Use your browser menu and choose “Install app”');}
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;});
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;render();});
+  window.addEventListener('appinstalled',()=>{state.installPrompt=null;render();});
   window.addEventListener('storage',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();render();});
   window.addEventListener('one-line-change',()=>{state.products=S.getProducts();state.categories=S.getCategories();state.orders=S.getOrders();state.settings=S.getSettings();});
   document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('dragstart',e=>{if(!e.target.closest('input[type=file]'))e.preventDefault();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.zoomImage){closeZoom();}else if(e.key==='Escape'&&state.filterOpen){closeFilter(false);}else if(e.key==='Escape'&&state.menu){state.menu=false;render();}if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault();});document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});

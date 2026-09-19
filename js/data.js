@@ -148,21 +148,42 @@
   }
 
   function surfaceDesign(design,surface){
-    const blank={text:"",font:"Impact",textColor:"#fff",textSize:30,textRotation:0,uploadedImage:"",imageSize:82,imageRotation:0,positions:{text:{x:50,y:40},image:{x:50,y:62}},textScale:22,imageScale:38};
-    if(design?.surfaceDesigns?.[surface]) return Object.assign({},blank,design.surfaceDesigns[surface]);
-    if(surface==="front"&&design) return Object.assign({},blank,design);
-    return clone(blank);
+    const blank={text:"",font:"Impact",textColor:"#fff",textSize:30,textRotation:0,uploadedImage:"",imageSize:82,imageRotation:0,positions:{text:{x:50,y:40},image:{x:50,y:62}},textScale:22,imageScale:38,layers:[]};
+    let raw=null;
+    if(design?.surfaceDesigns?.[surface])raw=design.surfaceDesigns[surface];
+    else if(surface==="front"&&design)raw=design;
+    if(!raw)return clone(blank);
+    const out=Object.assign({},blank,raw);out.positions=Object.assign({},blank.positions,raw.positions||{});
+    if(Array.isArray(raw.layers))out.layers=raw.layers.filter(Boolean).map(l=>Object.assign({},l,{position:Object.assign({x:50,y:50},l.position||{})}));
+    else{
+      out.layers=[];
+      if(raw.text)out.layers.push({type:'text',value:raw.text,font:raw.font||'Impact',color:raw.textColor||'#fff',size:Number(raw.textSize||30),rotation:Number(raw.textRotation||0),position:Object.assign({x:50,y:40},raw.positions?.text||{}),scale:Number(raw.textScale||22)});
+      if(raw.uploadedImage)out.layers.push({type:'image',src:raw.uploadedImage,size:Number(raw.imageSize||82),rotation:Number(raw.imageRotation||0),position:Object.assign({x:50,y:62},raw.positions?.image||{}),scale:Number(raw.imageScale||38)});
+    }
+    return out;
   }
-  function designedSurfaces(design){return ["front","back","rightSleeve","leftSleeve"].filter(s=>{const d=surfaceDesign(design,s);return d.text||d.uploadedImage;});}
+  function designedSurfaces(design){return ["front","back","rightSleeve","leftSleeve"].filter(s=>{const d=surfaceDesign(design,s);return d.layers?.length||d.text||d.uploadedImage;});}
   function designPreview(design,surface,className){
-    surface=surface||"front";const d=surfaceDesign(design,surface);const sleeve=surface.includes("Sleeve");
+    surface=surface||"front";const d=surfaceDesign(design,surface),sleeve=surface.includes("Sleeve");
     const garment=sleeve?(design.sleeveImage||"assets/sleeve-side-neutral.webp"):surface==="back"?(design.garmentBackImage||design.garmentImage):design.garmentImage;
-    const mirror=surface==="rightSleeve"?" scaleX(-1)":"";const zone="zone-"+surface;
-    const textScale=Number(d.textScale||Math.max(8,(d.textSize||30)*.72));
-    const imageScale=Number(d.imageScale||Math.max(18,(d.imageSize||82)*.46));
-    const text=d.text?'<span class="saved-design-text" style="left:'+d.positions.text.x+'%;top:'+d.positions.text.y+'%;color:'+esc(d.textColor)+';font-family:'+esc(d.font)+';font-size:'+textScale+'cqw;transform:translate(-50%,-50%) rotate('+(d.textRotation||0)+'deg)">'+esc(d.text)+'</span>':'';
-    const image=d.uploadedImage?'<img class="saved-design-image" src="'+esc(d.uploadedImage)+'" alt="" style="left:'+d.positions.image.x+'%;top:'+d.positions.image.y+'%;width:'+imageScale+'%;transform:translate(-50%,-50%) rotate('+(d.imageRotation||0)+'deg)" />':'';
-    return '<div class="real-garment-preview preview-'+surface+' '+esc(className||'')+'"><div class="garment-depth"></div><img class="garment-photo '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" src="'+esc(garment)+'" alt="" style="transform:'+mirror+'"><span class="garment-tint '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" style="background:'+esc(palette[design.garmentColor]||design.garmentColor||palette.Navy)+';mask-image:url('+esc(garment)+');-webkit-mask-image:url('+esc(garment)+');transform:'+mirror+'"></span><div class="garment-print-zone '+zone+'">'+text+image+'</div></div>';
+    const mirror=surface==="rightSleeve"?" scaleX(-1)":"",zone="zone-"+surface;
+    const layers=(d.layers?.length?d.layers:[
+      d.text?{type:'text',value:d.text,font:d.font,color:d.textColor,size:d.textSize,rotation:d.textRotation,position:d.positions.text,scale:d.textScale}:null,
+      d.uploadedImage?{type:'image',src:d.uploadedImage,size:d.imageSize,rotation:d.imageRotation,position:d.positions.image,scale:d.imageScale}:null
+    ].filter(Boolean));
+    const content=layers.map(l=>{
+      const pos=l.position||{x:50,y:50};
+      if(l.type==='text'){
+        const scale=Number(l.scale||Math.max(8,(l.size||30)*.72));
+        return '<span class="saved-design-text" style="left:'+Number(pos.x||0)+'%;top:'+Number(pos.y||0)+'%;color:'+esc(l.color||'#fff')+';font-family:'+esc(l.font||'Impact')+';font-size:'+scale+'cqw;transform:translate(-50%,-50%) rotate('+Number(l.rotation||0)+'deg)">'+esc(l.value||'')+'</span>';
+      }
+      if(l.type==='image'&&l.src){
+        const scale=Number(l.scale||Math.max(18,(l.size||82)*.46));
+        return '<img class="saved-design-image" src="'+esc(l.src)+'" alt="" style="left:'+Number(pos.x||0)+'%;top:'+Number(pos.y||0)+'%;width:'+scale+'%;transform:translate(-50%,-50%) rotate('+Number(l.rotation||0)+'deg)" />';
+      }
+      return '';
+    }).join('');
+    return '<div class="real-garment-preview preview-'+surface+' '+esc(className||'')+'"><div class="garment-depth"></div><img class="garment-photo '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" src="'+esc(garment)+'" alt="" style="transform:'+mirror+'"><span class="garment-tint '+(sleeve?'sleeve-preview ':'')+(surface==='rightSleeve'?'show-rightSleeve':'')+'" style="background:'+esc(palette[design.garmentColor]||design.garmentColor||palette.Navy)+';mask-image:url('+esc(garment)+');-webkit-mask-image:url('+esc(garment)+');transform:'+mirror+'"></span><div class="garment-print-zone '+zone+'">'+content+'</div></div>';
   }
 
   window.OneLineStore={palette,onlineImages,seedCategories,seedProducts,seedOrders,deliveryDefaults,printDefaults,icon,money,esc,load,save,getProducts,getOrders,getCart,getCategories,getDelivery,getPrints,getSettings,isDarkColor,productOptions,productImageForColor,surfaceDesign,designedSurfaces,designPreview};

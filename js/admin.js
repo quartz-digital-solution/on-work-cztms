@@ -28,7 +28,7 @@
     if(!allowed(state.view))state.view="products";
     state.orders=S.getOrders();
     root.innerHTML='<div class="admin-shell portal-'+role+'">'+
-      '<header class="admin-head"><a class="admin-logo" href="index.html">'+imageTag("one-line-mark.svg","One-Line")+'<span><b>ONE-LINE</b><small>'+roleLabel+'</small></span></a><button class="menu-toggle" data-action="menu">☰</button><nav class="admin-menu '+(state.menu?'open':'')+'">'+
+      '<header class="admin-head"><a class="admin-logo" href="index.html">'+imageTag("one-line-logo.webp","One-Line")+'<span><b>ONE-LINE</b><small>'+roleLabel+'</small></span></a><button class="menu-toggle" data-action="menu">☰</button><nav class="admin-menu '+(state.menu?'open':'')+'">'+
       nav("products","Products")+nav("add","Add Product")+(allowed("categories")?nav("categories","Categories"):"")+nav("orders","Orders")+(allowed("settings")?nav("settings","Settings"):"")+'<button data-action="open-store">Open store</button></nav></header>'+
       '<div class="status-card"><span>'+roleLabel+' portal · '+state.products.length+' products · '+state.categories.length+' categories · '+state.orders.length+' orders</span><div class="portal-switcher"><a href="admin.html">Admin</a><a href="staff.html">Staff</a><a href="management.html">Management</a><a href="receiver.html">Order receiving</a></div></div>'+
       '<main class="admin-main">'+view()+'</main><div class="toast" id="adminToast"></div></div>';
