@@ -1,17 +1,13 @@
-# Rebuild validation
+# v21 validation
 
-## Automated checks
+- Node syntax check passed for every JavaScript source file and service worker.
+- CSS brace validation passed for all CSS files.
+- Service-worker core cache references all resolve to real files.
+- No obsolete multi-uniform quick-customizer assets or selectors remain.
+- Product-gallery code has no pointer/touch drag handler; swiping is browser-native with CSS mandatory snapping and `scroll-snap-stop: always`.
+- Shirt recolour mask test confirmed pixels outside the supplied shirt mask are unchanged.
+- Fresh seed data contains 6 requested categories and exactly 10 retail products.
+- Existing-localStorage migration was tested to preserve existing matching records while adding missing requested categories/products.
+- Every individual project file is under 95,000 bytes.
 
-- JavaScript syntax checked with Node for every source file.
-- All local HTML/CSS/JS/image references checked to exist in the final folder.
-- Customer viewport contains no `user-scalable=no` restriction.
-- No global `touchmove`, wheel, `overscroll-behavior`, body fixed-scroll lock or visualViewport resize listener exists.
-- The only `touch-action` rules are scoped to direct manipulation targets (custom design layer / product image), not the page.
-- Local data/store functions validated for product loading, cart mutation and order creation.
-
-## Interaction design intentionally changed
-
-- The prior oversized catalogue heading/subcategory controls and the customizer's huge blank stage were discarded rather than patched.
-- Categories are full-bleed image cards.
-- Ready-made product cards use Add to cart, not a global/floating contact action.
-- The custom uniform CTA is the only prominent WhatsApp customization enquiry on the homepage.
+Real-device touch feel should still be checked after deployment because browser/OS scrolling physics differ slightly by device.

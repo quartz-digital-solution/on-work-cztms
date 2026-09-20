@@ -1,3 +1,10 @@
-One-Line 20260915-r7
+One-Line v21 — 2026-09-20
 
-Supersedes r4. See README.md for routes and credentials, DATA_MODEL.md for the local data architecture, and TEST_REPORT.md for verified work and pending real-browser/device checks.
+Focused corrections:
+- Removed custom product-image drag/swipe interception. Product galleries now use native browser horizontal scrolling plus one-image CSS snap points.
+- Replaced the previous multi-uniform recolour section with one shirt-colour customizer based on the supplied HTML mask/recolour method.
+- Admin can save image-only catalogue items with no product name, description or price; category is required and subcategory remains optional.
+- Added requested catalogue categories: T-Shirts, Uniforms, Sportswear, Shirts, Tags & Labels, Uniform Shoes.
+- Added 4 subcategory labels per category and 10 retail seed products.
+- Added one-time migration so existing browsers receive the new requested categories/products without overwriting existing matching products.
+- Kept the unlimited custom-design text/image layer support from the prior build.

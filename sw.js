@@ -1,4 +1,4 @@
-const CACHE='one-line-v20-20260919-smooth-unlimited-uniforms';
+const CACHE='one-line-v21-final-20260920';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./b2b.html',
   './css/styles-1.css','./css/styles-2.css','./css/styles-3.css','./css/admin.css','./css/site.css',
@@ -6,10 +6,7 @@ const CORE=[
   './one-line-logo.webp','./favicon.png','./icon-192.png','./icon-512.png','./manifest.webmanifest',
   './assets/tshirts-category.webp','./assets/crew-tee.webp','./assets/crew-tee-back.webp','./assets/polo-shirt.webp',
   './assets/polo-shirt-back.webp','./assets/sports-jersey.webp','./assets/sports-jersey-back.webp','./assets/sleeve-side-neutral.webp','./assets/contact-support.webp',
-  './assets/uniform-quick/uniform-1.webp','./assets/uniform-quick/uniform-1-shirt-mask.png',
-  './assets/uniform-quick/uniform-2.webp','./assets/uniform-quick/uniform-2-blue-mask.png',
-  './assets/uniform-quick/uniform-3.webp','./assets/uniform-quick/uniform-3-shirt-mask.png',
-  './assets/uniform-quick/uniform-4.webp','./assets/uniform-quick/uniform-4-navy-mask.png','./assets/uniform-quick/uniform-4-cream-mask.png'
+  './assets/fast-uniform/shirt-preview.webp','./assets/fast-uniform/shirt-mask.png'
 ];
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)));});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));await self.clients.claim();})());});

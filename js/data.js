@@ -22,15 +22,17 @@
     label2: "https://images.pexels.com/photos/28504904/pexels-photo-28504904.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     label3: "https://images.pexels.com/photos/28460403/pexels-photo-28460403.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
     shirt: "https://images.pexels.com/photos/2491123/pexels-photo-2491123.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
-    shirt2: "https://images.pexels.com/photos/10041268/pexels-photo-10041268.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop"
+    shirt2: "https://images.pexels.com/photos/10041268/pexels-photo-10041268.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop",
+    uniformShoe: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=900&h=1200&fit=crop"
   };
 
   const seedCategories = [
-    { id:"cat-tshirts", name:"T-Shirts", sub:"Crew · Oversized · Polo", code:"01", tone:"acid", image:onlineImages.tshirtBlack },
-    { id:"cat-uniforms", name:"Uniforms", sub:"School · Office · Staff", code:"02", tone:"paper", image:onlineImages.uniform },
-    { id:"cat-sports", name:"Sportswear", sub:"Jerseys · Shorts · Teams", code:"03", tone:"blue", image:onlineImages.jerseyGreen },
-    { id:"cat-shirts", name:"Shirts", sub:"Formal · Casual · Workwear", code:"04", tone:"clay", image:onlineImages.shirt },
-    { id:"cat-tags", name:"Tags & Labels", sub:"Woven · Printed · Hang tags", code:"05", tone:"paper", image:onlineImages.label }
+    { id:"cat-tshirts", name:"T-Shirts", sub:"Crew Neck · Polo · Oversized · Round Neck", code:"01", tone:"acid", image:onlineImages.tshirtBlack },
+    { id:"cat-uniforms", name:"Uniforms", sub:"School · Office · Staff · Hospitality", code:"02", tone:"paper", image:onlineImages.uniform },
+    { id:"cat-sports", name:"Sportswear", sub:"Jerseys · Tracksuits · Shorts · Teamwear", code:"03", tone:"blue", image:onlineImages.jerseyGreen },
+    { id:"cat-shirts", name:"Shirts", sub:"Formal · Casual · Workwear · Oxford", code:"04", tone:"clay", image:onlineImages.shirt },
+    { id:"cat-tags", name:"Tags & Labels", sub:"Woven · Printed · Hang Tags · Size Labels", code:"05", tone:"paper", image:onlineImages.label },
+    { id:"cat-uniform-shoes", name:"Uniform Shoes", sub:"School Shoes · Formal Shoes · Safety Shoes · Sports Shoes", code:"06", tone:"paper", image:onlineImages.uniformShoe }
   ];
 
   const cv = (color, image, sizes) => ({ color, image, sizes: sizes.slice() });
@@ -40,38 +42,62 @@
       price:449, mrp:599, image:onlineImages.tshirtBlack, images:[onlineImages.tshirtBlack,onlineImages.tshirtWhite], type:"Colour + Option",
       colors:["Black","White","Olive"], sizes:["S","M","L","XL","XXL"], optionTitle:"Size", stock:42,
       colorVariants:[cv("Black",onlineImages.tshirtBlack,["S","M","L","XL","XXL"]),cv("White",onlineImages.tshirtWhite,["S","M","L","XL","XXL"]),cv("Olive",onlineImages.tshirtOlive,["S","M","L","XL"])],
-      description:"240 GSM combed cotton with a structured fit, reinforced neck and clean ready-made finish. Customer customization is handled separately by enquiry."
+      description:"240 GSM combed cotton with a structured fit and reinforced neck."
     },
     {
       id:2, audience:"retail", name:"Performance Team Jersey", category:"Sportswear", subcategory:"Jerseys",
       price:649, mrp:799, image:onlineImages.jerseyGreen, images:[onlineImages.jerseyGreen,onlineImages.jerseyWhite,onlineImages.jerseyYellow], type:"Colour + Option",
       colors:["Green","White","Yellow"], sizes:["S","M","L","XL"], optionTitle:"Size", stock:28,
       colorVariants:[cv("Green",onlineImages.jerseyGreen,["S","M","L","XL"]),cv("White",onlineImages.jerseyWhite,["S","M","L","XL"]),cv("Yellow",onlineImages.jerseyYellow,["S","M","L","XL"])],
-      description:"Breathable team jersey ready to order. Ask us on WhatsApp for custom names, numbers or full team artwork.",
-      subItem:{name:"Matching sports shorts",price:299,type:"Colour + Option",optionTitle:"Size",colors:["Green","White","Yellow"],sizes:["S","M","L","XL"],image:onlineImages.jerseyGreen,images:[onlineImages.jerseyGreen,onlineImages.jerseyWhite,onlineImages.jerseyYellow],colorVariants:[cv("Green",onlineImages.jerseyGreen,["S","M","L","XL"]),cv("White",onlineImages.jerseyWhite,["S","M","L","XL"]),cv("Yellow",onlineImages.jerseyYellow,["S","M","L","XL"])]}
+      description:"Breathable team jersey for sports and group orders."
     },
     {
       id:3, audience:"retail", name:"Executive Uniform Shirt", category:"Uniforms", subcategory:"Office",
       price:720, mrp:890, image:onlineImages.uniform, images:[onlineImages.uniform,onlineImages.uniform2], type:"Colour + Option", colors:["White","Sky","Sand"], sizes:["38","40","42","44"], optionTitle:"Size", stock:35,
       colorVariants:[cv("White",onlineImages.uniform,["38","40","42","44"]),cv("Sky",onlineImages.uniform,["38","40","42","44"]),cv("Sand",onlineImages.uniform,["38","40","42","44"])],
-      description:"Professional ready-made uniform shirt for office and staff use. Contact us separately for logo embroidery or custom uniform production."
+      description:"Professional ready-made uniform shirt for office and staff use."
     },
     {
       id:4, audience:"retail", name:"Premium Polo T-Shirt", category:"T-Shirts", subcategory:"Polo",
       price:599, mrp:749, image:onlineImages.polo, images:[onlineImages.polo,onlineImages.polo2], type:"Colour + Option", colors:["Grey","Green","Pink"], sizes:["M","L","XL","XXL"], optionTitle:"Size", stock:31,
       colorVariants:[cv("Grey",onlineImages.polo,["M","L","XL","XXL"]),cv("Green",onlineImages.polo,["M","L","XL"]),cv("Pink",onlineImages.polo,["M","L","XL"])],
-      description:"Soft polo for staff, events and everyday business wear. Ready-made orders are not edited inside the customizer."
+      description:"Soft polo for staff, events and everyday business wear."
     },
     {
       id:5, audience:"retail", name:"Woven Brand Label Set", category:"Tags & Labels", subcategory:"Woven Labels",
       price:380, mrp:450, image:onlineImages.label, images:[onlineImages.label,onlineImages.label2,onlineImages.label3], type:"One Option", colors:[], sizes:["50 pcs","100 pcs","250 pcs"], optionTitle:"Pack quantity", stock:18,
-      description:"Ready-made sample label packs. For your own logo, material or dimensions, use the WhatsApp customization enquiry."
+      description:"Sample woven label packs in common garment sizes."
     },
     {
       id:6, audience:"retail", name:"Classic Work Shirt", category:"Shirts", subcategory:"Formal",
       price:799, mrp:999, image:onlineImages.shirt, images:[onlineImages.shirt,onlineImages.shirt2,onlineImages.uniform2], type:"Colour + Option", colors:["Blue","White"], sizes:["38","40","42","44"], optionTitle:"Size", stock:23,
       colorVariants:[cv("Blue",onlineImages.shirt,["38","40","42","44"]),cv("White",onlineImages.shirt,["38","40","42","44"])],
-      description:"A formal ready-made shirt with a clean finish for office and uniform use."
+      description:"A formal ready-made shirt with a clean finish for office use."
+    },
+    {
+      id:7, audience:"retail", name:"Oversized Cotton Tee", category:"T-Shirts", subcategory:"Oversized",
+      price:549, mrp:699, image:onlineImages.tshirtOlive, images:[onlineImages.tshirtOlive,onlineImages.tshirtWhite], type:"Colour + Option",
+      colors:["Olive","White","Black"], sizes:["S","M","L","XL"], optionTitle:"Size", stock:30,
+      colorVariants:[cv("Olive",onlineImages.tshirtOlive,["S","M","L","XL"]),cv("White",onlineImages.tshirtWhite,["S","M","L","XL"]),cv("Black",onlineImages.tshirtBlack,["S","M","L","XL"])],
+      description:"Relaxed oversized cotton T-shirt."
+    },
+    {
+      id:8, audience:"retail", name:"School Uniform Set", category:"Uniforms", subcategory:"School",
+      price:899, mrp:1099, image:onlineImages.uniform2, images:[onlineImages.uniform2,onlineImages.uniform], type:"One Option",
+      colors:[], sizes:["24","26","28","30","32","34"], optionTitle:"Size", stock:40,
+      description:"School uniform set for regular daily use."
+    },
+    {
+      id:9, audience:"retail", name:"Oxford Casual Shirt", category:"Shirts", subcategory:"Oxford",
+      price:849, mrp:1049, image:"assets/oxford-shirt.webp", images:["assets/oxford-shirt.webp",onlineImages.shirt2], type:"One Option",
+      colors:[], sizes:["38","40","42","44"], optionTitle:"Size", stock:22,
+      description:"Oxford-style shirt for casual and uniform use."
+    },
+    {
+      id:10, audience:"retail", name:"School Uniform Shoes", category:"Uniform Shoes", subcategory:"School Shoes",
+      price:799, mrp:999, image:onlineImages.uniformShoe, images:[onlineImages.uniformShoe], type:"One Option",
+      colors:[], sizes:["1","2","3","4","5","6","7","8"], optionTitle:"UK size", stock:45,
+      description:"Everyday school uniform shoes with a clean formal look."
     },
     { id:1001, audience:"b2b", name:"180 GSM Cotton Fabric Roll", category:"T-Shirts", subcategory:"Raw Material", price:0, mrp:0, image:onlineImages.tshirtOlive, images:[onlineImages.tshirtOlive], type:"One Option", colors:[], sizes:["25 kg roll","50 kg roll"], optionTitle:"Roll", stock:100, description:"B2B raw fabric supply. Price depends on colour, quantity and current material rate." },
     { id:1002, audience:"b2b", name:"Pique Polo Fabric", category:"T-Shirts", subcategory:"Raw Material", price:0, mrp:0, image:onlineImages.polo, images:[onlineImages.polo], type:"One Option", colors:[], sizes:["25 kg roll","50 kg roll"], optionTitle:"Roll", stock:100, description:"Pique material for polo production. Ask for current wholesale price." },
@@ -129,10 +155,41 @@
     return walk(value);
   }
   function save(key,value){ localStorage.setItem(key,JSON.stringify(value)); window.dispatchEvent(new CustomEvent("one-line-change",{detail:{key}})); }
-  function getProducts(){ return migrateKnownAssets(load("custom-store-products-v3",seedProducts)); }
+  function getProducts(){
+    let list=migrateKnownAssets(load("custom-store-products-v3",seedProducts));
+    // v21 is a one-time, non-destructive catalogue migration for browsers that already
+    // have the older demo catalogue saved in localStorage. Existing products win.
+    try{
+      if(localStorage.getItem("one-line-v21-products-migrated")!=="1"){
+        const ids=new Set(list.map(x=>String(x?.id)));
+        seedProducts.forEach(x=>{if(!ids.has(String(x.id)))list.push(clone(x));});
+        localStorage.setItem("custom-store-products-v3",JSON.stringify(list));
+        localStorage.setItem("one-line-v21-products-migrated","1");
+      }
+    }catch(_){}
+    return list;
+  }
   function getOrders(){ return load("custom-store-orders-v3",seedOrders); }
   function getCart(){ return load("custom-store-cart-v3",[]); }
-  function getCategories(){ return migrateKnownAssets(load("custom-store-categories-v3",seedCategories)); }
+  function getCategories(){
+    let list=migrateKnownAssets(load("custom-store-categories-v3",seedCategories));
+    try{
+      if(localStorage.getItem("one-line-v21-categories-migrated")!=="1"){
+        const byName=new Map(list.map((x,i)=>[String(x?.name||"").toLowerCase(),i]));
+        seedCategories.forEach(seed=>{
+          const key=seed.name.toLowerCase(),idx=byName.get(key);
+          if(idx===undefined){list.push(clone(seed));byName.set(key,list.length-1);}
+          else{
+            // Keep the owner's image/tone, but update the requested 4+ subcategory caption.
+            list[idx]={...list[idx],sub:seed.sub};
+          }
+        });
+        localStorage.setItem("custom-store-categories-v3",JSON.stringify(list));
+        localStorage.setItem("one-line-v21-categories-migrated","1");
+      }
+    }catch(_){}
+    return list;
+  }
   function getDelivery(){ return load("custom-store-delivery-v3",deliveryDefaults); }
   function getPrints(){ return load("custom-store-print-types-v3",printDefaults); }
   function getSettings(){ return load("custom-store-settings-v3",{whatsapp:"",b2bId:"B2B",b2bPassword:"1234"}); }
