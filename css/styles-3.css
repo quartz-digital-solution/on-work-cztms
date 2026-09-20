@@ -859,3 +859,23 @@ img{-webkit-user-drag:none}
   .fast-uniform-section .section-heading .fast-uniform-enquire{height:46px!important;min-width:0!important;flex:1 1 auto!important;max-width:220px!important}
   .control-head-actions{gap:6px}.compact-controls .control-head .designer-section-share{width:28px;height:28px}
 }
+
+
+/* v25 spacing polish fixes */
+.product-full-info .size-options{display:flex!important;flex-wrap:wrap!important;gap:10px!important;align-items:stretch!important}
+.product-full-info .size-options button{width:56px!important;min-width:56px!important;height:56px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;line-height:1!important;font-size:12px!important;font-weight:800!important}
+.product-full-info .selection-block>label{display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:wrap!important}
+.product-full-info .selection-block>label b{display:inline-flex!important;align-items:center!important;line-height:1!important}
+.product-full-info .subitem-controls .size-options{max-width:388px}
+
+@media(max-width:760px){
+  .fast-uniform-section .section-heading{display:block!important}
+  .fast-uniform-section .section-heading>div:first-child{max-width:none!important}
+  .fast-uniform-section .section-heading h2{max-width:none!important}
+  .fast-uniform-section .section-heading p{max-width:none!important}
+  .fast-uniform-heading-actions{margin-top:14px!important;width:100%!important;display:grid!important;grid-template-columns:46px minmax(0,1fr)!important;justify-content:flex-start!important;align-items:center!important}
+  .fast-uniform-section .section-heading .fast-uniform-enquire{max-width:none!important;width:100%!important}
+  .fast-uniform-section .section-heading .fast-uniform-enquire span{width:100%!important;text-align:center!important}
+  .product-full-info .size-options{gap:9px!important}
+  .product-full-info .size-options button{width:54px!important;min-width:54px!important;height:54px!important;font-size:11px!important}
+}
