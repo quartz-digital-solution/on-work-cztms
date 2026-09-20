@@ -99,6 +99,39 @@
       colors:[], sizes:["1","2","3","4","5","6","7","8"], optionTitle:"UK size", stock:45,
       description:"Everyday school uniform shoes with a clean formal look."
     },
+    {
+      id:21, audience:"retail", name:"Kids Green Primary Polo Uniform", category:"Uniforms", subcategory:"School",
+      price:699, mrp:849, image:"assets/kids-uniform-green-polo.webp", images:["assets/kids-uniform-green-polo.webp"], type:"One Option",
+      colors:[], sizes:["22","24","26","28","30","32","34"], optionTitle:"Size", stock:36,
+      description:"Comfortable kids school polo uniform for everyday class wear.",
+      subItem:{name:"Matching Black Stripe Shorts",price:299,type:"One Option",optionTitle:"Size",colors:[],sizes:["22","24","26","28","30","32","34"],colorVariants:[],images:["https://img-lcwaikiki.mncdn.com/mnpadding/1020/1360/ffffff/pim/productimages/20261/9295494/v1/l_20261-s6r648z4-cvl_u1.jpg"],image:"https://img-lcwaikiki.mncdn.com/mnpadding/1020/1360/ffffff/pim/productimages/20261/9295494/v1/l_20261-s6r648z4-cvl_u1.jpg"}
+    },
+    {
+      id:22, audience:"retail", name:"Kids Blue & Grey School Polo", category:"Uniforms", subcategory:"School",
+      price:749, mrp:899, image:"assets/kids-uniform-blue-grey.webp", images:["assets/kids-uniform-blue-grey.webp"], type:"One Option",
+      colors:[], sizes:["22","24","26","28","30","32","34"], optionTitle:"Size", stock:32,
+      description:"Smart two-tone school polo uniform for kids with a clean contrast finish.",
+      subItem:{name:"Matching Grey School Shorts",price:319,type:"One Option",optionTitle:"Size",colors:[],sizes:["22","24","26","28","30","32","34"],colorVariants:[],images:["https://www.childsplayclothing.com/cdn/shop/files/ZECNO043_GREY_1.jpg?v=1722568950&width=1200"],image:"https://www.childsplayclothing.com/cdn/shop/files/ZECNO043_GREY_1.jpg?v=1722568950&width=1200"}
+    },
+    {
+      id:23, audience:"retail", name:"Kids Yellow Contrast Polo Uniform", category:"Uniforms", subcategory:"School",
+      price:689, mrp:829, image:"assets/kids-uniform-yellow-black.webp", images:["assets/kids-uniform-yellow-black.webp"], type:"One Option",
+      colors:[], sizes:["22","24","26","28","30","32","34"], optionTitle:"Size", stock:34,
+      description:"Bright kids school polo with contrast collar and sleeve detailing."
+    },
+    {
+      id:24, audience:"retail", name:"Kids Cream & Navy School Uniform", category:"Uniforms", subcategory:"School",
+      price:799, mrp:949, image:"assets/kids-uniform-cream-navy.webp", images:["assets/kids-uniform-cream-navy.webp"], type:"One Option",
+      colors:[], sizes:["22","24","26","28","30","32","34"], optionTitle:"Size", stock:30,
+      description:"Premium cream and navy kids school polo uniform with classic contrast styling.",
+      subItem:{name:"Matching Navy School Shorts",price:329,type:"One Option",optionTitle:"Size",colors:[],sizes:["22","24","26","28","30","32","34"],colorVariants:[],images:["https://cdn11.bigcommerce.com/s-c4af4/images/stencil/1280w/products/82/1152/BS3078-NAVY-FRONT-LORES__37344.1740759380.jpg"],image:"https://cdn11.bigcommerce.com/s-c4af4/images/stencil/1280w/products/82/1152/BS3078-NAVY-FRONT-LORES__37344.1740759380.jpg"}
+    },
+    {
+      id:25, audience:"retail", name:"Kids Yellow Primary Polo Uniform", category:"Uniforms", subcategory:"School",
+      price:679, mrp:819, image:"assets/kids-uniform-yellow-polo.webp", images:["assets/kids-uniform-yellow-polo.webp"], type:"One Option",
+      colors:[], sizes:["22","24","26","28","30","32","34"], optionTitle:"Size", stock:38,
+      description:"Simple bright primary-school polo uniform for boys and girls."
+    },
     { id:1001, audience:"b2b", name:"180 GSM Cotton Fabric Roll", category:"T-Shirts", subcategory:"Raw Material", price:0, mrp:0, image:onlineImages.tshirtOlive, images:[onlineImages.tshirtOlive], type:"One Option", colors:[], sizes:["25 kg roll","50 kg roll"], optionTitle:"Roll", stock:100, description:"B2B raw fabric supply. Price depends on colour, quantity and current material rate." },
     { id:1002, audience:"b2b", name:"Pique Polo Fabric", category:"T-Shirts", subcategory:"Raw Material", price:0, mrp:0, image:onlineImages.polo, images:[onlineImages.polo], type:"One Option", colors:[], sizes:["25 kg roll","50 kg roll"], optionTitle:"Roll", stock:100, description:"Pique material for polo production. Ask for current wholesale price." },
     { id:1003, audience:"b2b", name:"Sports Jersey Fabric", category:"Sportswear", subcategory:"Raw Material", price:0, mrp:0, image:onlineImages.jerseyWhite, images:[onlineImages.jerseyWhite], type:"One Option", colors:[], sizes:["25 kg roll","50 kg roll"], optionTitle:"Roll", stock:100, description:"Quick-dry sports fabric for teamwear manufacturers and resellers." }
@@ -165,6 +198,12 @@
         seedProducts.forEach(x=>{if(!ids.has(String(x.id)))list.push(clone(x));});
         localStorage.setItem("custom-store-products-v3",JSON.stringify(list));
         localStorage.setItem("one-line-v21-products-migrated","1");
+      }
+      if(localStorage.getItem("one-line-v24-uniforms-migrated")!=="1"){
+        const ids=new Set(list.map(x=>String(x?.id)));
+        seedProducts.filter(x=>Number(x.id)>=21&&Number(x.id)<=25).forEach(x=>{if(!ids.has(String(x.id)))list.push(clone(x));});
+        localStorage.setItem("custom-store-products-v3",JSON.stringify(list));
+        localStorage.setItem("one-line-v24-uniforms-migrated","1");
       }
     }catch(_){}
     return list;

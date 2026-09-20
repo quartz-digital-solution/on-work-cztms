@@ -1,4 +1,4 @@
-const CACHE='one-line-v23-final-20260920';
+const CACHE='one-line-v24-focused-20260920';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./b2b.html',
   './css/styles-1.css','./css/styles-2.css','./css/styles-3.css','./css/admin.css','./css/site.css',
@@ -6,7 +6,8 @@ const CORE=[
   './one-line-logo.webp','./favicon.png','./icon-192.png','./icon-512.png','./manifest.webmanifest',
   './assets/tshirts-category.webp','./assets/crew-tee.webp','./assets/crew-tee-back.webp','./assets/polo-shirt.webp',
   './assets/polo-shirt-back.webp','./assets/sports-jersey.webp','./assets/sports-jersey-back.webp','./assets/sleeve-side-neutral.webp','./assets/contact-support.webp',
-  './assets/fast-uniform/shirt-preview.webp','./assets/fast-uniform/shirt-mask.png'
+  './assets/fast-uniform/shirt-preview.webp','./assets/fast-uniform/shirt-mask.png',
+  './assets/kids-uniform-green-polo.webp','./assets/kids-uniform-blue-grey.webp','./assets/kids-uniform-yellow-black.webp','./assets/kids-uniform-cream-navy.webp','./assets/kids-uniform-yellow-polo.webp'
 ];
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)));});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));await self.clients.claim();})());});

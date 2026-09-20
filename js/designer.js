@@ -127,6 +127,12 @@
       root._openGarmentColourPicker=()=>{setFromHex(customColourValue());overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.documentElement.classList.add('fast-picker-lock');document.body.classList.add('fast-picker-lock');};
     }
 
+    async function shareDesigner(){
+      const url=new URL(location.href);url.searchParams.delete('section');url.hash='customize';const value=url.toString();
+      try{if(navigator.share){await navigator.share({title:'One-Line apparel customizer',text:'Customize an apparel design',url:value});return;}if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return;}}catch(err){if(err?.name==='AbortError')return;}
+      try{const ta=document.createElement('textarea');ta.value=value;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(_){}
+    }
+
     function render(){
       const sleeve=state.surface.includes("Sleeve"),src=garmentSrc(),dark=S.isDarkColor(state.color),maxSize=resizeMax();
       root.innerHTML='<main class="designer-page compact-designer old-model-designer unlimited-layer-designer">'+
@@ -138,7 +144,7 @@
             '<img class="garment-photo '+(sleeve?'sleeve-photo ':'')+(state.surface==='rightSleeve'?'mirror-sleeve':'')+'" src="'+src+'" alt="'+S.esc(state.model.name+' '+surfaceLabel())+'" draggable="false">'+
             '<div class="garment-tint '+(sleeve?'sleeve-tint ':'')+(state.surface==='rightSleeve'?'mirror-sleeve':'')+'" style="background:'+colourValue(state.color)+';mask-image:url('+src+');-webkit-mask-image:url('+src+')"></div>'+
             '<div class="print-area surface-'+state.surface+'" data-print-area>'+current().layers.map(layerHtml).join('')+'</div></div></div><p class="drag-hint">'+I('move')+' Move any layer · pinch or corner handle to resize/rotate · double tap text to edit</p></section>'+
-          '<aside class="designer-controls compact-controls"><div class="control-head"><span>DESIGN CONTROLS</span><small>'+surfaceLabel()+'</small></div>'+
+          '<aside class="designer-controls compact-controls"><div class="control-head"><span>DESIGN CONTROLS</span><div class="control-head-actions"><small>'+surfaceLabel()+'</small><button type="button" class="designer-section-share" data-action="share-designer" aria-label="Share customizer">'+I('share')+'</button></div></div>'+
             '<section class="control-block garment-colour-control"><label>Garment colour</label><div class="swatches garment-colour-swatches">'+presetColours.map(c=>'<button aria-label="'+c+'" title="'+c+'" data-action="color" data-value="'+c+'" class="'+(state.color===c?'active':'')+'" style="background:'+S.palette[c]+'">'+(state.color===c?I('check'):'')+'</button>').join('')+'<button type="button" aria-label="Choose any colour" title="Choose any colour" data-action="custom-color-open" class="custom-colour-swatch '+(usingCustomColour()?'active':'')+'"></button></div><button type="button" class="choose-any-colour-row" data-action="custom-color-open"><span><i style="background:'+customColourValue()+'"></i>Choose any colour</span>'+I('chevron')+'</button></section>'+
             '<div class="quick-layer-tools unlimited-add-tools"><button data-action="add-text">'+I('type')+'<span>Add text</span></button><button data-action="choose-image">'+I('image')+'<span>Add image</span></button><input data-file hidden type="file" accept="image/*" multiple></div>'+
             '<section class="control-block material-quality-control"><label>Cloth type</label><div class="material-quality-cards">'+materials.map(m=>'<button data-action="material-card" data-value="'+S.esc(m.name)+'" class="'+(m.name===state.material.name?'active':'')+'"><span><b>'+S.esc(m.name)+'</b><strong>'+S.money(m.price)+'</strong></span><small>'+S.esc(m.note)+'</small></button>').join('')+'</div></section>'+
@@ -200,6 +206,7 @@
         else if(a==='select-layer'){state.active=el.dataset.layerId;state.pickerOpen=null;saveDraft();render();}
         else if(a==='color'){state.color=el.dataset.value;if(S.isDarkColor(state.color)&&chosenPrint().lightOnly)state.printType=state.printMethods.find(p=>!p.lightOnly)?.name||'DTF Print';saveDraft();render();}
         else if(a==='custom-color-open'){root._openGarmentColourPicker?.();}
+        else if(a==='share-designer'){shareDesigner();}
         else if(a==='remove-layer'){e.preventDefault();e.stopPropagation();removeLayer(el.dataset.layerId);}
         else if(a==='print'){if(el.disabled)return;state.printType=el.dataset.value;saveDraft();render();}
         else if(a==='reset-image'){const l=activeLayer();if(l?.type==='image'){l.rotation=0;saveDraft();render();}}
