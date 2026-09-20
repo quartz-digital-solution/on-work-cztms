@@ -1,4 +1,4 @@
-const CACHE='one-line-v21-final-20260920';
+const CACHE='one-line-v22-final-20260920';
 const CORE=[
   './index.html','./admin.html','./staff.html','./management.html','./receiver.html','./b2b.html',
   './css/styles-1.css','./css/styles-2.css','./css/styles-3.css','./css/admin.css','./css/site.css',

@@ -193,7 +193,7 @@
   function getDelivery(){ return load("custom-store-delivery-v3",deliveryDefaults); }
   function getPrints(){ return load("custom-store-print-types-v3",printDefaults); }
   function getSettings(){ return load("custom-store-settings-v3",{whatsapp:"",b2bId:"B2B",b2bPassword:"1234"}); }
-  function isDarkColor(name){ return ["black","navy","maroon","olive","green","blue","charcoal","brown"].some(x=>String(name||"").toLowerCase().includes(x)); }
+  function isDarkColor(name){ const value=String(name||'').trim().toLowerCase(); if(/^#[0-9a-f]{6}$/i.test(value)){const n=parseInt(value.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255; return (r*.2126+g*.7152+b*.0722)<155;} return ["black","navy","maroon","olive","green","blue","charcoal","brown","purple"].some(x=>value.includes(x)); }
   function productOptions(product){
     if(product?.type==="Simple") return [];
     if(Array.isArray(product?.colorVariants) && product.colorVariants.length) return [...new Set(product.colorVariants.flatMap(v=>v.sizes||[]))];
